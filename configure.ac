@@ -1,0 +1,15 @@
+
+AC_INIT(libccp4c, 5.0.2-ysbl-2, emsley@ysbl.york.ac.uk)
+AC_CONFIG_SRCDIR([ccp4_vars.h])
+
+AM_INIT_AUTOMAKE
+AC_PROG_CC
+AC_PROG_LIBTOOL
+AC_PROG_RANLIB
+
+AC_HEADER_STDC([])
+
+AC_CONFIG_FILES([
+Makefile])
+AC_OUTPUT
+
