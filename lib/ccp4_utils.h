@@ -53,6 +53,7 @@
 #include <string.h>
 #include "ccp4_types.h"
 #include "library_file.h"
+static char rcsidh[] = "$Id: ccp4_utils.h,v 1.3 2004/01/23 16:32:52 pjx Exp $";
 
 #ifdef __cplusplus
 namespace CCP4 {

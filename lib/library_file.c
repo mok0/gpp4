@@ -39,7 +39,7 @@
      to the CCP4 Secretary, Daresbury Laboratory, Warrington WA4 4AD, UK.
      The GNU Lesser General Public can also be obtained by writing to the
      Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-     MA 02111-1307 USA
+     MA 02111-1307 USA 
 */
 
 /** @file library_file.c
@@ -56,8 +56,9 @@
 #include "library_file.h"
 #include "ccp4_errno.h"
 #include "ccp4_file_err.h"
-
-static uint16 nativeIT = NATIVEIT; /* machine integer type */
+static char rcsid[] = "$Id: library_file.c,v 1.14 2004/06/29 11:03:16 mdw Exp $";
+                                                        
+static uint16 nativeIT = NATIVEIT; /* machine integer type */ 
 static uint16 nativeFT = NATIVEFT; /* machine float type */
 
 static int _item_sizes[] = {
@@ -89,7 +90,7 @@ static int (*_write_mode[])(CCP4File *, const uint8 *, size_t) = {
   ccp4_file_writeshortcomp,
   ccp4_file_writecomp,
   NULL,
-  ccp4_file_writeint
+  ccp4_file_writeint    
 };
 
 /**
@@ -107,7 +108,7 @@ static void vaxF2ieeeF(union float_uint_uchar *buffer, const unsigned int size)
   unsigned int i;
 
   if ( buffer == NULL || size == 0) return;
-
+  
   for (i = 0; i < size; i++) {
     exp = (buffer[i].c[1] << 1) | (buffer[i].c[0] >> 7); /* extract exponent */
     if (!exp && !buffer[i].c[1])        /* zero value */
@@ -170,14 +171,14 @@ static void ieeeF2vaxF(union float_uint_uchar *buffer, const unsigned int size)
       else {                    /* infinity or NaN */
         if (exp == 254)         /* unrepresentable - OFL */
           /* set mant=0 for overflow */
-          out.c[0] = out.c[1] = out.c[2] = out.c[3] = 0;
+          out.c[0] = out.c[1] = out.c[2] = out.c[3] = 0; 
         out.c[0] &= 0x7f;       /* set last bit of exp to 0 */
         out.c[1] = 0x80;        /* sign=1 exp=0 -> OFL or NaN.  this will raise
                                    a reserved operand exception if used. */
       }
     } else if (buffer[i].c[1] & 0x60) { /* denormalized value */
       int shft;
-
+      
       shft = (buffer[i].c[1] & 0x40) ? 1 : 2; /* shift needed to normalize */
       /* shift mantissa */
       /* note last bit of exp set to 1 implicitly */
@@ -212,7 +213,7 @@ static void convexF2ieeeF(union float_uint_uchar *buffer, const unsigned int siz
   unsigned int i;
 
   if ( buffer == NULL || size == 0) return;
-
+  
   for (i = 0; i < size; i++) {
     exp = (buffer[i].c[0]<<1) | (buffer[i].c[1]>>7); /* extract exponent */
     if (!exp && !buffer[i].c[0])        /* zero value */
@@ -225,7 +226,7 @@ static void convexF2ieeeF(union float_uint_uchar *buffer, const unsigned int siz
       out.c[3] = buffer[i].c[3];
     } else if (exp) {           /* denormalized number */
       int shft;
-
+      
       out.c[0] = buffer[i].c[0] & 0x80; /* keep sign, zero exponent */
       shft = 3 - exp;
       /* shift original mant by 1 or 2 to get denormalized mant */
@@ -276,14 +277,14 @@ static void ieeeF2convexF(union float_uint_uchar *buffer, const unsigned int siz
       else {                    /* infinity or NaN */
         if (exp == 254)         /* unrepresentable - OFL */
           /* set mant=0 for overflow */
-          out.c[0] = out.c[1] = out.c[2] = out.c[3] = 0;
+          out.c[0] = out.c[1] = out.c[2] = out.c[3] = 0; 
         out.c[1] &= 0x7f;       /* set last bit of exp to 0 */
         out.c[0] = 0x80;        /* sign=1 exp=0 -> OFL or NaN.  this will raise
                                    a reserved operand exception if used. */
       }
     } else if (buffer[i].c[1] & 0x60) { /* denormalized value */
       int shft;
-
+      
       shft = (buffer[i].c[1] & 0x40) ? 1 : 2; /* shift needed to normalize */
       /* shift mantissa */
       /* note last bit of exp set to 1 implicitly */
@@ -318,18 +319,18 @@ static void ieeeF2convexF(union float_uint_uchar *buffer, const unsigned int siz
 int ccp4_file_raw_read(CCP4File *cfile, char *buffer, size_t n_items)
 {
   int result;
-
+  
   if (cfile->buffered && cfile->stream) {
     result = fread (buffer, (size_t) sizeof(char), n_items,
                     cfile->stream);
     if (result != n_items && feof(cfile->stream)) {
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_EOF),
-                  "ccp4_file_raw_read", NULL);
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_EOF), 
+		  "ccp4_file_raw_read", NULL); 
       cfile->iostat = CIO_EOF;
       result = EOF;
     } else if (result != n_items && ferror(cfile->stream)) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_raw_read", NULL);
-      cfile->iostat = CIO_ReadFail;
+      cfile->iostat = CIO_ReadFail; 
       result = 0; }
   } else {
 #if defined _MSC_VER
@@ -339,13 +340,13 @@ int ccp4_file_raw_read(CCP4File *cfile, char *buffer, size_t n_items)
 #endif
     if (n_items && result <= 0) {
       ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_ReadFail),
-                  "ccp4_file_raw_read", NULL);
+		  "ccp4_file_raw_read", NULL);
       cfile->iostat = CIO_ReadFail;
-      result = 0; }
+      result = 0; } 
   }
   cfile->last_op = READ_OP;
 
-  cfile->loc += result;
+  cfile->loc += result; 
   cfile->getbuff = 0;
 
   return result;
@@ -366,25 +367,25 @@ int ccp4_file_raw_read(CCP4File *cfile, char *buffer, size_t n_items)
 int ccp4_file_raw_write(CCP4File *cfile, const char *buffer, size_t n_items)
 {
   int result;
-
+  
   if (cfile->buffered && cfile->stream)
     result = fwrite (buffer, (size_t) sizeof(char), n_items,
                     cfile->stream);
-  else
-#if defined _MSC_VER
+  else 
+#if defined _MVS
     result = _write (cfile->fd, buffer, n_items);
 #else
     result = write (cfile->fd, buffer, n_items);
 #endif
-
+        
   cfile->last_op = WRITE_OP;
-
-  if (result == n_items)
-    cfile->loc += n_items;
+    
+  if (result == n_items) 
+    cfile->loc += n_items; 
   else {
     ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_WriteFail),
-                "ccp4_file_raw_write", NULL);
-    cfile->iostat = CIO_WriteFail;
+		"ccp4_file_raw_write", NULL);
+    cfile->iostat = CIO_WriteFail; 
     ccp4_file_tell(cfile); }
   cfile->length = MAX(cfile->loc,cfile->length);
   cfile->getbuff = 0;
@@ -408,36 +409,36 @@ int ccp4_file_raw_write(CCP4File *cfile, const char *buffer, size_t n_items)
 int ccp4_file_raw_seek(CCP4File *cfile, long offset, int whence)
 {
   int result = -1;
-
+      
   if (!cfile->direct)  {
     ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_raw_seek", NULL);
+		"ccp4_file_raw_seek", NULL);
     return result; }
-
+  
   if (cfile->buffered) {
 #if defined (__alpha) && defined (vms)
     (void) fflush (cfile->stream);
 #endif
     if (!(result = (fseek (cfile->stream,offset,whence))))
-      result = ftell(cfile->stream);
+      result = ftell(cfile->stream);   
   } else {
 #if defined _MSC_VER
      result = _lseek(cfile->fd,offset,whence);
 #else
      result = (int) lseek(cfile->fd, offset, whence);
 #endif
-  }
-
+  } 
+  
   cfile->last_op = IRRELEVANT_OP;
-
+  
   if (result ==  -1) {
     ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_SeekFail),
-                "ccp4_file_raw_seek", NULL);
+		"ccp4_file_raw_seek", NULL);
     cfile->iostat = CIO_SeekFail;
-  } else
+  } else 
     cfile->loc = result;
   cfile->getbuff = 0;
-
+  
   return (result);
 }
 
@@ -457,7 +458,7 @@ static void _file_free(CCP4File *cfile)
 /**
  * _file_init:
  * @param cfile ()
- *
+ * 
  * initialise cfile struct
  * @return cfile struct
  */
@@ -466,14 +467,14 @@ static CCP4File *_file_init()
   CCP4File *cfile = (CCP4File *) malloc(sizeof(CCP4File));
   char *foreign = getenv ("CONVERT_FROM");
   char *native = getenv ("NATIVEMTZ");
-
+  
   memset(cfile,'\0',sizeof(CCP4File));
   cfile->fd = -1;
   cfile->buffered = 1;
   cfile->binary = 1;
   cfile->last_op = IRRELEVANT_OP;
   cfile->mode = DEFMODE;
-  cfile->itemsize = _item_sizes[DEFMODE];
+  cfile->itemsize = _item_sizes[DEFMODE]; 
   if (native == NULL && foreign != NULL) {
     if (strcmp (foreign, "BEIEEE") == 0) {
       cfile->fconvert = DFNTF_BEIEEE ;
@@ -486,17 +487,17 @@ static CCP4File *_file_init()
       cfile->iconvert = DFNTI_IBO ; }
     else if (strcmp (foreign, "CONVEXNATIVE") == 0) {
       cfile->fconvert = DFNTF_CONVEXNATIVE ;
-      cfile->iconvert = DFNTI_MBO ; }
+      cfile->iconvert = DFNTI_MBO ; }  
   } else {
     cfile->fconvert = nativeFT;
     cfile->iconvert = nativeIT;
   }
   cfile->_read=_read_mode[DEFMODE];
-  cfile->_write=_write_mode[DEFMODE];
+  cfile->_write=_write_mode[DEFMODE]; 
   return (cfile);
 }
 
-/**
+/** 
  * _file_open_mode:
  * @param cfile (CCP4File *)
  * @param flag (const int) mode flag
@@ -513,13 +514,13 @@ static void _file_open_mode(CCP4File * cfile, const int flag)
   if (flag & O_TMP)
     cfile->scratch = 1;
   if (flag & (O_WRONLY | O_RDWR | O_APPEND) ) {
-    cfile->write = 1;
+    cfile->write = 1; 
     if (flag & O_RDWR)
       cfile->read = 1;
     if (flag & O_APPEND)
-      cfile->append = 1;
-  } else
-    cfile->read = 1;
+      cfile->append = 1; 
+  } else 
+    cfile->read = 1; 
 }
 
 /**
@@ -533,10 +534,10 @@ static void _file_open_mode(CCP4File * cfile, const int flag)
 static int _file_close (CCP4File *cfile)
 {
   int result = 0;
-
+  
   if(cfile->buffered && cfile->stream) {
     if (cfile->own)
-      result = fclose (cfile->stream);
+      result = fclose (cfile->stream); 
     else
       result = fflush(cfile->stream);
   } else {
@@ -547,11 +548,11 @@ static int _file_close (CCP4File *cfile)
       result = close (cfile->fd);
 #endif
   }
-
-  if (result == EOF)
+  
+  if (result == EOF) 
     cfile->iostat = CIO_CloseFail;
-  else
-    cfile->stream = NULL;
+  else 
+    cfile->stream = NULL; 
 
   return (result);
 }
@@ -561,7 +562,7 @@ static int _file_close (CCP4File *cfile)
  * @param cfile  (CCP4File *)
  *
  * is the @cfile writeable
- * @return 1 if true
+ * @return 1 if true 
  */
 int ccp4_file_is_write(const CCP4File *cfile)
 {
@@ -646,7 +647,7 @@ int ccp4_file_setstamp(CCP4File *cfile, const size_t offset)
 {
   if (!cfile) {
     ccp4_signal(CCP4_ERRLEVEL(3)| CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_setstamp", NULL);
+		"ccp4_file_setstamp", NULL);
     return EOF; }
 
   return ccp4_file_raw_setstamp(cfile, offset*cfile->itemsize);
@@ -658,19 +659,19 @@ int ccp4_file_setstamp(CCP4File *cfile, const size_t offset)
  * @param mode (int) io_mode
  *
  * set the data mode of cfile to mode
- * (BYTE (8 bit) = 0,
- *  INT16  (16 bit) = 1,
- *  INT32  (32 bit) = 6,
- *  FLOAT32 (32 bit) = 2,
- *  COMP32 (2*16 bit) = 3,
- *  COMP64 (2*32 bit) = 4).
+ * (BYTE (8 bit) = 0, 
+ *  INT16  (16 bit) = 1, 
+ *  INT32  (32 bit) = 6, 
+ *  FLOAT32 (32 bit) = 2, 
+ *  COMP32 (2*16 bit) = 3, 
+ *  COMP64 (2*32 bit) = 4).  
  * @return 0 on success, EOF on failure.
  */
 int ccp4_file_setmode (CCP4File *cfile, const int mode)
 {
   if (!cfile) {
     ccp4_signal(CCP4_ERRLEVEL(3)| CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_mode", NULL);
+		"ccp4_file_mode", NULL);
     return EOF; }
 
   if (mode >= 0 && mode <= 6 && mode != 5) {
@@ -680,7 +681,7 @@ int ccp4_file_setmode (CCP4File *cfile, const int mode)
     cfile->_write=_write_mode[mode];
   } else {
     ccp4_signal(CCP4_ERRLEVEL(3)| CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_mode", NULL);
+		"ccp4_file_mode", NULL);
     return EOF; }
 
   return  0;
@@ -690,7 +691,7 @@ int ccp4_file_setmode (CCP4File *cfile, const int mode)
  * ccp4_file_mode:
  * @param cfile  (CCP4File *)
  *
- * get data mode of @cfile (BYTE =0, INT16 =1, INT32=6, FLOAT32 =2,
+ * get data mode of @cfile (BYTE =0, INT16 =1, INT32=6, FLOAT32 =2, 
  * COMP32 =3, COMP64 =4)
  * @return %mode
  */
@@ -698,9 +699,9 @@ int ccp4_file_mode (const CCP4File *cfile)
 {
   if (!cfile) {
     ccp4_signal(CCP4_ERRLEVEL(3)| CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_mode", NULL);
+		"ccp4_file_mode", NULL);
     return EOF; }
-
+    
   return (cfile->mode);
 }
 
@@ -714,7 +715,7 @@ int ccp4_file_itemsize(const CCP4File *cfile)
 {
   if (!cfile) {
     ccp4_signal(CCP4_ERRLEVEL(3)| CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_itemsize", NULL);
+		"ccp4_file_itemsize", NULL);
     return EOF; }
 
   return (cfile->itemsize);
@@ -747,7 +748,7 @@ const char *ccp4_file_name( CCP4File *cfile)
 int ccp4_file_setbyte(CCP4File *cfile, const int byte_order)
 {
   int result = (cfile->fconvert | (cfile->iconvert<<8));
-
+  
   switch (byte_order) {
   case DFNTF_BEIEEE:
     cfile->fconvert = DFNTF_BEIEEE;
@@ -755,11 +756,11 @@ int ccp4_file_setbyte(CCP4File *cfile, const int byte_order)
     break;
   case DFNTF_LEIEEE:
     cfile->fconvert = DFNTF_LEIEEE;
-    cfile->iconvert = DFNTI_IBO ;
+    cfile->iconvert = DFNTI_IBO ; 
     break;
   case DFNTF_VAX:
     cfile->fconvert = DFNTF_VAX ;
-    cfile->iconvert = DFNTI_IBO ;
+    cfile->iconvert = DFNTI_IBO ; 
     break;
   case DFNTF_CONVEXNATIVE:
     cfile->fconvert = DFNTF_CONVEXNATIVE ;
@@ -767,7 +768,7 @@ int ccp4_file_setbyte(CCP4File *cfile, const int byte_order)
     break;
   default:
     ccp4_signal(CCP4_ERRLEVEL(3)| CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_setbyte", NULL);
+		"ccp4_file_setbyte", NULL);
     result = 0;
   }
   return result;
@@ -793,7 +794,7 @@ int ccp4_file_byte(CCP4File *cfile)
  *
  * open @cfile with existing handle FILE struct file and mode @flag.
  * The struct stat is check to determine if file is a regular file,
- * if it is, and is not stdin, it is assumed to be direct access.
+ * if it is, and is not stdin, it is assumed to be direct access. 
  * @return (CCP4File *) on success, NULL on failure
  */
 CCP4File *ccp4_file_open_file (const FILE *file, const int flag)
@@ -812,14 +813,14 @@ CCP4File *ccp4_file_open_file (const FILE *file, const int flag)
 
   if (!(cfile = _file_init() ) ) {
       ccp4_signal(CCP4_ERRLEVEL(3),
-                  "ccp4_file_open_file", NULL);
+                  "ccp4_file_open_file", NULL);    
       return NULL; }
-
+          
   /* set values in structure */
   _file_open_mode(cfile,flag);
   cfile->stream = (FILE *) file;
   cfile->buffered = 1;
-  cfile->open = 1;
+  cfile->open = 1;   
 
 #if defined _MSC_VER
   _fstat(_fileno(cfile->stream), &st);
@@ -835,7 +836,7 @@ CCP4File *ccp4_file_open_file (const FILE *file, const int flag)
     cfile->direct = 1;
   }
   cfile->loc = ftell( (FILE *)file);
-
+  
   return cfile;
 }
 
@@ -845,9 +846,9 @@ CCP4File *ccp4_file_open_file (const FILE *file, const int flag)
  * @param flag (const int) io mode (O_RDONLY =0, O_WRONLY =1, O_RDWR =2,
  *        O_TMP =, O_APPEND =)
  *
- * initialise CCP4File struct with file descriptor @fd and mode @flag
+ * initialise CCP4File struct with file descriptor @fd and mode @flag 
  * The struct stat is check to determine if file is a regular file,
- * if it is, and is not stdin, it is assumed to be direct access.
+ * if it is, and is not stdin, it is assumed to be direct access. 
  * @return (CCP4File *) on success, NULL on failure
  */
 CCP4File *ccp4_file_open_fd (const int fd, const int flag)
@@ -861,12 +862,12 @@ CCP4File *ccp4_file_open_fd (const int fd, const int flag)
 
   if (!(cfile = _file_init() ) ) {
       ccp4_signal(CCP4_ERRLEVEL(3),
-                  "ccp4_file_open_fd", NULL);
+                  "ccp4_file_open_fd", NULL);    
       return NULL; }
-
-  _file_open_mode(cfile, flag);
+      
+  _file_open_mode(cfile, flag);      
   cfile->fd = fd;
-  cfile->open = 1;
+  cfile->open = 1;    
   cfile->buffered = 0;
 
 #if defined _MSC_VER
@@ -895,19 +896,19 @@ CCP4File *ccp4_file_open_fd (const int fd, const int flag)
 /**
  * ccp4_file_open:
  * @param filename (const char *) filename
- * @param flag (const int) i/o mode, possible values are O_RDONLY, O_WRONLY,
+ * @param flag (const int) i/o mode, possible values are O_RDONLY, O_WRONLY, 
  *      O_RDWR, O_APPEND, O_TMP, O_CREAT, O_TRUNC - see ccp4_sysdep.h
  *
  * initialise CCP4File struct for file filename with mode @flag.
  * If !buffered use open(), otherwise fopen()
   * The struct stat is check to determine if file is a regular file,
- * if it is, and is not stdin, it is assumed to be direct access.
+ * if it is, and is not stdin, it is assumed to be direct access. 
  *
  * @return (CCP4File *) on success, NULL on failure
  */
 CCP4File *ccp4_file_open (const char *filename, const int flag)
 {
-  CCP4File *cfile;
+  CCP4File *cfile; 
   int openflags = O_RDONLY;
   char fmode[5];
 #if defined _MSC_VER
@@ -915,7 +916,7 @@ CCP4File *ccp4_file_open (const char *filename, const int flag)
 #else
   struct stat st;
 #endif
-
+  
   if (!(cfile = _file_init())) {
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_open", NULL);
     return NULL; }
@@ -923,7 +924,7 @@ CCP4File *ccp4_file_open (const char *filename, const int flag)
 
   if (!cfile->buffered) {
     if (cfile->read && cfile->write) openflags = (O_RDWR | O_CREAT);
-    else if (cfile->write)  openflags = (O_WRONLY | O_CREAT);
+    else if (cfile->write)  openflags = (O_WRONLY | O_CREAT); 
     if (cfile->append) openflags |= O_APPEND;
     if (flag & O_TRUNC) openflags |= O_TRUNC;
 #if defined _MSC_VER
@@ -940,7 +941,7 @@ CCP4File *ccp4_file_open (const char *filename, const int flag)
     if (cfile->fd == -1) {
       ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_CantOpenFile),
                   "ccp4_file_open1", NULL);
-      return NULL;
+      return NULL; 
     } else {
 #if defined _MSC_VER
       _fstat(cfile->fd, &st); }
@@ -957,9 +958,9 @@ CCP4File *ccp4_file_open (const char *filename, const int flag)
         if (flag & O_TRUNC) {*mptr++ = 'w'; }
         else *mptr++ = 'r';
         *mptr++ = '+';
-      } else if (cfile->write)
+      } else if (cfile->write) 
         *mptr++ = 'w';
-      else
+      else 
         *mptr++ = 'r';
     }
 #if defined(__DECC) && defined(VMS) || defined (_WIN32)
@@ -976,14 +977,14 @@ CCP4File *ccp4_file_open (const char *filename, const int flag)
                              "mbc=16",        /* bigger blocksize */
                              "ctx=stm", "mrs=0", "rat=cr", "rfm=stmlf");
 #else
-# ifdef _MSC_VER
-    if (cfile->scratch)
+# ifdef _MVS
+    if (cfile->scratch) 
       cfile->stream = tmpfile();
-    else
+    else 
       cfile->stream = fopen (filename, fmode);
 # else
     cfile->stream = fopen (filename, fmode);
-    if (cfile->stream)
+    if (cfile->stream) 
       if (cfile->scratch && unlink (filename)!=0) {
         ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_UnlinkFail),
                     "ccp4_file_open(unlink)", NULL);
@@ -994,24 +995,24 @@ CCP4File *ccp4_file_open (const char *filename, const int flag)
       ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_CantOpenFile),
                   "ccp4_file_open2", NULL);
       cfile->iostat = CIO_CantOpenFile;
-      return NULL; }
+      return NULL; } 
 #if defined (__alpha) && defined (vms)
 (void) fflush (cfile->stream);
 #endif
-#if defined _MSC_VER
+#if defined _MVS
   _fstat(_fileno(cfile->stream), &st);
 #else
   fstat(fileno(cfile->stream), &st);
 #endif
   }
-#if defined _MSC_VER
+#if defined _MVS
   cfile->name = _strdup(filename);
 #else
   cfile->name = strdup(filename);
 #endif
-  cfile->open = 1;
-  cfile->own = 1;
-#if defined _MSC_VER
+  cfile->open = 1;  
+  cfile->own = 1;  
+#if defined _MVS
   if ( !(st.st_mode & S_IFREG) ) {
 #else
   if ( !S_ISREG(st.st_mode) ) {
@@ -1023,15 +1024,15 @@ CCP4File *ccp4_file_open (const char *filename, const int flag)
     cfile->direct = 1;
   }
   cfile->loc = cfile->append ? cfile->length : 0;
-
+  
   return cfile;
 }
 
 /**
  * ccp4_file_close:
- * @param cfile (CCP4File *)
+ * @param cfile (CCP4File *) 
  *
- * close @cfile if owned, close (non-buffered) or
+ * close @cfile if owned, close (non-buffered) or 
  * fclose (buffered),  or fflush if stream not owned.
  * Free resources.
  * @return 0 on success, EOF on failure
@@ -1041,13 +1042,13 @@ int ccp4_file_close (CCP4File *cfile)
 
   if (!cfile) {
     ccp4_signal(CCP4_ERRLEVEL(3)| CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_close", NULL);
+		"ccp4_file_close", NULL);
     return EOF; }
 
   if (_file_close (cfile) == EOF) {
     ccp4_signal(CCP4_ERRLEVEL(3),"ccp4_file_close", NULL);
     return EOF; }
-
+ 
   _file_free(cfile);
 
   return (0);
@@ -1055,7 +1056,7 @@ int ccp4_file_close (CCP4File *cfile)
 
 /**
  * ccp4_file_rarch:
- * @param cfile (CCP4File *)
+ * @param cfile (CCP4File *) 
  *
  * read machine stamp from file @cfile->stream.
  * The machine stamp is at @cfile->stamp_loc items, set
@@ -1072,29 +1073,29 @@ int ccp4_file_rarch (CCP4File *cfile)
 
   if (!cfile) {
     ccp4_signal(CCP4_ERRLEVEL(3)| CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_rarch", NULL);
+		"ccp4_file_rarch", NULL);
     return EOF; }
 
-  if (native != NULL) return (nativeFT | (nativeIT<<8));
+  if (native != NULL) return (nativeFT | (nativeIT<<8)); 
   if (foreign == NULL) {
-    if (ccp4_file_raw_seek(cfile, cfile->stamp_loc, SEEK_SET) == -1) {
+    if (ccp4_file_raw_seek(cfile, cfile->stamp_loc, SEEK_SET) == -1) { 
       ccp4_signal(CCP4_ERRLEVEL(3),"ccp4_file_rarch", NULL);
       return EOF; }
-
-    if (ccp4_file_raw_read(cfile, (char *) mtstring, 4UL) != 4) {
+    
+    if (ccp4_file_raw_read(cfile, (char *) mtstring, 4UL) != 4) { 
         ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_rarch", NULL);
         return EOF; }
-
+        
     cfile->iconvert = (mtstring[1]>>4) & 0x0f;
     cfile->fconvert = (mtstring[0]>>4) & 0x0f;
   }
-
+  
   return (cfile->fconvert | (cfile->iconvert<<8));
 }
 
 /**
  * ccp4_file_warch:
- * @param cfile (CCP4File *)
+ * @param cfile (CCP4File *) 
  *
  * write machine stamp to file @cfile->stream.
  * The machine stamp is placed at @cfile->stamp_loc items,
@@ -1108,10 +1109,10 @@ int ccp4_file_warch (CCP4File *cfile)
 
   if (!cfile) {
     ccp4_signal(CCP4_ERRLEVEL(3)| CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_warch", NULL);
+		"ccp4_file_warch", NULL);
     return EOF; }
 
-  if (ccp4_file_raw_seek(cfile, cfile->stamp_loc, SEEK_SET) == -1) {
+  if (ccp4_file_raw_seek(cfile, cfile->stamp_loc, SEEK_SET) == -1) { 
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_warch", NULL);
       return EOF; }
 
@@ -1119,7 +1120,7 @@ int ccp4_file_warch (CCP4File *cfile)
   mtstring[1] = 1 | (cfile->iconvert << 4);
   mtstring[2] = mtstring[3] = 0;
 
-  if (ccp4_file_raw_write(cfile, (const char *) mtstring, 4) != 4) {
+  if (ccp4_file_raw_write(cfile, (const char *) mtstring, 4) != 4) { 
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_warch", NULL);
     return EOF; }
 
@@ -1130,7 +1131,7 @@ int ccp4_file_warch (CCP4File *cfile)
  * ccp4_file_read:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * mode dependent read function.  Reads @nitems items from stream
  * @cfile->stream to @buffer as determined by cfile->mode.
@@ -1140,12 +1141,12 @@ int ccp4_file_warch (CCP4File *cfile)
 int ccp4_file_read (CCP4File *cfile, uint8 *buffer, size_t nitems)
 {
   int result;
-
+ 
   result = cfile->_read(cfile,(uint8 *) buffer,nitems);
-
-  if (result != nitems)
-    ccp4_signal(CCP4_ERRLEVEL(3),
-               "ccp4_file_read", NULL);
+  
+  if (result != nitems) 
+    ccp4_signal(CCP4_ERRLEVEL(3), 
+	       "ccp4_file_read", NULL);
   return (result);
 }
 
@@ -1153,7 +1154,7 @@ int ccp4_file_read (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * ccp4_file_readcomp:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * float complex {float,float} read function.  Reads @nitems complex from stream
  * @cfile->stream to @buffer.  Allows short count when eof is detected (
@@ -1166,24 +1167,24 @@ int ccp4_file_readcomp (CCP4File *cfile, uint8 *buffer, size_t nitems)
   int i, n, result;
 
   if (!cfile)  {
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                  "ccp4_file_readcomp", NULL);
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		  "ccp4_file_readcomp", NULL);
     return EOF; }
 
   if ( !cfile->read || cfile->iostat) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_readcomp", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_readcomp", NULL);
     return EOF; }
 
   if (cfile->last_op == WRITE_OP)
     if (ccp4_file_raw_seek(cfile,0L,SEEK_CUR) == -1) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readcomp", NULL);
-      return EOF; }
+      return EOF; }   
 
   n = _item_sizes[COMP64] * nitems;
   if ( (result = ccp4_file_raw_read (cfile, (char *) buffer, n)) != n) {
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readcomp", NULL);
-    if (cfile->stream && !feof(cfile->stream))
+    if (cfile->stream && !feof(cfile->stream)) 
       return EOF;  }  /* short count on stream is OK if EOF */
 
   result /= _item_sizes[COMP64];
@@ -1193,7 +1194,7 @@ int ccp4_file_readcomp (CCP4File *cfile, uint8 *buffer, size_t nitems)
     switch (cfile->fconvert) {     /* get to BE IEEE */
     case DFNTF_VAX :
         vaxF2ieeeF((union float_uint_uchar *) buffer, n);
-        break;
+        break;   
     case DFNTF_CONVEXNATIVE :
         convexF2ieeeF((union float_uint_uchar *) buffer, n);
         break;
@@ -1212,13 +1213,13 @@ int ccp4_file_readcomp (CCP4File *cfile, uint8 *buffer, size_t nitems)
         }
         break;
     default :
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                  "ccp4_file_readcomp", NULL);
-      return EOF;
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		  "ccp4_file_readcomp", NULL);
+      return EOF; 
     }
     switch (nativeFT) {              /* get to Native if not BE IEEE */
     case DFNTF_BEIEEE :
-        break;
+        break;                      
     case DFNTF_LEIEEE :
         {
             char j;
@@ -1238,9 +1239,9 @@ int ccp4_file_readcomp (CCP4File *cfile, uint8 *buffer, size_t nitems)
         ieeeF2vaxF((union float_uint_uchar *) buffer, n);
         break;
     default :
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                  "ccp4_file_readcomp", NULL);
-      return EOF;
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		  "ccp4_file_readcomp", NULL);
+      return EOF; 
     }
   }
   return (result);
@@ -1250,7 +1251,7 @@ int ccp4_file_readcomp (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * ccp4_file_readshortcomp:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * short complex {short,short} read function.  Reads @nitems complex from stream
  * @cfile->stream to @buffer. Allows short count when eof is detected (
@@ -1263,25 +1264,25 @@ int ccp4_file_readshortcomp (CCP4File *cfile, uint8 *buffer, size_t nitems)
   int i, n, result;
 
   if (!cfile)  {
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                  "ccp4_file_readshortcomp", NULL);
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		  "ccp4_file_readshortcomp", NULL);
     return EOF; }
 
   if ( !cfile->read || cfile->iostat) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_readshortcomp", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_readshortcomp", NULL);
     return EOF; }
 
   if (cfile->last_op == WRITE_OP)
     if (ccp4_file_raw_seek(cfile,0L,SEEK_CUR) == -1) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readshortcomp", NULL);
-      return EOF; }
+      return EOF; }   
 
   n = _item_sizes[COMP32] * nitems;
   if ( (result = ccp4_file_raw_read (cfile, (char *) buffer, n)) != n) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readshortcomp", NULL);
     if (cfile->stream && !feof(cfile->stream))
-      return EOF; }
+      return EOF; } 
 
   result /= _item_sizes[COMP32];
 
@@ -1297,7 +1298,7 @@ int ccp4_file_readshortcomp (CCP4File *cfile, uint8 *buffer, size_t nitems)
           buffer[i] = buffer[i+1];
           buffer[i+1] = j; } }
       else {
-        ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
+        ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
                     "ccp4_file_readshortcomp", NULL);
         return EOF; }
     }
@@ -1309,7 +1310,7 @@ int ccp4_file_readshortcomp (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * ccp4_file_readfloat:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * float read function.  Reads @nitems floats from stream
  * @cfile->stream to @buffer.
@@ -1321,25 +1322,25 @@ int ccp4_file_readfloat (CCP4File *cfile, uint8 *buffer, size_t nitems)
   int i, n, result;
 
   if (!cfile)  {
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                  "ccp4_file_readfloat", NULL);
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		  "ccp4_file_readfloat", NULL);
     return EOF; }
 
   if (!cfile->read || cfile->iostat) {
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                  "ccp4_file_readfloat", NULL);
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		  "ccp4_file_readfloat", NULL);
       return EOF; }
 
   if (cfile->last_op == WRITE_OP)
     if (ccp4_file_raw_seek(cfile,0L,SEEK_CUR) == -1) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readfloat", NULL);
-      return EOF; }
+      return EOF; }   
 
   n = _item_sizes[FLOAT32] * nitems;
-  if ( (result = ccp4_file_raw_read (cfile, (char *) buffer, n)) != n) {
+  if ( (result = ccp4_file_raw_read (cfile, (char *) buffer, n)) != n) { 
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readfloat", NULL);
-    if (cfile->stream && !feof(cfile->stream))
-      return EOF; }
+    if (cfile->stream && !feof(cfile->stream)) 
+      return EOF; } 
 
   result /= _item_sizes[FLOAT32];
 
@@ -1348,7 +1349,7 @@ int ccp4_file_readfloat (CCP4File *cfile, uint8 *buffer, size_t nitems)
     switch (cfile->fconvert) {     /* get to BE IEEE */
     case DFNTF_VAX :
       vaxF2ieeeF((union float_uint_uchar *) buffer, n);
-      break;
+      break;   
     case DFNTF_CONVEXNATIVE :
       convexF2ieeeF((union float_uint_uchar *) buffer, n);
       break;
@@ -1356,34 +1357,34 @@ int ccp4_file_readfloat (CCP4File *cfile, uint8 *buffer, size_t nitems)
       break;
     case DFNTF_LEIEEE :
       {
-        char j;
-        for (i=0; i < n*4; i+=4) {
-          j = buffer[i];
-          buffer[i] = buffer[i+3];
-          buffer[i+3] = j;
-          j = buffer[i+1];
-          buffer[i+1] = buffer[i+2];
-          buffer[i+2] =j; }
+	char j;
+	for (i=0; i < n*4; i+=4) {
+	  j = buffer[i];
+	  buffer[i] = buffer[i+3];
+	  buffer[i+3] = j;
+	  j = buffer[i+1];
+	  buffer[i+1] = buffer[i+2];
+	  buffer[i+2] =j; }
       }
       break;
     default :
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                  "ccp4_file_readfloat", NULL);
-      return EOF;
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		  "ccp4_file_readfloat", NULL);
+      return EOF; 
     }
     switch (nativeFT) {
     case DFNTF_BEIEEE :
       break;                      /* done enough */
     case DFNTF_LEIEEE :
       {
-        char j;
-        for (i=0; i < n*4; i+=4) {
-          j = buffer[i];
-          buffer[i] = buffer[i+3];
-          buffer[i+3] = j;
-          j = buffer[i+1];
-          buffer[i+1] = buffer[i+2];
-          buffer[i+2] =j; }
+	char j;
+	for (i=0; i < n*4; i+=4) {
+	  j = buffer[i];
+	  buffer[i] = buffer[i+3];
+	  buffer[i+3] = j;
+	  j = buffer[i+1];
+	  buffer[i+1] = buffer[i+2];
+	  buffer[i+2] =j; }
       }
       break;
     case DFNTF_CONVEXNATIVE :
@@ -1393,9 +1394,9 @@ int ccp4_file_readfloat (CCP4File *cfile, uint8 *buffer, size_t nitems)
       ieeeF2vaxF((union float_uint_uchar *) buffer, n);
       break;
     default :
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                  "ccp4_file_readfloat", NULL);
-      return EOF;
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		  "ccp4_file_readfloat", NULL);
+      return EOF; 
     }
   }
   return (result);
@@ -1405,7 +1406,7 @@ int ccp4_file_readfloat (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * ccp4_file_readint:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * integer read function.  Reads @nitems int from stream
  * @cfile->stream to @buffer.
@@ -1417,25 +1418,25 @@ int ccp4_file_readint (CCP4File *cfile, uint8 *buffer, size_t nitems)
   int n, result;
 
   if (!cfile)  {
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                  "ccp4_file_readint", NULL);
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		  "ccp4_file_readint", NULL);
     return EOF; }
 
   if ( !cfile->read || cfile->iostat) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_readint", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_readint", NULL);
     return EOF; }
 
   if (cfile->last_op == WRITE_OP)
     if (ccp4_file_raw_seek(cfile,0L,SEEK_CUR) == -1) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readint", NULL);
-      return EOF; }
+      return EOF; }   
 
   n = _item_sizes[INT32] * nitems;
   if ( (result = ccp4_file_raw_read (cfile, (char *) buffer, n)) != n) {
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readint", NULL);
-    if (cfile->stream && !feof(cfile->stream))
-      return EOF; }
+    if (cfile->stream && !feof(cfile->stream)) 
+      return EOF; } 
 
   result /= _item_sizes[INT32];
 
@@ -1443,19 +1444,19 @@ int ccp4_file_readint (CCP4File *cfile, uint8 *buffer, size_t nitems)
 
   if (cfile->iconvert != nativeIT) {
     if ((cfile->iconvert==DFNTI_MBO && nativeIT==DFNTI_IBO) ||
-        (cfile->iconvert==DFNTI_IBO && nativeIT==DFNTI_MBO)) {
+	(cfile->iconvert==DFNTI_IBO && nativeIT==DFNTI_MBO)) {
       char j;
       int i;
       for (i=0; i < n*4; i+=4) {
-        j = buffer[i];
-        buffer[i] = buffer[i+3];
-        buffer[i+3] = j;
-        j = buffer[i+1];
-        buffer[i+1] = buffer[i+2];
-        buffer[i+2] =j; }
-    } else {
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_readint", NULL);
+	j = buffer[i];
+	buffer[i] = buffer[i+3];
+	buffer[i+3] = j;
+	j = buffer[i+1];
+	buffer[i+1] = buffer[i+2];
+	buffer[i+2] =j; }
+    } else { 
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_readint", NULL);
       return EOF; }
   }
   return (result);
@@ -1465,7 +1466,7 @@ int ccp4_file_readint (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * ccp4_file_readshort:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * short read function.  Reads @nitems shorts from stream
  * @cfile->stream to @buffer.
@@ -1477,41 +1478,41 @@ int ccp4_file_readshort (CCP4File *cfile, uint8 *buffer, size_t nitems)
   int n, result;
 
   if (!cfile)  {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_readshort", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		"ccp4_file_readshort", NULL);
     return EOF; }
 
   if (!cfile->read || cfile->iostat) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_readshort", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_readshort", NULL);
     return EOF; }
 
   if (cfile->last_op == WRITE_OP)
     if (ccp4_file_raw_seek(cfile,0L,SEEK_CUR) == -1) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readshort", NULL);
-      return EOF; }
+      return EOF; }   
 
   n = _item_sizes[INT16] * nitems;
   if ( (result = ccp4_file_raw_read (cfile, (char *) buffer, n)) != n) {
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readshort", NULL);
-    if (cfile->stream && !feof(cfile->stream))
-      return EOF; }
+    if (cfile->stream && !feof(cfile->stream)) 
+      return EOF; } 
 
   result /= _item_sizes[INT16];
 
   n = result;
   if (cfile->iconvert != nativeIT) {
     if ((cfile->iconvert==DFNTI_MBO && nativeIT==DFNTI_IBO) ||
-        (cfile->iconvert==DFNTI_IBO && nativeIT==DFNTI_MBO)) {
+	(cfile->iconvert==DFNTI_IBO && nativeIT==DFNTI_MBO)) {
       char j;
       int i;
       for (i=0; i < n*2; i+=2) {
-        j = buffer[i];
-        buffer[i] = buffer[i+1];
-        buffer[i+1] = j; }
+	j = buffer[i];
+	buffer[i] = buffer[i+1];
+	buffer[i+1] = j; } 
     } else {
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                  "ccp4_file_readshort", NULL);
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		  "ccp4_file_readshort", NULL);
       return EOF; }
   }
   return (result);
@@ -1521,7 +1522,7 @@ int ccp4_file_readshort (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * ccp4_file_readchar:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * character read function.  Reads @nitems characters from stream
  * @cfile->stream to @buffer.
@@ -1533,24 +1534,24 @@ int ccp4_file_readchar (CCP4File *cfile, uint8 *buffer, size_t nitems)
   size_t result;
 
   if (! cfile) {
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                  "ccp4_file_readchar", NULL);
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		  "ccp4_file_readchar", NULL);
       return EOF; }
 
   if (!cfile->read || cfile->iostat) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_readchar", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_readchar", NULL);
     return EOF; }
 
   if (cfile->last_op == WRITE_OP)
     if (ccp4_file_raw_seek(cfile,0L,SEEK_CUR) == -1) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readchar", NULL);
-      return EOF; }
+      return EOF; }   
 
   if ( (result = ccp4_file_raw_read (cfile, (char *) buffer, nitems)) != nitems) {
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readchar", NULL);
     if (cfile->stream && !feof(cfile->stream))
-      return EOF; }
+      return EOF; } 
 
   return (result);
 }
@@ -1559,7 +1560,7 @@ int ccp4_file_readchar (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * ccp4_file_write:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * mode dependent write function.  Write @nitems items from @buffer
  * to @cfile->stream as determined by cfile->mode.
@@ -1572,9 +1573,9 @@ int ccp4_file_write (CCP4File *cfile, const uint8 *buffer, size_t nitems)
 
   result = cfile->_write(cfile, buffer, nitems);
 
-  if ( result != nitems)
+  if ( result != nitems) 
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_write", NULL);
-
+  
   return (result);
 }
 
@@ -1582,7 +1583,7 @@ int ccp4_file_write (CCP4File *cfile, const uint8 *buffer, size_t nitems)
  * ccp4_file_writecomp:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * complex {float,float} write function.  Write @nitems items from @buffer
  * to @cfile->stream.
@@ -1594,22 +1595,22 @@ int ccp4_file_writecomp (CCP4File *cfile, const uint8 *buffer, size_t nitems)
   size_t result = 0, n;
 
   if (!cfile) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_writecomp", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		"ccp4_file_writecomp", NULL);
     return EOF; }
 
   if (!cfile->write ||cfile->iostat) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_writecomp", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_writecomp", NULL);
     return EOF;}
 
-  if (cfile->last_op == READ_OP)
+  if (cfile->last_op == READ_OP) 
     if (ccp4_file_raw_seek(cfile,0L,SEEK_CUR) == -1) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writecomp", NULL);
-      return EOF; }
-
+      return EOF; }   
+      
   n = nitems * _item_sizes[COMP64];
-
+  
   if (cfile->fconvert != nativeFT) {
     char out_buffer[8];
     const char *out_ptr = (char *) buffer;
@@ -1619,8 +1620,8 @@ int ccp4_file_writecomp (CCP4File *cfile, const uint8 *buffer, size_t nitems)
       case DFNTF_BEIEEE :
         memcpy(out_buffer, out_ptr, _item_sizes[COMP64]);
         out_ptr += _item_sizes[COMP64];
-        break;
-      case DFNTF_LEIEEE :
+        break;                      
+      case DFNTF_LEIEEE : 
         out_buffer[3] = *out_ptr++;
         out_buffer[2] = *out_ptr++;
         out_buffer[1] = *out_ptr++;
@@ -1641,13 +1642,13 @@ int ccp4_file_writecomp (CCP4File *cfile, const uint8 *buffer, size_t nitems)
         ieeeF2vaxF((union float_uint_uchar *) out_buffer, 2);
         break;
     default :
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                  "CCP4_File::writecomp", NULL);
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		  "CCP4_File::writecomp", NULL);
     }
-    switch (cfile->fconvert) {
+    switch (cfile->fconvert) {    
     case DFNTF_VAX :
         vaxF2ieeeF((union float_uint_uchar *) out_buffer, 2);
-        break;
+        break;   
     case DFNTF_CONVEXNATIVE :
         convexF2ieeeF((union float_uint_uchar *) out_buffer, 2);
         break;
@@ -1661,19 +1662,19 @@ int ccp4_file_writecomp (CCP4File *cfile, const uint8 *buffer, size_t nitems)
           out_buffer[3] = j;
           j = out_buffer[1];
           out_buffer[1] = out_buffer[2];
-          out_buffer[2] =j;
+          out_buffer[2] =j; 
           j = out_buffer[4];
           out_buffer[4] = out_buffer[7];
           out_buffer[7] = j;
           j = out_buffer[5];
           out_buffer[5] = out_buffer[6];
-          out_buffer[6] =j;
+          out_buffer[6] =j; 
         }
         break;
     default :
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                  "ccp4_file_writecomp", NULL);
-      return EOF;
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		  "ccp4_file_writecomp", NULL);
+      return EOF; 
     }
     result += ccp4_file_raw_write (cfile, out_buffer, _item_sizes[COMP64]);
     }
@@ -1683,7 +1684,7 @@ int ccp4_file_writecomp (CCP4File *cfile, const uint8 *buffer, size_t nitems)
 
   if (result != n)
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writecomp", NULL);
-
+    
   return (result / _item_sizes[COMP64]);
 }
 
@@ -1691,7 +1692,7 @@ int ccp4_file_writecomp (CCP4File *cfile, const uint8 *buffer, size_t nitems)
  * ccp4_file_writeshortcomp:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * short complex {short,short} write function.  Write @nitems items from @buffer
  * to @cfile->stream.
@@ -1703,20 +1704,20 @@ int ccp4_file_writeshortcomp (CCP4File *cfile, const uint8 *buffer, size_t nitem
   size_t result = 0, n;
 
   if (!cfile) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_writeshortcomp", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		"ccp4_file_writeshortcomp", NULL);
     return EOF; }
 
   if (!cfile->write ||cfile->iostat) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_writeshortcomp", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_writeshortcomp", NULL);
     return EOF;}
 
-  if (cfile->last_op == READ_OP)
+  if (cfile->last_op == READ_OP) 
     if (ccp4_file_raw_seek(cfile,0L,SEEK_CUR) == -1) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writeshortcomp", NULL);
-      return EOF; }
-
+      return EOF; }   
+      
   n = nitems * _item_sizes[COMP32];
 
   if (cfile->iconvert != nativeIT) {
@@ -1725,22 +1726,22 @@ int ccp4_file_writeshortcomp (CCP4File *cfile, const uint8 *buffer, size_t nitem
     size_t i;
     for (i = 0; i != nitems; i++) {
       if ((cfile->iconvert==DFNTI_MBO && nativeIT==DFNTI_IBO) ||
-          (cfile->iconvert==DFNTI_IBO && nativeIT==DFNTI_MBO)) {
+	  (cfile->iconvert==DFNTI_IBO && nativeIT==DFNTI_MBO)) {
         out_buffer[1] = *out_ptr++;
         out_buffer[0] = *out_ptr++;
         out_buffer[3] = *out_ptr++;
-        out_buffer[2] = *out_ptr++;
-      } else {
-        ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_writeshortcomp", NULL);
+        out_buffer[2] = *out_ptr++; 
+      } else { 
+        ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_writeshortcomp", NULL);
         return EOF; }
     result += ccp4_file_raw_write (cfile, out_buffer, _item_sizes[COMP32]);
     }
    } else {
     result = ccp4_file_raw_write (cfile, (char *) buffer, n);
   }
-
-  if ( result != n)
+  
+  if ( result != n) 
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writeshortcomp", NULL);
 
   return (result / _item_sizes[COMP32]);
@@ -1750,7 +1751,7 @@ int ccp4_file_writeshortcomp (CCP4File *cfile, const uint8 *buffer, size_t nitem
  * ccp4_file_writefloat:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * float write function.  Write @nitems items from @buffer
  * to @cfile->stream.
@@ -1762,20 +1763,20 @@ int ccp4_file_writefloat (CCP4File *cfile, const uint8 *buffer, size_t nitems)
   size_t result = 0, n;
 
   if (!cfile) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_writefloat", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		"ccp4_file_writefloat", NULL);
     return EOF; }
 
   if (!cfile->write ||cfile->iostat) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_writefloat", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_writefloat", NULL);
     return EOF;}
 
-  if (cfile->last_op == READ_OP)
+  if (cfile->last_op == READ_OP) 
     if (ccp4_file_raw_seek(cfile,0L,SEEK_CUR) == -1) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writefloat", NULL);
-      return EOF; }
-
+      return EOF; }   
+      
   n = nitems * _item_sizes[FLOAT32];
 
   if (cfile->fconvert != nativeFT) {
@@ -1787,8 +1788,8 @@ int ccp4_file_writefloat (CCP4File *cfile, const uint8 *buffer, size_t nitems)
       case DFNTF_BEIEEE :
         memcpy(out_buffer, out_ptr, _item_sizes[FLOAT32]);
         out_ptr += _item_sizes[FLOAT32];
-        break;
-      case DFNTF_LEIEEE :
+        break;                      
+      case DFNTF_LEIEEE : 
         out_buffer[3] = *out_ptr++;
         out_buffer[2] = *out_ptr++;
         out_buffer[1] = *out_ptr++;
@@ -1805,13 +1806,13 @@ int ccp4_file_writefloat (CCP4File *cfile, const uint8 *buffer, size_t nitems)
         ieeeF2vaxF((union float_uint_uchar *) out_buffer, 1);
         break;
     default :
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                  "CCP4_File::writefloat", NULL);
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		  "CCP4_File::writefloat", NULL);
     }
-    switch (cfile->fconvert) {
+    switch (cfile->fconvert) {    
     case DFNTF_VAX :
         vaxF2ieeeF((union float_uint_uchar *) out_buffer, 1);
-        break;
+        break;   
     case DFNTF_CONVEXNATIVE :
         convexF2ieeeF((union float_uint_uchar *) out_buffer, 1);
         break;
@@ -1825,13 +1826,13 @@ int ccp4_file_writefloat (CCP4File *cfile, const uint8 *buffer, size_t nitems)
           out_buffer[3] = j;
           j = out_buffer[1];
           out_buffer[1] = out_buffer[2];
-          out_buffer[2] =j;
+          out_buffer[2] =j; 
         }
         break;
     default :
-      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                  "ccp4_file_writefloat", NULL);
-      return EOF;
+      ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		  "ccp4_file_writefloat", NULL);
+      return EOF; 
     }
     result += ccp4_file_raw_write (cfile, out_buffer, _item_sizes[FLOAT32]);
     }
@@ -1841,15 +1842,15 @@ int ccp4_file_writefloat (CCP4File *cfile, const uint8 *buffer, size_t nitems)
 
   if (result != n)
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writefloat", NULL);
-
+    
   return (result / _item_sizes[FLOAT32]);
 }
-
+  
 /**
  * ccp4_file_writeint:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * int write function.  Write @nitems items from @buffer
  * to @cfile->stream.
@@ -1861,20 +1862,20 @@ int ccp4_file_writeint (CCP4File *cfile, const uint8 *buffer, size_t nitems)
   size_t result = 0, n;
 
   if (!cfile) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_writeint", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		"ccp4_file_writeint", NULL);
     return EOF; }
 
   if (!cfile->write ||cfile->iostat) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_writeint", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_writeint", NULL);
     return EOF;}
 
-  if (cfile->last_op == READ_OP)
+  if (cfile->last_op == READ_OP) 
     if (ccp4_file_raw_seek(cfile,0L,SEEK_CUR) == -1) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writeint", NULL);
-      return EOF; }
-
+      return EOF; }   
+      
   n = nitems * _item_sizes[INT32];
 
   if (cfile->iconvert != nativeIT) {
@@ -1883,14 +1884,14 @@ int ccp4_file_writeint (CCP4File *cfile, const uint8 *buffer, size_t nitems)
     size_t i;
     for (i = 0; i != nitems; i++) {
       if ((cfile->iconvert==DFNTI_MBO && nativeIT==DFNTI_IBO) ||
-          (cfile->iconvert==DFNTI_IBO && nativeIT==DFNTI_MBO)) {
+	  (cfile->iconvert==DFNTI_IBO && nativeIT==DFNTI_MBO)) {
         out_buffer[3] = *out_ptr++;
         out_buffer[2] = *out_ptr++;
         out_buffer[1] = *out_ptr++;
-        out_buffer[0] = *out_ptr++;
-      } else {
-        ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_writeint", NULL);
+        out_buffer[0] = *out_ptr++; 
+      } else { 
+        ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_writeint", NULL);
         return EOF; }
     result += ccp4_file_raw_write (cfile, out_buffer, _item_sizes[INT32]);
     }
@@ -1898,7 +1899,7 @@ int ccp4_file_writeint (CCP4File *cfile, const uint8 *buffer, size_t nitems)
     result = ccp4_file_raw_write (cfile, (char *) buffer, n);
   }
 
-  if ( result != n)
+  if ( result != n) 
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writeint", NULL);
 
   return (result / _item_sizes[INT32]);
@@ -1908,7 +1909,7 @@ int ccp4_file_writeint (CCP4File *cfile, const uint8 *buffer, size_t nitems)
  * ccp4_file_writeshort:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * short write function.  Write @nitems items from @buffer
  * to @cfile->stream.
@@ -1920,42 +1921,42 @@ int ccp4_file_writeshort (CCP4File *cfile, const uint8 *buffer, size_t nitems)
   size_t result = 0, n;
 
   if (!cfile) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_writeshort", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		"ccp4_file_writeshort", NULL);
     return EOF; }
 
   if (!cfile->write ||cfile->iostat) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_writeshort", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_writeshort", NULL);
     return EOF;}
 
-  if (cfile->last_op == READ_OP)
+  if (cfile->last_op == READ_OP) 
     if (ccp4_file_raw_seek(cfile,0L,SEEK_CUR) == -1) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writeshort", NULL);
-      return EOF; }
-
+      return EOF; }   
+      
   n = nitems * _item_sizes[INT16];
-
+  
   if (cfile->iconvert != nativeIT) {
     char out_buffer[2];
     const char *out_ptr = (char *) buffer;
     size_t i;
     for (i = 0; i != nitems; i++) {
       if ((cfile->iconvert==DFNTI_MBO && nativeIT==DFNTI_IBO) ||
-          (cfile->iconvert==DFNTI_IBO && nativeIT==DFNTI_MBO)) {
+	  (cfile->iconvert==DFNTI_IBO && nativeIT==DFNTI_MBO)) {
         out_buffer[1] = *out_ptr++;
         out_buffer[0] = *out_ptr++;
-      } else {
-        ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_readint", NULL);
+      } else { 
+        ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_readint", NULL);
         return EOF; }
     result += ccp4_file_raw_write (cfile, out_buffer, _item_sizes[INT16]);
     }
    } else {
     result = ccp4_file_raw_write (cfile, (char *) buffer, n);
   }
-
-  if ( result != n)
+  
+  if ( result != n) 
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writeshort", NULL);
 
   return (result / _item_sizes[INT16]);
@@ -1965,7 +1966,7 @@ int ccp4_file_writeshort (CCP4File *cfile, const uint8 *buffer, size_t nitems)
  * ccp4_file_writechar:
  * @param cfile (CCP4File *)
  * @param buffer (uint8 *) buffer
- * @param nitems (size_t) number of items
+ * @param nitems (size_t) number of items 
  *
  * char write function.  Write @nitems items from @buffer
  * to @cfile->stream.
@@ -1977,21 +1978,21 @@ int ccp4_file_writechar (CCP4File *cfile, const uint8 *buffer, size_t nitems)
   size_t result;
 
   if (!cfile) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_writechar", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		"ccp4_file_writechar", NULL);
     return EOF; }
 
   if (!cfile->write ||cfile->iostat) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode),
-                "ccp4_file_writechar", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
+		"ccp4_file_writechar", NULL);
     return EOF;}
 
-  if (cfile->last_op == READ_OP)
+  if (cfile->last_op == READ_OP) 
     if (ccp4_file_raw_seek(cfile,0L,SEEK_CUR) == -1) {
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writechar", NULL);
-      return EOF; }
-
-  if ( (result = ccp4_file_raw_write (cfile, (char *) buffer, nitems)) != nitems)
+      return EOF; }   
+  
+  if ( (result = ccp4_file_raw_write (cfile, (char *) buffer, nitems)) != nitems) 
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writechar", NULL);
 
   return (result);
@@ -2014,10 +2015,10 @@ int ccp4_file_seek (CCP4File *cfile, long offset, int whence)
   int result;
 
   if (!cfile) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_seek", NULL);
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		"ccp4_file_seek", NULL);
     return -1; }
-
+        
   result = ccp4_file_raw_seek(cfile, offset*cfile->itemsize, whence);
 
   if (result != -1) ccp4_file_clearerr(cfile);
@@ -2035,14 +2036,14 @@ int ccp4_file_seek (CCP4File *cfile, long offset, int whence)
  */
 void ccp4_file_rewind (CCP4File *cfile)
 {
-  if (!cfile) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_rewind", NULL);
+  if (!cfile) {   
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		"ccp4_file_rewind", NULL);
     return ; }
-
+   
   if (ccp4_file_raw_seek(cfile, 0, SEEK_SET)) {
-      ccp4_signal(CCP4_ERRLEVEL(3),
-                  "ccp4_file_rewind", NULL);
+      ccp4_signal(CCP4_ERRLEVEL(3), 
+	  	  "ccp4_file_rewind", NULL);
   } else {
     ccp4_file_clearerr(cfile);
   }
@@ -2051,7 +2052,7 @@ void ccp4_file_rewind (CCP4File *cfile)
 /**
  * ccp4_file_length:
  * @param cfile (CCP4File *)
- *
+ * 
  * Length of file on disk.
  * @return length of @cfile on success, EOF on failure
  */
@@ -2064,12 +2065,12 @@ long ccp4_file_length (CCP4File *cfile)
 #endif
 
   if (!cfile) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_length", NULL);
-    return EOF; }
-
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		"ccp4_file_length", NULL);
+    return EOF; } 
+        
   cfile->last_op = IRRELEVANT_OP;
-
+  
   if (cfile->buffered && cfile->stream)
       fflush (cfile->stream);
 #if defined _MSC_VER
@@ -2092,16 +2093,16 @@ long ccp4_file_length (CCP4File *cfile)
 long ccp4_file_tell (CCP4File *cfile)
 {
   long result;
-
+  
   if (! cfile) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_tell", NULL);
-    return EOF; }
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		"ccp4_file_tell", NULL);
+    return EOF; } 
 
   cfile->last_op = IRRELEVANT_OP;
 
   if (cfile->buffered && cfile->stream) {
-    fflush (cfile->stream);
+    fflush (cfile->stream); 
     result = (long) ftell(cfile->stream);
   } else
 #if defined _MSC_VER
@@ -2109,9 +2110,9 @@ long ccp4_file_tell (CCP4File *cfile)
 #else
     result = (long) lseek(cfile->fd, 0L, SEEK_CUR);
 #endif
-
+  
   cfile->loc = result;
-
+    
   return (result);
 }
 
@@ -2125,9 +2126,9 @@ long ccp4_file_tell (CCP4File *cfile)
 int ccp4_file_feof(CCP4File *cfile)
 {
   if (!cfile) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr),
-                "ccp4_file_feof", NULL);
-    return EOF; }
+    ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_NullPtr), 
+		"ccp4_file_feof", NULL);
+    return EOF; } 
 
   return (cfile->stream) ? feof(cfile->stream) : cfile->loc >= cfile->length;
 }
@@ -2161,7 +2162,7 @@ void ccp4_file_fatal (CCP4File *cfile, char *message)
   if (!cfile)
     ccp4_signal(CCP4_ERRLEVEL(4) | CCP4_ERRNO(CIO_NullPtr), "ccp4_file_fatal",
                 NULL);
-
+    
   l = strlen (message) + strlen (cfile->name) + 1;
   if ( !(buff = malloc(l)))
       ccp4_signal(CCP4_ERRLEVEL(4), "ccp4_file_fatal", NULL);
@@ -2179,12 +2180,12 @@ void ccp4_file_fatal (CCP4File *cfile, char *message)
  * @return associated error code
  */
 int ccp4_file_error(CCP4File *cfile)
-{
+{  
   if (!cfile->iostat)
     return 0;
   fprintf(stderr,"%s %s \n",
             cfile->name,ccp4_strerror(cfile->iostat));
-  return CCP4_ERRGETCODE(cfile->iostat);
+  return CCP4_ERRGETCODE(cfile->iostat); 
 }
 
 /**
@@ -2208,10 +2209,10 @@ void ccp4_file_flush(CCP4File *cfile)
 char *ccp4_file_print(CCP4File *cfile, char *msg_start, char *msg_end)
 {
   char *msg_curr = msg_start;
-
+  
   if (!cfile)
     return msg_start;
-
+    
   if (cfile->name)
     if ((msg_end - msg_curr) > strlen(cfile->name)) {
       strcpy(msg_curr,cfile->name);

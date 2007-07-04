@@ -1,5 +1,5 @@
 /*
-     ccp4_parser.c: Functions to read in and "parse" CCP4 keyworded input.
+     ccp4_parser.c: Functions to read in and "parse" CCP4 keyworded input. 
      Copyright (C) 2001  CCLRC, Peter Briggs
 
      This library is free software and is distributed under the terms and
@@ -120,6 +120,7 @@
 #include "ccp4_parser.h"
 #include "ccp4_errno.h"
 #include "ccp4_sysdep.h"
+static char rcsid[] = "$Id: ccp4_parser.c,v 1.20 2004/04/06 14:16:52 mdw Exp $";
 
 /* stuff for error reporting */
 #define CPARSER_ERRNO(n) (CCP4_ERR_PARS | (n))
@@ -173,40 +174,40 @@ CCP4PARSERARRAY* ccp4_parse_start(const int maxtokens)
       parsePtr->fp = NULL;
 
       /* Explicitly ensure that each token's fullstring member is
-         set to NULL before calling ccp4_parse_reset (which tries to
-         free memory associated with non-NULL fullstrings) since
-         we can't rely on them being created with a NULL value */
+	 set to NULL before calling ccp4_parse_reset (which tries to
+	 free memory associated with non-NULL fullstrings) since
+	 we can't rely on them being created with a NULL value */
       for (itok = 0; itok < maxtokens; itok++)
-        parsePtr->token[itok].fullstring = NULL;
+	parsePtr->token[itok].fullstring = NULL;
       ccp4_parse_reset(parsePtr);
       if (diag) printf("CCP4_PARSE_START: fullstring set to NULL\n");
 
       /* Initialise the default maximum and minimum allowed
-         exponents for numerical tokens */
+	 exponents for numerical tokens */
       ccp4_parse_maxmin(parsePtr,DBL_MAX_10_EXP,DBL_MIN_10_EXP);
       if (diag) printf("CCP4_PARSE_START: max and min set\n");
 
       /* Initialise the default delimiter and null delimiter characters
-         with a call to ccp4_parse_delimiters */
+	 with a call to ccp4_parse_delimiters */
       parsePtr->delim=NULL;
       parsePtr->nulldelim=NULL;
       if (!ccp4_parse_delimiters(parsePtr,NULL,NULL)) {
-        ccp4_parse_end(parsePtr);
-        parsePtr = NULL;
+	ccp4_parse_end(parsePtr);
+	parsePtr = NULL;
       }
       if (diag) printf("CCP4_PARSE_START: delimiters set\n");
 
       /* Initialise the default comment characters with a call
-         to ccp4_parse_comments */
+	 to ccp4_parse_comments */
       parsePtr->comment=NULL;
       if (!ccp4_parse_comments(parsePtr,NULL)) {
-        ccp4_parse_end(parsePtr);
-        parsePtr = NULL;
+	ccp4_parse_end(parsePtr);
+	parsePtr = NULL;
       }
       if (diag) printf("CCP4_PARSE_START: comments set\n");
     }
   }
-
+  
   if (diag) printf("CCP4_PARSE_START: Returning from ccp4_parse_start\n");
   return parsePtr;
 }
@@ -228,7 +229,7 @@ int ccp4_parse_end(CCP4PARSERARRAY *parsePtr)
     maxtokens = parsePtr->maxtokens;
     if (parsePtr->token && parsePtr->maxtokens > 0) {
       for (i=0; i<maxtokens; i++)
-        if(parsePtr->token[i].fullstring) free(parsePtr->token[i].fullstring);
+	if(parsePtr->token[i].fullstring) free(parsePtr->token[i].fullstring); 
       free(parsePtr->token);
     }
     /* Free memory for lists of comments and delimiters */
@@ -256,10 +257,10 @@ int ccp4_parse_init_token(const CCP4PARSERARRAY *parsePtr, const int itok)
   if (parsePtr) {
     if (itok < parsePtr->maxtokens) {
       /* Full string is dynamically allocated - free the
-         associated memory, if assigned */
+	 associated memory, if assigned */
       if (parsePtr->token[itok].fullstring) {
-          free(parsePtr->token[itok].fullstring);
-          parsePtr->token[itok].fullstring = NULL;
+	  free(parsePtr->token[itok].fullstring);
+	  parsePtr->token[itok].fullstring = NULL;
       }
       /* Set fixed string tokens to empty string */
       strcpy(parsePtr->token[itok].word,"");
@@ -318,7 +319,7 @@ int ccp4_parse_reset(CCP4PARSERARRAY *parsePtr)
 */
 
 int ccp4_parse_delimiters(CCP4PARSERARRAY *parsePtr,
-                          const char *delim, const char *nulldelim)
+			  const char *delim, const char *nulldelim)
 {
   const char defdelim[]=" \t,=\r",defnulldelim[]=",=";
   char *delimPtr=NULL,*nulldelimPtr=NULL;
@@ -336,9 +337,9 @@ int ccp4_parse_delimiters(CCP4PARSERARRAY *parsePtr,
     if (delimPtr) {
       ldelim--;
       if (!delim) {
-        strncpy(delimPtr,defdelim,ldelim+1);
+	strncpy(delimPtr,defdelim,ldelim+1);
       } else {
-        strncpy(delimPtr,delim,ldelim+1);
+	strncpy(delimPtr,delim,ldelim+1);
       }
       delimPtr[ldelim] = '\0';
     }
@@ -353,9 +354,9 @@ int ccp4_parse_delimiters(CCP4PARSERARRAY *parsePtr,
     if (nulldelimPtr) {
       lnulldelim--;
       if (!nulldelim) {
-        strncpy(nulldelimPtr,defnulldelim,lnulldelim+1);
+	strncpy(nulldelimPtr,defnulldelim,lnulldelim+1);
       } else {
-        strncpy(nulldelimPtr,nulldelim,lnulldelim+1);
+	strncpy(nulldelimPtr,nulldelim,lnulldelim+1);
       }
       nulldelimPtr[lnulldelim] = '\0';
     }
@@ -409,9 +410,9 @@ int ccp4_parse_comments(CCP4PARSERARRAY *parsePtr, const char *comment_chars)
     commentPtr = (char *) ccp4_utils_malloc(sizeof(char)*lcomment);
     if (commentPtr) {
       if (!comment_chars) {
-        strncpy(commentPtr,def_comment_chars,lcomment);
+	strncpy(commentPtr,def_comment_chars,lcomment);
       } else {
-        strncpy(commentPtr,comment_chars,lcomment);
+	strncpy(commentPtr,comment_chars,lcomment);
       }
       lcomment--;
       commentPtr[lcomment] = '\0';
@@ -442,7 +443,7 @@ int ccp4_parse_comments(CCP4PARSERARRAY *parsePtr, const char *comment_chars)
 */
 
 int ccp4_parse_maxmin(CCP4PARSERARRAY *parsePtr, const double max_exponent,
-                      const double min_exponent)
+		      const double min_exponent)
 {
   if (parsePtr) {
     parsePtr->max_exponent = (double) max_exponent;
@@ -456,7 +457,7 @@ int ccp4_parse_maxmin(CCP4PARSERARRAY *parsePtr, const double max_exponent,
 /* ccp4_parse
 
    This is a scanner based on the old CCP4 Fortranic PARSE routine.
-
+ 
    It takes an input string ("line") and returns the number of
    tokens ("ntokens") which are delimited by certain characters
    (defaulted to space, tab, comma, equals - these can be changed by
@@ -465,7 +466,7 @@ int ccp4_parse_maxmin(CCP4PARSERARRAY *parsePtr, const double max_exponent,
    elements in an array ("tokens") of type CCP4PARSERTOKEN (see header
    file for definition and members).
 
-   Substrings can be delimited by single- or double-quotes but must
+   Substrings can be delimited by single- or double-quotes but must 
    be surrounded by delimiters to be recognised.
 
    An unquoted comment character (defaulted to ! or #) in the input line
@@ -483,10 +484,10 @@ int ccp4_parse_maxmin(CCP4PARSERARRAY *parsePtr, const double max_exponent,
 
    line   = pointer to a null-terminated string of characters,
             forming the input to be processed. Unaltered on
-            output.
+	    output.
    parser = pointer to a CCP4PARSERARRAY structure which will
             be used to hold the results of processing the input
-            line.
+	    line.
 */
 
 int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
@@ -557,204 +558,204 @@ int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
       /* Examine characters in pairs */
 
       /* Deal with special case, start and end of line
-         This is to avoid accessing non-existant parts of the string */
+	 This is to avoid accessing non-existant parts of the string */
       if (ich < start) {
-        this_char = delim[0];
+	this_char = delim[0];
       } else {
-        this_char = line[ich];
+	this_char = line[ich];
       }
       if (ich == llen-1) {
-        next_char = delim[0];
+	next_char = delim[0];
       } else {
-        next_char = line[ich+1];
+	next_char = line[ich+1];
       }
       if (diag) printf("CCP4_PARSE: %d: Current char = \"%c\" : \n",ich,this_char);
 
       /* Set flags for this round
-         The pairs of characters are analysed and flags set
-         accordingly to signal actions after the analysis */
+	 The pairs of characters are analysed and flags set
+	 accordingly to signal actions after the analysis */
       starttoken = 0;
       endtoken   = 0;
 
       if (!quotedstring) {
-        /* Not in a quoted string so look for opening quotes
-           This is delimiter followed by quote character */
+	/* Not in a quoted string so look for opening quotes
+	   This is delimiter followed by quote character */
 
-        /* Is current character a delimiter character? */
-        isdelim = charmatch(this_char,delim);
+	/* Is current character a delimiter character? */
+	isdelim = charmatch(this_char,delim);
+	
+	/* Is next charcter a quote character? */
+	isquote = charmatch(next_char,quot);
 
-        /* Is next charcter a quote character? */
-        isquote = charmatch(next_char,quot);
+	/* Start of quoted string? */
+	if (isdelim && isquote) {
 
-        /* Start of quoted string? */
-        if (isdelim && isquote) {
+	  if (diag) printf("CCP4_PARSE: start of a quoted string\n");
+	  quotedstring = 1;
+	  starttoken = 1;
+	  matchquote = next_char;
+	  /* Advance to the next character immediately */
+	  ich++;
 
-          if (diag) printf("CCP4_PARSE: start of a quoted string\n");
-          quotedstring = 1;
-          starttoken = 1;
-          matchquote = next_char;
-          /* Advance to the next character immediately */
-          ich++;
+	} else {
+	  /* Not the start of a quoted string */
 
-        } else {
-          /* Not the start of a quoted string */
+	  /* Is the current character the start of a comment? */
+	  iscommt = charmatch(this_char,comm);
+	  if (iscommt) {
+	    if (diag) printf("CCP4_PARSE: start of a comment\n");
+	  }
 
-          /* Is the current character the start of a comment? */
-          iscommt = charmatch(this_char,comm);
-          if (iscommt) {
-            if (diag) printf("CCP4_PARSE: start of a comment\n");
-          }
+	  /* Is the current character the start or end of a token? */
+	  if (!isdelim) {
 
-          /* Is the current character the start or end of a token? */
-          if (!isdelim) {
+	    /* End of the current token?
+	       Only if we are in a token now, and the next
+	       character is a delimiter or a comment */
+	    if (token && (charmatch(next_char,delim) || charmatch(next_char,comm))) {
+	      if (diag) printf("CCP4_PARSE: end of a token\n");
+	      endtoken = 1;
+	    }
 
-            /* End of the current token?
-               Only if we are in a token now, and the next
-               character is a delimiter or a comment */
-            if (token && (charmatch(next_char,delim) || charmatch(next_char,comm))) {
-              if (diag) printf("CCP4_PARSE: end of a token\n");
-              endtoken = 1;
-            }
+	  } else {
 
-          } else {
+	    /* Start of a token?
+	       Only if we are not in a token now, and the next character
+	       is not a delimiter (or a comment) too */
+	    if (!token && !(charmatch(next_char,delim) || charmatch(next_char,comm))) {
+		if (diag) printf("CCP4_PARSE: start of a token\n");
+		starttoken = 1;
+	    }
+	    
+	    /* Or - could be a null token?
+	       This is a pair of null delimiters together */
+	    if (!token && charmatch(this_char,nulldelim)
+		&& charmatch(next_char,nulldelim)) {
+	      if (diag) printf("CCP4_PARSE: null token\n");
+	      starttoken = 1;
+	      nulltoken  = 1;
+	    }
 
-            /* Start of a token?
-               Only if we are not in a token now, and the next character
-               is not a delimiter (or a comment) too */
-            if (!token && !(charmatch(next_char,delim) || charmatch(next_char,comm))) {
-                if (diag) printf("CCP4_PARSE: start of a token\n");
-                starttoken = 1;
-            }
-
-            /* Or - could be a null token?
-               This is a pair of null delimiters together */
-            if (!token && charmatch(this_char,nulldelim)
-                && charmatch(next_char,nulldelim)) {
-              if (diag) printf("CCP4_PARSE: null token\n");
-              starttoken = 1;
-              nulltoken  = 1;
-            }
-
-          }
-          /* End of token identification */
-        }
-
+	  }
+	  /* End of token identification */
+	}
+	
       } else {
-        /* Inside a quoted string so look for closing quotes
-           This is a matching quote followed by a delimiter */
+	/* Inside a quoted string so look for closing quotes
+	   This is a matching quote followed by a delimiter */
+	
+	/* Is current character a matching quote? */
+	isquote = (this_char == matchquote);
 
-        /* Is current character a matching quote? */
-        isquote = (this_char == matchquote);
+	/* Is next charcter a delimiter character? */
+	isdelim = charmatch(next_char,delim);
 
-        /* Is next charcter a delimiter character? */
-        isdelim = charmatch(next_char,delim);
-
-        /* End of quoted string */
-        if (isdelim && isquote) {
-          if (diag) printf("CCP4_PARSE: end of a quoted string\n");
-          quotedstring = 0;
-          endtoken = 1;
-          matchquote = ' ';
-        }
-        /* End of character analyses */
+	/* End of quoted string */
+	if (isdelim && isquote) {
+	  if (diag) printf("CCP4_PARSE: end of a quoted string\n");
+	  quotedstring = 0;
+	  endtoken = 1;
+	  matchquote = ' ';
+	}
+	/* End of character analyses */
       }
 
       /* Start of new token */
       if (starttoken) {
-        /* Check we don't have maximum number of tokens already */
-        if (ntok < maxtok) {
-          /* Set flags */
-          token = 1;
-          if (quotedstring || !nulltoken) {
-            ibeg = ich + 1;
-          } else {
-            ibeg = ich;
-          }
-          if (diag) printf("CCP4_PARSE: Start of a new token... ibeg = %d\n",ibeg);
-          /* Initialise values */
-          tokenarray[ntok].fullstring = NULL;
-          tokenarray[ntok].value    = 0.0;
-          tokenarray[ntok].isstring = 0;
-          tokenarray[ntok].strlength = 0;
-          tokenarray[ntok].isnumber = 0;
-          tokenarray[ntok].intdigits= 0;
-          tokenarray[ntok].frcdigits= 0;
-          tokenarray[ntok].isquoted = 0;
-          tokenarray[ntok].isnull   = 0;
-          /* Flag start of quoted string */
-          if (quotedstring) { tokenarray[ntok].isquoted = 1; }
-          /* Flag null token */
-          if (nulltoken) {
-            if (diag) printf("CCP4_PARSE: Null token\n");
-            tokenarray[ntok].isnull = 1;
-            tokenarray[ntok].iend   = ich;
-            token = 0;
-            nulltoken = 0;
-          }
-        } else {
-          /* Maximum number of tokens already found */
+	/* Check we don't have maximum number of tokens already */
+	if (ntok < maxtok) {
+	  /* Set flags */
+	  token = 1;
+	  if (quotedstring || !nulltoken) {
+	    ibeg = ich + 1;
+	  } else {
+	    ibeg = ich;
+	  }
+	  if (diag) printf("CCP4_PARSE: Start of a new token... ibeg = %d\n",ibeg);
+	  /* Initialise values */
+	  tokenarray[ntok].fullstring = NULL;
+	  tokenarray[ntok].value    = 0.0;
+	  tokenarray[ntok].isstring = 0;
+	  tokenarray[ntok].strlength = 0;
+	  tokenarray[ntok].isnumber = 0;
+	  tokenarray[ntok].intdigits= 0;
+	  tokenarray[ntok].frcdigits= 0;
+	  tokenarray[ntok].isquoted = 0;
+	  tokenarray[ntok].isnull   = 0;
+	  /* Flag start of quoted string */
+	  if (quotedstring) { tokenarray[ntok].isquoted = 1; }
+	  /* Flag null token */
+	  if (nulltoken) {
+	    if (diag) printf("CCP4_PARSE: Null token\n");
+	    tokenarray[ntok].isnull = 1;
+	    tokenarray[ntok].iend   = ich;
+	    token = 0;
+	    nulltoken = 0;
+	  }
+	} else {
+	  /* Maximum number of tokens already found */
           ccp4_signal(CPARSER_ERRNO(CPARSERR_MaxTokExceeded),"ccp4_parse",NULL);
-          parser->ntokens = ntok;
-          return ntok;
-        }
-        if (diag) printf("CCP4_PARSE: This is the start of token %d\n",ntok);
+	  parser->ntokens = ntok;
+	  return ntok;
+	}
+	if (diag) printf("CCP4_PARSE: This is the start of token %d\n",ntok);
       }
       /* End of new token */
 
       /* End of current token */
       if (endtoken) {
-        token = 0;
-        /* Exclude trailing quote from the token? */
-        if (tokenarray[ntok].isquoted) {
-          iend = ich - 1;
-        } else {
-          iend = ich;
-        }
-        if (diag) printf("CCP4_PARSE: End of a token... iend = %d\n",iend);
-        /* Store the full token in the array */
-        lword = iend - ibeg + 1;
-        if (diag) printf("CCP4_PARSE: lword = %d - start char = %c, end char = %c\n",
-                         lword,line[ibeg],line[iend]);
-        tokenarray[ntok].fullstring = (char *) ccp4_utils_malloc(sizeof(char)*(lword+1));
-        if (tokenarray[ntok].fullstring) {
-          strncpy(tokenarray[ntok].fullstring,&line[ibeg],lword);
-          tokenarray[ntok].fullstring[lword] = '\0';
-          if (diag) printf("CCP4_PARSE: Token is \"%s\"\n",tokenarray[ntok].fullstring);
-        } else {
+	token = 0;
+	/* Exclude trailing quote from the token? */
+	if (tokenarray[ntok].isquoted) {
+	  iend = ich - 1;
+	} else {
+	  iend = ich;
+	}
+	if (diag) printf("CCP4_PARSE: End of a token... iend = %d\n",iend);
+	/* Store the full token in the array */
+	lword = iend - ibeg + 1;
+	if (diag) printf("CCP4_PARSE: lword = %d - start char = %c, end char = %c\n",
+			 lword,line[ibeg],line[iend]);
+	tokenarray[ntok].fullstring = (char *) ccp4_utils_malloc(sizeof(char)*(lword+1));
+	if (tokenarray[ntok].fullstring) {
+	  strncpy(tokenarray[ntok].fullstring,&line[ibeg],lword);
+	  tokenarray[ntok].fullstring[lword] = '\0';
+	  if (diag) printf("CCP4_PARSE: Token is \"%s\"\n",tokenarray[ntok].fullstring);
+	} else {
           ccp4_signal(CPARSER_ERRNO(CPARSERR_AllocFail),"ccp4_parse",NULL);
-        }
-        tokenarray[ntok].ibeg = ibeg;
-        tokenarray[ntok].iend = iend;
-        /* Store the 4 character token in the array */
-        if (lword > 4) lword = 4;
-        strncpy(tokenarray[ntok].word,&line[ibeg],lword);
-        tokenarray[ntok].word[lword] = '\0';
-        /* Determine numerical value (if any) */
-        if (doublefromstr(tokenarray[ntok].fullstring,parser->max_exponent,
-                          parser->min_exponent,&value,&intvalue,&intdigits,
-                          &frcvalue,&frcdigits,&expvalue,&expdigits)) {
-          if (diag) printf("CCP4_PARSE: This has a numerical value of %lf\n",value);
-          tokenarray[ntok].value     = value;
-          tokenarray[ntok].isnumber  = 1;
-          tokenarray[ntok].intdigits = intdigits;
-          tokenarray[ntok].frcdigits = frcdigits;
-        } else {
-          if (diag) printf("CCP4_PARSE: There is no numerical value for this token\n");
-          tokenarray[ntok].isstring = 1;
-          tokenarray[ntok].strlength   = strlen(tokenarray[ntok].fullstring);
-        }
-        /* Reset flags etc ready for next token*/
-        token  = 0;
-        value  = 0.0;
-        /* Increment number of tokens */
-        ntok++;
-        if (diag) printf("CCP4_PARSE: This is the end of a token\n");
+	}
+	tokenarray[ntok].ibeg = ibeg;
+	tokenarray[ntok].iend = iend;
+	/* Store the 4 character token in the array */
+	if (lword > 4) lword = 4; 
+	strncpy(tokenarray[ntok].word,&line[ibeg],lword);
+	tokenarray[ntok].word[lword] = '\0';
+	/* Determine numerical value (if any) */
+	if (doublefromstr(tokenarray[ntok].fullstring,parser->max_exponent,
+			  parser->min_exponent,&value,&intvalue,&intdigits,
+			  &frcvalue,&frcdigits,&expvalue,&expdigits)) {
+	  if (diag) printf("CCP4_PARSE: This has a numerical value of %lf\n",value);
+	  tokenarray[ntok].value     = value;
+	  tokenarray[ntok].isnumber  = 1;
+	  tokenarray[ntok].intdigits = intdigits;
+	  tokenarray[ntok].frcdigits = frcdigits;
+	} else {
+	  if (diag) printf("CCP4_PARSE: There is no numerical value for this token\n");
+	  tokenarray[ntok].isstring = 1;
+	  tokenarray[ntok].strlength   = strlen(tokenarray[ntok].fullstring);
+	}
+	/* Reset flags etc ready for next token*/
+	token  = 0;
+	value  = 0.0;
+	/* Increment number of tokens */
+	ntok++;
+	if (diag) printf("CCP4_PARSE: This is the end of a token\n");
       }
 
       /* Don't do any more processing after a comment */
       if (iscommt) {
-        parser->ntokens = ntok;
-        return ntok;
+	parser->ntokens = ntok;
+	return ntok;
       }
       /* Check the next pair of characters */
     }
@@ -793,29 +794,29 @@ int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
    structure "parser" and can be accessed by the application program.
 
    The function returns the number of tokens, or 0 on reaching end of file.
-   On encountering an unrecoverable error ccp4_parser returns -1.
+   On encountering an unrecoverable error ccp4_parser returns -1. 
 
    Arguments:
 
    line   = pointer to a null-terminated string of characters,
             forming the input to be processed.
-            On input can either be an empty string ("") or
-            contain characters to be processed (see above for
-            description).
-            On output "line" will be overwritten with the actual
-            input line, up to nchar characters.
+	    On input can either be an empty string ("") or
+	    contain characters to be processed (see above for
+	    description).
+	    On output "line" will be overwritten with the actual
+	    input line, up to nchar characters.
    nchars = maximum number of characters that can be read into
             "line" i.e. the size of "line" in memory.
    parser = pointer to a CCP4PARSERARRAY structure which will
             be used to hold the results of processing the input
-            line.
+	    line.
    print  = flag controlling echoing of input lines to stdout.
             print=0: suppress echoing of lines to stdout
-            Otherwise echoing is turned on.
+	    Otherwise echoing is turned on.
 */
 
 int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
-                const int print)
+		const int print)
 {
   int fromstdin=0,fromfile=0,fromapp=0,diag=0;
   int nch,nold,continuation,first,trunc,llen,buflen;
@@ -861,7 +862,7 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
   ntok       = parser->ntokens;
   filein     = parser->fp;
   if (diag) printf("CCP4_PARSER: parser->ntokens = %d, ntok = %d\n",
-                   parser->ntokens,ntok);
+		   parser->ntokens,ntok);
 
   /* Set up an internal buffer for input
      The buffer is over-allocated (twice as long as the max string
@@ -896,10 +897,10 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
 
   /* Set flag for first line of input */
   first = 1;
-
+  
   /* Set flag for line continuation */
   continuation = 1;
-
+  
   /* Start the input loop */
   while (continuation) {
 
@@ -908,31 +909,31 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
     if (fromstdin) {
       if (diag) printf("CCP4_PARSER: reading from stdin...\n");
       if (!fgets(linein,buflen,stdin)) {
-        /* Jump out at this point if eof is reached from
-           stdin */
-        return 0;
+	/* Jump out at this point if eof is reached from
+	   stdin */
+	return 0;
       }
     } else if (fromfile) {
       if (diag) printf("CCP4_PARSER: reading from external file...\n");
       if (!fgets(linein,buflen,filein)) {
-        /* Return to input from stdin if eof is read from
-           the external file */
-        if (diag) printf("CCP4_PARSER: End of external file reached\n");
-        fclose(filein);
-        filein = NULL;
-        fromfile  = 0;
-        fromstdin = 1;
-        /* Blank the line and reset the first flag to
-           force reading from standard input immediately */
-        linein[0] = '\0';
-        ntok      = 0;
-        parser->ntokens = ntok;
-        first     = 1;
+	/* Return to input from stdin if eof is read from
+	   the external file */
+	if (diag) printf("CCP4_PARSER: End of external file reached\n");
+	fclose(filein);
+	filein = NULL;
+	fromfile  = 0;
+	fromstdin = 1;
+	/* Blank the line and reset the first flag to
+	   force reading from standard input immediately */
+	linein[0] = '\0';
+	ntok      = 0;
+	parser->ntokens = ntok;
+	first     = 1;
       }
     } else if (fromapp) {
       if (diag) printf("CCP4_PARSER: reading from application...\n");
       /* If this line contains a continuation mark then
-         read from stdin next time around */
+	 read from stdin next time around */
       strncpy(linein,line,nchars);
       linein[nchars]='\0';
     }
@@ -941,10 +942,10 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
     llen = strlen(linein);
     if (llen > 0)
       if (linein[llen-1] == '\n') {
-        linein[llen-1] = '\0';
-        llen--;
+	linein[llen-1] = '\0';
+	llen--;
       }
-
+    
     /* If previous line ended with a continuation character
        then append this one to it
        Check that we don't overflow the number of characters
@@ -964,7 +965,7 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
       printf("CCP4_PARSER: line = \"%s\"\n",line);
       printf("CCP4_PARSER: remaining available characters = %d\n",nch);
     }
-
+      
     /* Use ccp4_parse to break the input line up into tokens
        Only parse the latest chunk - ccp4_parse will append
        new tokens onto the tokenarray */
@@ -976,69 +977,69 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
     /* Have we found more tokens since last time? */
     if (ntok != nold) {
       /* Check first token to see if it is an instruction
-         to read from an external file */
+	 to read from an external file */
       if (!fromfile && tokenarray[0].word[0] == '@') {
-        if (diag) printf("CCP4_PARSER: Instruction to read from external file\n");
-        /* Get filename and attempt to open file */
-        if (tokenarray[0].fullstring) {
-          llen = strlen(tokenarray[0].fullstring);
-          strncpy(filename,&tokenarray[0].fullstring[1],llen);
-          if (diag) printf("CCP4_PARSER: External file name is \"%s\"\n",filename);
-          /* Open the external file as read-only */
-          filein = fopen(filename,"r");
-          if (!filein) {
+	if (diag) printf("CCP4_PARSER: Instruction to read from external file\n");
+	/* Get filename and attempt to open file */
+	if (tokenarray[0].fullstring) {
+	  llen = strlen(tokenarray[0].fullstring);
+	  strncpy(filename,&tokenarray[0].fullstring[1],llen);
+	  if (diag) printf("CCP4_PARSER: External file name is \"%s\"\n",filename);
+	  /* Open the external file as read-only */
+	  filein = fopen(filename,"r");
+	  if (!filein) {
             ccp4_signal(CPARSER_ERRNO(CPARSERR_CantOpenFile),"ccp4_parser",NULL);
-          } else {
-            fromstdin = 0;
-            fromfile  = 1;
-          }
-        } else {
-          /* Token with file name is null */
+	  } else {
+	    fromstdin = 0;
+	    fromfile  = 1;
+	  }
+	} else {
+	  /* Token with file name is null */
           ccp4_signal(CPARSER_ERRNO(CPARSERR_NoName),"ccp4_parser",NULL);
-        }
-        /* Blank the line and reset the number of tokens
-           to force reading from the external file immediately */
-        line[0] = '\0';
-        ntok    = 0;
-        parser->ntokens = ntok;
+	}
+	/* Blank the line and reset the number of tokens
+	   to force reading from the external file immediately */
+	line[0] = '\0';
+	ntok    = 0;
+	parser->ntokens = ntok;
 
       /* Check last token to see if it is continuation
-         character */
+	 character */
       } else if (ntok > 0 &&
-          (strmatch("&",tokenarray[ntok-1].word) ||
-           strmatch("\\",tokenarray[ntok-1].word) ||
-           strmatch("-",tokenarray[ntok-1].word))) {
-        if (diag) printf("CCP4_PARSER: Detected continuation character\n");
-        /* It's a continuation mark
-           Set flag to indicate this fact in later rounds */
-        continuation = 1;
-        /* Truncate the line to remove the continuation
-           character */
-        if (ntok > 1)
-          trunc = tokenarray[ntok-1].ibeg;
-        else
-          trunc = 0;
-        if (diag) printf("CCP4_PARSER: Continuation character should be at position %d\n\"%c\" is the character at this position\n",trunc,line[trunc]);
-        line[trunc] = '\0';
-        /* Lose the last token */
-        ntok--;
-        parser->ntokens = ntok;
+	  (strmatch("&",tokenarray[ntok-1].word) ||
+	   strmatch("\\",tokenarray[ntok-1].word) ||
+	   strmatch("-",tokenarray[ntok-1].word))) {
+	if (diag) printf("CCP4_PARSER: Detected continuation character\n");
+	/* It's a continuation mark 
+	   Set flag to indicate this fact in later rounds */
+	continuation = 1;
+	/* Truncate the line to remove the continuation
+	   character */
+	if (ntok > 1)
+	  trunc = tokenarray[ntok-1].ibeg;
+	else
+	  trunc = 0;
+	if (diag) printf("CCP4_PARSER: Continuation character should be at position %d\n\"%c\" is the character at this position\n",trunc,line[trunc]);
+	line[trunc] = '\0';
+	/* Lose the last token */ 
+	ntok--;
+	parser->ntokens = ntok;
       } else {
-        /* Not a continuation character */
-        continuation = 0;
+	/* Not a continuation character */
+	continuation = 0;
       }
-
+      
     } else {
       /* Didn't get any more tokens from the last pass
-         Check if it is a blank line or comment line */
+	 Check if it is a blank line or comment line */
       if (ntok == 0) {
-        /* Echo comment line to stdout and blank
-           the line */
-        if (strlen(line) > 0) {
-          if (print) printf(" Comment line--- %s\n",line);
-          line[0] = '\0';
+	/* Echo comment line to stdout and blank
+	   the line */
+	if (strlen(line) > 0) {
+	  if (print) printf(" Comment line--- %s\n",line);
+	  line[0] = '\0';
           nch = nchars;
-        }
+	}
         if (fromapp) continuation = 0;
       }
     }
@@ -1058,8 +1059,8 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
       strtoupper(parser->keyword,tokenarray[0].word);
       parser->keyword[strlen(tokenarray[0].word)] = '\0';
       if (diag) printf("CCP4_PARSER: Keyword is %s\n",parser->keyword);
-      /*Echo the line to standard output */
-      if (print) printf(" Data line--- %s\n",line);
+      /*Echo the line to standard output */ 
+      if (print) printf(" Data line--- %s\n",line); 
     } else {
       parser->keyword[0] = '\0';
     }
@@ -1067,7 +1068,7 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
   free(linein);
   /* Update the returned variables */
   parser->fp = filein;
-
+  
   if (diag) printf("CCP4_PARSER: Returning from ccp4_parser\n");
   return ntok;
 }
@@ -1092,7 +1093,7 @@ int ccp4_keymatch(const char *keyin1, const char *keyin2)
   /* Compare truncated lengths */
   len1 = strlen(keyin1);
   if (len1 > 4) len1 = 4;
-
+ 
   len2 = strlen(keyin2);
   if (len2 > 4) len2 = 4;
 
@@ -1122,7 +1123,7 @@ char *strtoupper (char *str1, const char *str2)
   int len2,i;
 
   if (!str2) return NULL;
-
+  
   len2 = strlen(str2);
   if (len2 > 0) for (i=0; i<len2 ; i++) str1[i] = toupper(str2[i]);
   str1[len2] = '\0';
@@ -1134,7 +1135,7 @@ char *strtolower (char *str1, const char *str2)
   int len2,i;
 
   if (!str2) return NULL;
-
+  
   len2 = strlen(str2);
   if (len2 > 0) for (i=0; i<len2 ; i++) str1[i] = tolower(str2[i]);
   str1[len2] = '\0';
@@ -1227,9 +1228,9 @@ int charmatch(const char character, const char *charlist)
    zero.
 */
 int doublefromstr(const char *str, const double max_exp, const double min_exp,
-                  double *valuePtr, double *intvaluePtr, int *intdigitsPtr,
-                  double *frcvaluePtr, int *frcdigitsPtr,
-                  double *expvaluePtr, int *expdigitsPtr)
+		  double *valuePtr, double *intvaluePtr, int *intdigitsPtr,
+		  double *frcvaluePtr, int *frcdigitsPtr,
+		  double *expvaluePtr, int *expdigitsPtr)
 {
   int    lstr,ichar=0,char_value,diag=0;
   int    sign,expsign,point,exponent,is_int,is_frc,is_exp;
@@ -1276,53 +1277,44 @@ int doublefromstr(const char *str, const double max_exp, const double min_exp,
       if (diag) printf(" is not a digit...\n");
 
       if (this_char == '+' || this_char == '-') {
-        /* Sign? i.e. + or -
-           This can only occur in two places: immediately at the
-           start of the putative number, or immediately at the start
-           of the putative exponent */
-        if (ichar == 0 && this_char == '-') {
-          sign = -1;
-        } else if (ichar == exponent + 1 && this_char == '-') {
-          expsign = -1;
-        } else if (this_char != '+') {
-          return 0;
-        }
+	/* Sign? i.e. + or -
+	   This can only occur in two places: immediately at the
+	   start of the putative number, or immediately at the start
+	   of the putative exponent */
+	if (ichar == 0 && this_char == '-') {
+	  sign = -1;
+	} else if (ichar == exponent + 1 && this_char == '-') {
+	  expsign = -1;
+	} else if (this_char != '+') {
+	  return 0;
+	}
 
       } else if (this_char == '.') {
-        /* Decimal point? i.e. .
-           There can only be one decimal point */
-        if (point > -1) return 0;
-        point = ichar;
-        is_int = 0;
-        is_frc = 1;
+	/* Decimal point? i.e. .
+	   There can only be one decimal point */
+	if (point > -1) return 0;
+	point = ichar;
+	is_int = 0;
+	is_frc = 1;
 
       } else if (toupper(this_char) == 'E') {
-        char exponent_char;
-        /* E must be followed by [+-]digit */
-        if (ichar+1 >= lstr) return 0;
-        exponent_char = str[ichar+1];
-        if (exponent_char == '+' || exponent_char == '-') {
-          if (ichar+2 >= lstr) return 0;
-          exponent_char = str[ichar+2];
-        }
-        if (!isdigit(exponent_char)) return 0;
-        /* Exponent? i.e. e or E
-           There can only be one exponent */
-        if (exponent > -1) return 0;
-        exponent = ichar;
-        is_int = 0;
-        is_frc = 0;
-        is_exp = 1;
+	/* Exponent? i.e. e or E
+	   There can only be one exponent */
+	if (exponent > -1) return 0;
+	exponent = ichar;
+	is_int = 0;
+	is_frc = 0;
+	is_exp = 1;
 
       } else {
-        /* Not a permissible character
-           This is not a number so get out now */
-        if (diag) printf("DOUBLEFROMSTR: Not a permitted character - exiting\n");
-        return 0;
+	/* Not a permissible character
+	   This is not a number so get out now */
+	if (diag) printf("DOUBLEFROMSTR: Not a permitted character - exiting\n");
+	return 0;
       }
     } else {
       /* It is a digit
-         Build up the value of each component */
+	 Build up the value of each component */
 
       if (diag) printf(" is a digit ...\n");
 
@@ -1331,20 +1323,20 @@ int doublefromstr(const char *str, const double max_exp, const double min_exp,
       char_value = atoi(this_str);
 
       if (is_int) {
-        /* Integer part of the number */
-        n_int_digits++;
-        int_value = int_value * 10.0 + (double) char_value;
-        if (diag) printf("DOUBLEFROMSTR: Processing integer component: value = %lf, #digits = %d\n",int_value,n_int_digits);
+	/* Integer part of the number */
+	n_int_digits++;
+	int_value = int_value * 10.0 + (double) char_value;
+	if (diag) printf("DOUBLEFROMSTR: Processing integer component: value = %lf, #digits = %d\n",int_value,n_int_digits);
       } else if (is_frc) {
-        /* Decimal part of the number */
-        n_frc_digits++;
-        frc_value = frc_value + ((double) char_value)/pow(10.0,(double) n_frc_digits);
-        if (diag) printf("DOUBLEFROMSTR: Processing decimal component: value = %lf, #digits = %d\n",frc_value,n_frc_digits);
+	/* Decimal part of the number */
+	n_frc_digits++;
+	frc_value = frc_value + ((double) char_value)/pow(10.0,(double) n_frc_digits);
+	if (diag) printf("DOUBLEFROMSTR: Processing decimal component: value = %lf, #digits = %d\n",frc_value,n_frc_digits);
       } else if (is_exp) {
-        /* Exponent */
-        n_exp_digits++;
-        exp_value = exp_value * 10.0 + (double) char_value;
-        if (diag) printf("DOUBLEFROMSTR: Processing exponential component: value = %lf, #digits = %d\n",exp_value,n_exp_digits);
+	/* Exponent */
+	n_exp_digits++;
+	exp_value = exp_value * 10.0 + (double) char_value;
+	if (diag) printf("DOUBLEFROMSTR: Processing exponential component: value = %lf, #digits = %d\n",exp_value,n_exp_digits);
       }
 
     }
@@ -1378,12 +1370,12 @@ int doublefromstr(const char *str, const double max_exp, const double min_exp,
      (ii) can int_part * pow(10.0,exp_value) be evaluated?
      This second is an issue for numbers with int_part > 0.
   */
-  if ( (exp_value + (double) (n_int_digits - 1) > max_exp) &&
+  if ( (exp_value + (double) (n_int_digits - 1) > max_exp) && 
         (n_int_digits || n_frc_digits) ) {
     ccp4_signal(CPARSER_ERRNO(CPARSERR_ExpOverflow),"doublefromstr",NULL);
     printf("DOUBLEFROMSTR: Token is \"%s\"\n",str);
     *valuePtr = 0.0;
-  } else if ( (exp_value < min_exp) &&
+  } else if ( (exp_value < min_exp) && 
         (n_int_digits || n_frc_digits) ) {
     ccp4_signal(CPARSER_ERRNO(CPARSERR_ExpUnderflow),"doublefromstr",NULL);
     printf("DOUBLEFROMSTR: Token is \"%s\"\n",str);
@@ -1395,11 +1387,11 @@ int doublefromstr(const char *str, const double max_exp, const double min_exp,
   }
 
   if (diag) printf("DOUBLEFROMSTR: Integer component = %lf, (%d digits)\n",
-                   *intvaluePtr,*intdigitsPtr);
+		   *intvaluePtr,*intdigitsPtr);
   if (diag) printf("DOUBLEFROMSTR: Decimal component = %lf, (%d digits)\n",
-                   *frcvaluePtr,*frcdigitsPtr);
+		   *frcvaluePtr,*frcdigitsPtr);
   if (diag) printf("DOUBLEFROMSTR: Exponent component = %lf, (%d digits)\n",
-                   *expvaluePtr,*expdigitsPtr);
+		   *expvaluePtr,*expdigitsPtr);
   if (diag) printf("DOUBLEFROMSTR: Finished - value is determined to be %lf\n",*valuePtr);
 
   return 1;
@@ -1453,11 +1445,11 @@ const char *symop_to_mat4(const char *symchs_begin, const char *symchs_end, floa
     /* Parse symop */
     if (isspace(ch)) {
       /* Have to allow symop strings to contain spaces for
-         compatibility with older MTZ files
-         Ignore and step on to next character */
+	 compatibility with older MTZ files
+	 Ignore and step on to next character */
       ++ptr_symchs;
       continue;
-    } else if (ch == ',' || ch == '*') {
+    } else if (ch == ',' || ch == '*') {           
       ++ptr_symchs;
       if (value == 0.0f && col == 3) {
         /* nothing set, this is a problem */
@@ -1514,24 +1506,24 @@ const char *symop_to_mat4(const char *symchs_begin, const char *symchs_end, floa
     } else if (ch == '+' || ch == '-') {
       sign = ((ch == '+')? 1.0f : -1.0f) ;
       ++ptr_symchs;
-      if ( value == 0.0f && col == 3)
-        continue;
+      if ( value == 0.0f && col == 3) 
+	continue;
       /* drop through to evaluation */
     } else if ( ch == '/') {
       ++ptr_symchs;
       if (value == 0.0f) {
-        /* error */
-        symop_to_mat4_err(symchs_begin);
-        return NULL;
+	/* error */
+	symop_to_mat4_err(symchs_begin);
+	return NULL;
       }
       value2 = strtod(ptr_symchs, &cp);
       if (!value2) {
-        /* error */
-        symop_to_mat4_err(symchs_begin);
-        return NULL;
+	/* error */
+	symop_to_mat4_err(symchs_begin);
+	return NULL;
       }
       /* Nb don't apply the sign to value here
-         It will already have been applied in the previous round */
+	 It will already have been applied in the previous round */
       value = (float) value/value2;
       ptr_symchs = cp;
       continue;
@@ -1543,17 +1535,17 @@ const char *symop_to_mat4(const char *symchs_begin, const char *symchs_end, floa
       ++ptr_symchs;
       continue;
     }
-
+   
   /* initialise and clear the relevant array  (init_array == 1)*/
   /* use knowledge that we are using a [4][4] for rot */
   if (init_array) {
-    init_array = 0;
+    init_array = 0;       
     for (j = 0 ; j !=4 ; ++j)
       for (k = 0; k !=4 ; ++k)
         rot[(((nsym << 2) + k ) << 2) +j] = 0.0f;
      rot[(((nsym << 2 ) + 3 )  << 2) +3] = 1.0f;
   }
-
+ 
     /* value to be entered in rot */
     rot[(((nsym << 2) + nops) << 2) + col] = value;
 
@@ -1588,7 +1580,7 @@ const char *symop_to_mat4(const char *symchs_begin, const char *symchs_end, floa
 int symop_to_mat4_err(const char *symop)
 {
   printf("\n **SYMMETRY OPERATOR ERROR**\n\n Error in interpreting symop \"%s\"\n\n",
-         symop);
+	 symop);
   ccp4_signal(CPARSER_ERRNO(CPARSERR_SymopToMat),"symop_to_mat4",NULL);
   return 1;
 }
@@ -1599,7 +1591,7 @@ ccp4_symop mat4_to_rotandtrn(const float rsm[4][4]) {
   ccp4_symop symop;
 
   for (i = 0; i < 3; ++i) {
-    for (j = 0; j < 3; ++j)
+    for (j = 0; j < 3; ++j) 
       symop.rot[i][j]=rsm[i][j];
     symop.trn[i]=rsm[i][3];
   }
@@ -1620,7 +1612,7 @@ void rotandtrn_to_mat4(float rsm[4][4], const ccp4_symop symop) {
   int i,j;
 
   for (i = 0; i < 3; ++i) {
-    for (j = 0; j < 3; ++j)
+    for (j = 0; j < 3; ++j) 
       rsm[i][j]=symop.rot[i][j];
     rsm[i][3]=symop.trn[i];
     rsm[3][i]=0.0;
@@ -1640,12 +1632,12 @@ char *mat4_to_symop(char *symchs_begin, char *symchs_end, const float rsm[4][4])
   int debug=0;
 
   if (debug)
-    for (jdo20 = 0; jdo20 != 4; ++jdo20)
+    for (jdo20 = 0; jdo20 != 4; ++jdo20) 
       printf("Input matrix: %f %f %f %f \n",rsm[jdo20][0],rsm[jdo20][1],
           rsm[jdo20][2],rsm[jdo20][3]);
 
   /* blank output string */
-  for (ich = symchs_begin; ich < symchs_end; ++ich)
+  for (ich = symchs_begin; ich < symchs_end; ++ich) 
     *ich = ' ';
   ich = symchs_begin;
 
@@ -1653,67 +1645,67 @@ char *mat4_to_symop(char *symchs_begin, char *symchs_end, const float rsm[4][4])
     *ich = '0';
     ist = 0;    /* ---- Ist is flag for first character of operator */
     for (jdo10 = 0; jdo10 != 4; ++jdo10) {
-
+      
       if (rsm[jdo20][jdo10] != 0.f) {
-        irsm = (int) rint(fabs(rsm[jdo20][jdo10]));
-
-        if ( rsm[jdo20][jdo10] > 0. && ist) {
-          if (ich >= symchs_end) {
-            ccp4_signal(CCP4_ERRLEVEL(3) | CPARSER_ERRNO(CPARSERR_MatToSymop),
-                        "mat4_to_symop 1", NULL);
-            return NULL; }
-          *ich++ = '+';
-        } else if ( rsm[jdo20][jdo10] < 0.f ) {
-          if (ich >= symchs_end) {
-            ccp4_signal(CCP4_ERRLEVEL(3) | CPARSER_ERRNO(CPARSERR_MatToSymop),
-                        "mat4_to_symop 2", NULL);
-            return NULL; }
-          if (jdo10 != 3) {
-            *ich++ = '-';
-          } else {
-            /* translation part is forced to be positive, see below */
-            *ich++ = '+';
-          }
+	irsm = (int) rint(fabs(rsm[jdo20][jdo10]));
+	
+	if ( rsm[jdo20][jdo10] > 0. && ist) {
+	  if (ich >= symchs_end) {
+	    ccp4_signal(CCP4_ERRLEVEL(3) | CPARSER_ERRNO(CPARSERR_MatToSymop), 
+			"mat4_to_symop 1", NULL);
+	    return NULL; }
+	  *ich++ = '+';
+	} else if ( rsm[jdo20][jdo10] < 0.f ) {
+	  if (ich >= symchs_end) {
+	    ccp4_signal(CCP4_ERRLEVEL(3) | CPARSER_ERRNO(CPARSERR_MatToSymop), 
+			"mat4_to_symop 2", NULL);
+	    return NULL; }
+	  if (jdo10 != 3) {
+	    *ich++ = '-';
+	  } else {
+	    /* translation part is forced to be positive, see below */
+	    *ich++ = '+';
+	  }
           ist = 1;
-        }
-
-        if (jdo10 != 3) {
-          /* rotation part */
-          if (ich+1 >= symchs_end) {
-            ccp4_signal(CCP4_ERRLEVEL(3) | CPARSER_ERRNO(CPARSERR_MatToSymop),
-                      "mat4_to_symop 3", NULL);
-            return NULL; }
-          if (irsm != 1) {
-            *ich++ = numb[irsm];
-            *ich++ = axiscr[jdo10];
-          } else {
-            *ich++ = axiscr[jdo10];
-          }
-          ist = 1;
+	}
+      
+	if (jdo10 != 3) {
+	  /* rotation part */
+	  if (ich+1 >= symchs_end) {
+	    ccp4_signal(CCP4_ERRLEVEL(3) | CPARSER_ERRNO(CPARSERR_MatToSymop), 
+		      "mat4_to_symop 3", NULL);
+	    return NULL; }
+	  if (irsm != 1) {
+	    *ich++ = numb[irsm];
+	    *ich++ = axiscr[jdo10];
+	  } else {
+	    *ich++ = axiscr[jdo10];
+	  }
+	  ist = 1;
         } else {
-          /* translation part */
-          itr = (int) rint(rsm[jdo20][3]*12.0);
+	  /* translation part */
+	  itr = (int) rint(rsm[jdo20][3]*12.0);
           while (itr < 0) itr += 12;
           itr = (itr - 1) % 12;
           if (npntr1[itr] > 0) {
-           if (ich+2 >= symchs_end) {
-            ccp4_signal(CCP4_ERRLEVEL(3) | CPARSER_ERRNO(CPARSERR_MatToSymop),
-                      "mat4_to_symop 4", NULL);
-            return NULL; }
-           *ich++ = numb[npntr1[itr]];
-           *ich++ = '/';
+	   if (ich+2 >= symchs_end) {
+	    ccp4_signal(CCP4_ERRLEVEL(3) | CPARSER_ERRNO(CPARSERR_MatToSymop), 
+		      "mat4_to_symop 4", NULL);
+	    return NULL; }
+	   *ich++ = numb[npntr1[itr]];
+	   *ich++ = '/';
            *ich++ = numb[npntr2[itr]];
-          } else {
+	  } else {
            *--ich = ' ';
-          }
-        }
+	  }
+	}
       }
     }
     if (jdo20 != 2) {
       if (*ich == '0')
         ++ich;
       if (ich+2 >= symchs_end) {
-        ccp4_signal(CCP4_ERRLEVEL(3) | CPARSER_ERRNO(CPARSERR_MatToSymop),
+        ccp4_signal(CCP4_ERRLEVEL(3) | CPARSER_ERRNO(CPARSERR_MatToSymop), 
                      "mat4_to_symop 5", NULL);
         return NULL; }
       *ich++ = ',';
@@ -1737,15 +1729,15 @@ char *mat4_to_recip_symop(char *symchs_begin, char *symchs_end, const float rsm[
   ich_out = symchs_begin;
   for (ich = symop; ich < symop+lsymop; ++ich) {
     if (*ich == 'X') {
-      if (ich_out == symchs_begin || (ich_out > symchs_begin &&
+      if (ich_out == symchs_begin || (ich_out > symchs_begin && 
           *(ich_out-1) != '-' && *(ich_out-1) != '+')) *ich_out++ = '+';
       *ich_out++ = 'h';
     } else if (*ich == 'Y') {
-      if (ich_out == symchs_begin || (ich_out > symchs_begin &&
+      if (ich_out == symchs_begin || (ich_out > symchs_begin && 
           *(ich_out-1) != '-' && *(ich_out-1) != '+')) *ich_out++ = '+';
       *ich_out++ = 'k';
     } else if (*ich == 'Z') {
-      if (ich_out == symchs_begin || (ich_out > symchs_begin &&
+      if (ich_out == symchs_begin || (ich_out > symchs_begin && 
           *(ich_out-1) != '-' && *(ich_out-1) != '+')) *ich_out++ = '+';
       *ich_out++ = 'l';
     } else if (*ich == ' ') {

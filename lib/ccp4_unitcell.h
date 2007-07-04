@@ -1,6 +1,6 @@
 /*
      ccp4_unitcell.h: headers for C library for ccp4_unitcell.c
-     Copyright (C) 2001  CCLRC, Martyn Winn
+     Copyright (C) 2001  CCLRC, Martyn Winn  
 
      This library is free software and is distributed under the terms and
      conditions of the CCP4 licence agreement as `Part 0' (Annex 2)
@@ -44,7 +44,7 @@
 
 /** @file ccp4_unitcell.h
  *  C library for manipulations based on cell parameters.
- *  Martyn Winn
+ *  Martyn Winn 
  */
 
 #ifndef __CCP4_UNITCELL
@@ -55,7 +55,6 @@ namespace CCP4uc {
 extern "C" {
 #endif
 
-#include "ccp4_errno.h"
 #include <math.h>
 
 /** From input cell and orthogonalisation code, find orthogonalisation
@@ -66,8 +65,8 @@ extern "C" {
  * @param rf
  * @return Cell volume
  */
-double ccp4uc_frac_orth_mat(const double cell[6], const int ncode,
-                           double ro[3][3], double rf[3][3]);
+double ccp4uc_frac_orth_mat(const double cell[6], const int ncode, 
+			   double ro[3][3], double rf[3][3]);
 
 /** From input cell, find dimensions of reciprocal cell.
  * @param cell
@@ -134,7 +133,7 @@ int ccp4uc_is_rhombohedral(const float cell[6], const float tolerance);
 /** Check if cell parameters conform to a hexagonal setting.
  * @param cell Cell parameters. Angles are assumed to be in degrees.
  * @param tolerance A tolerance for agreement.
- * @return 1 if cell parameters conform, 0 otherwise.
+ * @return 1 if cell parameters conform, 0 otherwise. 
  */
 int ccp4uc_is_hexagonal(const float cell[6], const float tolerance);
 

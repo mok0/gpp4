@@ -54,7 +54,7 @@
 </ul>
 
  *  @section utilities_overview Overview
-
+ 
 The CCP4 C-library provides many utility functions which either give
 specific CCP4 functionality (e.g. traditional keyword parsing) or
 are just generally useful (platform independent date).
@@ -83,14 +83,16 @@ are just generally useful (platform independent date).
 #include <pwd.h>
 #endif
 
-#define CCP4_ERRNO(y) (CCP4_ERR_UTILS | (y))
+#define CCP4_ERRNO(y) (CCP4_ERR_UTILS | (y))          
+                                       
+static char rcsid[] = "$Id: library_utils.c,v 1.24 2004/04/02 14:24:59 mdw Exp $";
 
 /* static uint16 nativeIT = NATIVEIT; */ /* machine integer type - currently unused here */
 static uint16 nativeFT = NATIVEFT; /* machine float type */
 
 /** .
- *
- * @return
+ * 
+ * @return 
  */
 int ccp4_utils_translate_mode_float(float *out, const void *buffer, int dim, int mode)
 {
@@ -132,12 +134,12 @@ int ccp4_utils_translate_mode_float(float *out, const void *buffer, int dim, int
   default:
     break;
   }
-
+  
   return (ctr);
 }
 
 /** Gets the length of a Fortran string with trailing blanks removed.
- *
+ * 
  * @return length of string
  */
 size_t ccp4_utils_flength (char *s, int len)
@@ -148,8 +150,8 @@ size_t ccp4_utils_flength (char *s, int len)
 }
 
 /** .
- *
- * @return
+ * 
+ * @return 
  */
 void ccp4_utils_print (const char *message)
 {
@@ -158,8 +160,8 @@ void ccp4_utils_print (const char *message)
 
 #if ! defined (VMS)
 /** .
- *
- * @return
+ * 
+ * @return 
  */
 int ccp4_utils_setenv (char *str)
 {
@@ -199,8 +201,8 @@ int ccp4_utils_setenv (char *str)
 
 #if ! defined (VMS)
 /** .
- *
- * @return
+ * 
+ * @return 
  */
 int ccp4_utils_outbuf(void)
 {
@@ -223,8 +225,8 @@ int ccp4_utils_outbuf(void)
 }
 
 /** .
- *
- * @return
+ * 
+ * @return 
  */
 int ccp4_utils_noinpbuf(void)
 {
@@ -257,8 +259,8 @@ union float_uint_uchar ccp4_nan ()
 }
 
 /** .
- *
- * @return
+ * 
+ * @return 
  */
 int ccp4_utils_isnan (const union float_uint_uchar *realnum)
 {
@@ -267,7 +269,7 @@ int ccp4_utils_isnan (const union float_uint_uchar *realnum)
     case DFNTF_LEIEEE :
       return ((realnum->i & 0x7f800000) == 0x7f800000); /* exponent all 1s */
     case DFNTF_CONVEXNATIVE :
-      return ((realnum->i & 0xff800000) == 0x80000000);
+      return ((realnum->i & 0xff800000) == 0x80000000);      
     case DFNTF_VAX :
       return ((realnum->i & 0x0000ff80) == 0x00008000);
     default :
@@ -278,8 +280,8 @@ int ccp4_utils_isnan (const union float_uint_uchar *realnum)
 
 #define MDFBIG -1.0E10          /* BIOMOL absence flag value */
 /** .
- *
- * @return
+ * 
+ * @return 
  */
 void ccp4_utils_bml (int ncols, union float_uint_uchar cols[])
 {
@@ -290,8 +292,8 @@ void ccp4_utils_bml (int ncols, union float_uint_uchar cols[])
 }
 
 /** .
- *
- * @return
+ * 
+ * @return 
  */
 void ccp4_utils_wrg (int ncols, union float_uint_uchar cols[], float wminmax[])
 {
@@ -304,8 +306,8 @@ void ccp4_utils_wrg (int ncols, union float_uint_uchar cols[], float wminmax[])
 }
 
 /** .
- *
- * @return
+ * 
+ * @return 
  */
 void ccp4_utils_hgetlimits (int *IValueNotDet, float *ValueNotDet)
 {
@@ -314,16 +316,16 @@ void ccp4_utils_hgetlimits (int *IValueNotDet, float *ValueNotDet)
 }
 
 /** .
- *
- * @return
+ * 
+ * @return 
  */
 int ccp4_utils_mkdir (const char *path, const char *cmode)
-#if !defined (_MSC_VER) && !defined(_WIN32)
-{
-  unsigned mode = 0;
-  int result;
+#if !defined (_MVS) && !defined(_WIN32)
+{  
+  mode_t mode = 0;
+  int result; 
 #if defined (__APPLE__)
-  static const unsigned TBM = 0x07;
+  static const unsigned short TBM = 0x07;
 
   switch (strlen(cmode)) {
   case 4:
@@ -334,8 +336,8 @@ int ccp4_utils_mkdir (const char *path, const char *cmode)
     break;
   case 3:
     mode |= (*cmode & TBM) << 6 ;
-    mode |= (*(cmode+1) & TBM) << 3 ;
-    mode |= (*(cmode+2) & TBM) ;
+    mode |= (*(cmode+1) & TBM) << 3 ; 
+    mode |= (*(cmode+2) & TBM) ;      
     break;
   case 2:
     mode |= (*cmode & TBM) << 3 ;
@@ -347,20 +349,20 @@ int ccp4_utils_mkdir (const char *path, const char *cmode)
   default:
     mode = 0x0fff ;
   }
-#else
+#else 
 /* Possible modes (see stat.h)
   Currently pass 3-character string and interpret as octal.
   Try also S_IRWXU, S_IRWXG, etc. */
   sscanf(cmode,"%o",&mode);
-#endif
-  result = mkdir(path, (mode_t) mode);
+#endif   
+  result = mkdir(path,mode); 
 
   if (result == -1) {
     if (errno == EEXIST) {
       result = 1;
     }
   }
-  return (result);
+  return (result); 
 }
 #else
    {
@@ -368,10 +370,10 @@ int ccp4_utils_mkdir (const char *path, const char *cmode)
        return (-1);*/
      int result;
      result = mkdir(path);
-
+     
      if (result == -1) {
        if (errno == EEXIST) {
-         result = 1;
+	 result = 1;
        }
      }
      return (result);
@@ -379,8 +381,8 @@ int ccp4_utils_mkdir (const char *path, const char *cmode)
 #endif
 
 /** .
- *
- * @return
+ * 
+ * @return 
  */
 int ccp4_utils_chmod (const char *path, const char *cmode)
 #if !defined (_MSC_VER) || !defined(_WIN32)
@@ -398,8 +400,8 @@ int ccp4_utils_chmod (const char *path, const char *cmode)
     break;
   case 3:
     mode |= (*cmode & TBM) << 6 ;
-    mode |= (*(cmode+1) & TBM) << 3 ;
-    mode |= (*(cmode+2) & TBM) ;
+    mode |= (*(cmode+1) & TBM) << 3 ; 
+    mode |= (*(cmode+2) & TBM) ;      
     break;
   case 2:
     mode |= (*cmode & TBM) << 3 ;
@@ -411,13 +413,13 @@ int ccp4_utils_chmod (const char *path, const char *cmode)
   default:
     mode = 0x0fff ;
   }
-#else
+#else 
 /* Possible modes (see stat.h)
   Currently pass 3-character string and interpret as octal.
   Try also S_IRWXU, S_IRWXG, etc. */
   sscanf(cmode,"%o",&mode);
 #endif
-  return (chmod(path, (mode_t) mode));
+  return (chmod(path,mode)); 
 }
 #else
    {
@@ -429,12 +431,12 @@ int ccp4_utils_chmod (const char *path, const char *cmode)
 
 /** This is a wrapper for the malloc function, which adds some
  * error trapping.
- *
+ * 
  * @return void
  */
 void *ccp4_utils_malloc(size_t size)
 
-{ void *val;
+{ void *val; 
 
   val = malloc (size);
   if (!val && size)
@@ -446,11 +448,11 @@ void *ccp4_utils_malloc(size_t size)
 
 /** This is a wrapper for the realloc function, which adds some
  * error trapping.
- *
- * @return
+ * 
+ * @return 
  */
 void *ccp4_utils_realloc(void *ptr, size_t size)
-{ void *val;
+{ void *val; 
 
   val = realloc (ptr, size);
   if (!val && size)
@@ -462,11 +464,11 @@ void *ccp4_utils_realloc(void *ptr, size_t size)
 
 /** This is a wrapper for the calloc function, which adds some
  * error trapping.
- *
- * @return
+ * 
+ * @return 
  */
 void *ccp4_utils_calloc(size_t nelem , size_t elsize)
-{ void *val;
+{ void *val; 
 
   val = calloc (nelem, elsize);
   if (!val && elsize)
@@ -486,14 +488,14 @@ void *ccp4_utils_calloc(size_t nelem , size_t elsize)
  */
 #if ! defined (_MSC_VER)
 char *ccp4_utils_username(void)
-{
+{ 
   struct passwd *passwd_struct=NULL;
   char *userid=NULL;
   if (!(userid = getlogin())) {
     passwd_struct = getpwuid(getuid());
     userid = passwd_struct->pw_name;
   }
-  return(userid);
+  return(userid); 
 }
 #endif
 
@@ -509,7 +511,7 @@ char *ccp4_utils_basename(char *filename)
 
   for ( i = strlen(filename)-1; i >= 0; i-- ) {
     if (filename[i] == PATH_SEPARATOR) {
-      indx1 = i;
+      indx1 = i; 
       break;
     }
   }
@@ -518,7 +520,7 @@ char *ccp4_utils_basename(char *filename)
      in case filename has multiple extension separators */
   for ( i = strlen(filename)-1; i >= (indx1 < 0 ? 0 : indx1) ; i-- ) {
     if (filename[i] == EXT_SEPARATOR) {
-      length = i - indx1;
+      length = i - indx1; 
       break;
     }
   }
@@ -540,7 +542,7 @@ char *ccp4_utils_pathname(char *filename)
 
   for ( i = strlen(filename)-1; i >= 0; i-- ) {
     if (filename[i] == PATH_SEPARATOR) {
-      indx1 = i;
+      indx1 = i; 
       break;
     }
   }
@@ -563,11 +565,11 @@ char *ccp4_utils_extension(char *filename)
 
   for ( i = strlen(filename)-1; i >= 0; i-- ) {
     if (filename[i] == EXT_SEPARATOR) {
-      indx1 = i;
+      indx1 = i; 
       length = strlen(filename) - indx1;
       break;
     } else if (filename[i] == PATH_SEPARATOR) {
-      indx1 = i;
+      indx1 = i; 
       length = 1;
       break;
     }
@@ -608,8 +610,8 @@ char *ccp4_utils_joinfilenames(char *dir, char *file)
 }
 
 /** .
- *
- * @return
+ * 
+ * @return 
  */
 void ccp4_utils_idate (int iarray[3])
 {
@@ -623,8 +625,8 @@ void ccp4_utils_idate (int iarray[3])
 }
 
 /** .
- *
- * @return
+ * 
+ * @return 
  */
 char *ccp4_utils_date(char *date)
 {
@@ -647,8 +649,8 @@ void ccp4_utils_itime (int iarray[3])
      time_t tim;
      tim = time(NULL);
      lt = localtime(&tim);
-     iarray[0] = lt->tm_hour;
-     iarray[1] = lt->tm_min;
+     iarray[0] = lt->tm_hour; 
+     iarray[1] = lt->tm_min; 
      iarray[2] = lt->tm_sec;
 }
 
@@ -671,7 +673,7 @@ char *ccp4_utils_time(char *time)
  * @param tarray Array containing User and System times.
  * @return Sum of User and System times.
  */
-#if ! defined (_MSC_VER)
+#if ! defined (_MVS) 
 float ccp4_utils_etime (float tarray[2])
 {
   static long clk_tck = 0;
@@ -709,18 +711,18 @@ float acosf(float x) {
   return (float) acos( (double) x);
 }
 
-float atanf(float x) {
+float atanf(float x) {       
   return (float) atan( (double) x);
 }
 
-float asinf(float x) {
+float asinf(float x) {       
   return (float) asin( (double) x);
 }
 
 #endif
 
-#  if (defined _MSC_VER)
-double rint(double x) {
+#  if (defined _MVS)
+double rint(double x) { 
   if (x >= 0.) {
    return (double)(int)(x+.5);
   }

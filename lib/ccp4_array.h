@@ -1,5 +1,5 @@
 /*
-     ccp4_array.h: header file for resizable array implementation.
+     ccp4_array.h: header file for resizable array implementation. 
      Copyright (C) 2002  Kevin Cowtan
 
      This library is free software and is distributed under the terms and
@@ -99,6 +99,7 @@ extern "C" {
 
 #include <stdlib.h>
 #include <string.h>
+static char rcsidha[] = "$Id: ccp4_array.h,v 1.3 2004/01/23 16:32:50 pjx Exp $";
 
 /*! constant pointer type */
 typedef const void *ccp4_constptr;
@@ -215,61 +216,61 @@ typedef struct ccp4array_base_ {
 */
 #define ccp4array_free(v) ccp4array_free_((ccp4_ptr*)(&v))
 
-/**
- * See macro ccp4array_new
+/** 
+ * See macro ccp4array_new 
 */
 ccp4_ptr ccp4array_new_(ccp4_ptr *p);
-/**
- * See macro ccp4array_new_size
+/** 
+ * See macro ccp4array_new_size 
 */
 ccp4_ptr ccp4array_new_size_(ccp4_ptr *p, const int size, const size_t reclen);
-/**
- * See macro ccp4array_resize
+/** 
+ * See macro ccp4array_resize 
 */
 void ccp4array_resize_(ccp4_ptr *p, const int size, const size_t reclen);
-/**
- * See macro ccp4array_reserve
+/** 
+ * See macro ccp4array_reserve 
 */
 void ccp4array_reserve_(ccp4_ptr *p, const int size, const size_t reclen);
-/**
- * See macro ccp4array_append
+/** 
+ * See macro ccp4array_append 
 */
 void ccp4array_append_(ccp4_ptr *p, ccp4_constptr data, const size_t reclen);
-/**
- * See macro ccp4array_append_n
+/** 
+ * See macro ccp4array_append_n 
 */
 void ccp4array_append_n_(ccp4_ptr *p, ccp4_constptr data, const int n, const size_t reclen);
-/**
- * See macro ccp4array_append_list
+/** 
+ * See macro ccp4array_append_list 
 */
 void ccp4array_append_list_(ccp4_ptr *p, ccp4_constptr data, const int n, const size_t reclen);
-/**
- * See macro ccp4array_insert
+/** 
+ * See macro ccp4array_insert  
 */
 void ccp4array_insert_(ccp4_ptr *p, const int i, ccp4_constptr data, const size_t reclen);
-/**
- * See macro ccp4array_delete_ordered
+/** 
+ * See macro ccp4array_delete_ordered 
 */
 void ccp4array_delete_ordered_(ccp4_ptr *p, const int i, const size_t reclen);
-/**
- * See macro ccp4array_delete
+/** 
+ * See macro ccp4array_delete 
 */
 void ccp4array_delete_(ccp4_ptr *p, const int i, const size_t reclen);
-/**
- * See macro ccp4array_delete_last
+/** 
+ * See macro ccp4array_delete_last 
 */
 void ccp4array_delete_last_(ccp4_ptr *p, const size_t reclen);
-/**
- * See macro ccp4array_size
+/** 
+ * See macro ccp4array_size 
 */
 int ccp4array_size_(ccp4_constptr *p);
-/**
+/** 
  * See macro ccp4array_free
 */
 void ccp4array_free_(ccp4_ptr *p);
 
 #ifdef __cplusplus
-}
+} 
 #endif
 
 #endif /* __CCP4_ARRAY_INC */

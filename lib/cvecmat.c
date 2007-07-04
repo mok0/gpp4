@@ -44,10 +44,11 @@
 
 /** @file cvecmat.c
  *  C library for vector and matrix manipulations.
- *  Martyn Winn
+ *  Martyn Winn 
  */
 
 #include "cvecmat.h"
+static char rcsid[] = "$Id: cvecmat.c,v 1.3 2004/01/26 11:49:20 pjx Exp $";
 
 /*  c = a X b  */
 
@@ -62,10 +63,10 @@ void ccp4_3matmul(double c[3][3], const double a[3][3], const double b[3][3])
 {
   int i,j,k;
 
-  for ( i = 0; i < 3; i++ )
+  for ( i = 0; i < 3; i++ ) 
     for ( j = 0; j < 3; j++ ) {
       c[i][j] = 0.0;
-      for ( k = 0; k < 3; k++ )
+      for ( k = 0; k < 3; k++ ) 
         c[i][j] += a[i][k]*b[k][j];
     }
 }
@@ -74,10 +75,10 @@ void ccp4_4matmul( float c[4][4], const float  a[4][4], const float b[4][4])
 {
   int i,j,k;
 
-  for ( i = 0; i < 4; i++ )
+  for ( i = 0; i < 4; i++ ) 
     for ( j = 0; j < 4; j++ ) {
       c[i][j] = 0.0;
-      for ( k = 0; k < 4; k++ )
+      for ( k = 0; k < 4; k++ ) 
         c[i][j] += a[i][k]*b[k][j];
     }
 }
@@ -97,9 +98,9 @@ double invert3matrix(const double a[3][3], double ai[3][3])
 
   d = a[0][0]*c[0][0] + a[0][1]*c[0][1] + a[0][2]*c[0][2];
 
-  if (d > 1.0e-30 || d < -1.0e-30) {
-    for ( i = 0; i < 3; i++ )
-      for ( j = 0; j < 3; j++ )
+  if (d > 1.0e-30) {
+    for ( i = 0; i < 3; i++ ) 
+      for ( j = 0; j < 3; j++ ) 
         ai[i][j] = c[j][i] / d;
   } else {
     return 0;
@@ -123,27 +124,27 @@ float invert4matrix(const float a[4][4], float ai[4][4])
 
     /* Function Body */
     for (ii = 0; ii < 4; ++ii) {
-        for (jj = 0; jj < 4; ++jj) {
-            i = -1;
-            for (i1 = 0; i1 < 4; ++i1) {
-                if (i1 != ii) {
-                    ++i;
-                    j = -1;
-                    for (j1 = 0; j1 < 4; ++j1) {
-                        if (j1 != jj) {
-                            ++j;
-                            x[i][j] = a[i1][j1];
-                        }
-                    }
-                }
-            }
+	for (jj = 0; jj < 4; ++jj) {
+	    i = -1;
+	    for (i1 = 0; i1 < 4; ++i1) {
+		if (i1 != ii) {
+		    ++i;
+		    j = -1;
+		    for (j1 = 0; j1 < 4; ++j1) {
+			if (j1 != jj) {
+			    ++j;
+			    x[i][j] = a[i1][j1];
+			}
+		    }
+		}
+	    }
 
-            am = x[0][0]*x[1][1]*x[2][2] - x[0][0]*x[1][2]*x[2][1] +
+	    am = x[0][0]*x[1][1]*x[2][2] - x[0][0]*x[1][2]*x[2][1] +
      +         x[0][1]*x[1][2]*x[2][0] - x[0][1]*x[1][0]*x[2][2] +
      +         x[0][2]*x[1][0]*x[2][1] - x[0][2]*x[1][1]*x[2][0];
-            i2 = ii + jj;
-            c[ii][jj] = ccp4_pow_ii(-1.0, i2) * am;
-        }
+	    i2 = ii + jj;
+	    c[ii][jj] = ccp4_pow_ii(-1.0, i2) * am;
+	}
     }
 
 /* ---- Calculate determinant */
@@ -151,7 +152,7 @@ float invert4matrix(const float a[4][4], float ai[4][4])
     d = 0.0;
 
     for (i = 0; i < 4; ++i) {
-        d = a[i][0] * c[i][0] + d;
+	d = a[i][0] * c[i][0] + d;
     }
 
 /* ---- Get inverse matrix */
@@ -159,16 +160,16 @@ float invert4matrix(const float a[4][4], float ai[4][4])
 
   if (d > 1.0e-30) {
     for (i = 0; i < 4; ++i) {
-        for (j = 0; j < 4; ++j) {
-            ai[i][j] = c[j][i] / d;
-        }
+	for (j = 0; j < 4; ++j) {
+	    ai[i][j] = c[j][i] / d;
+	}
     }
   } else {
     return 0;
   }
 
   return d;
-}
+} 
 
 float ccp4_pow_ii(const float base, const int power) {
 

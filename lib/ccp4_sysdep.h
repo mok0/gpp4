@@ -57,7 +57,7 @@
 #  define CALL_LIKE_SUN 1
 #endif
 
-#if defined (__hpux)
+#if defined (__hpux) 
 #  define KNOWN_MACHINE
 #  define CALL_LIKE_HPUX 1
 #endif
@@ -163,8 +163,8 @@
 #ifndef NOUNISTD
 #  include <unistd.h>
 #else
-#  ifndef VMS
-#    ifndef _MSC_VER
+#  ifndef VMS 
+#    ifndef _MVS
 #      include <sys/file.h>     /* ESV, old Concentrix */ /* non-POSIX */
 #    endif
 #  endif
@@ -240,7 +240,7 @@
 #define O_TMP    0x0010       /**< i/o mode: scratch file */
 
 #define BYTE  0
-#define INT16 1
+#define INT16 1   
 #define INT32 6
 #define FLOAT32 2
 #define COMP32  3

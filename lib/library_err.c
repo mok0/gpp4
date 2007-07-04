@@ -51,8 +51,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "ccp4_errno.h"
+static char rcsid[] = "$Id: library_err.c,v 1.17 2004/04/19 14:39:14 mdw Exp $";
 
-/** @global ccp4_errno: global to store data
+/** @global ccp4_errno: global to store data 
 */
 int ccp4_errno = 0;
 
@@ -226,7 +227,7 @@ const char *ccp4_strerror(int error)
     ccp4_errno
     "message : error message "
     param message (const char *)
-    return void
+    return void      
 */
 void ccp4_error (const char *msg)
 {
@@ -236,11 +237,11 @@ void ccp4_error (const char *msg)
     colon = "";
   else
     colon = ": ";
-
+ 
   fprintf (stderr, "%s%s%s\n",
            msg, colon, ccp4_strerror(ccp4_errno));
   if(ccp4_errno != -1 && CCP4_ERRGETSYS(ccp4_errno)) {
-    fprintf (stderr, "System: %s\nLevel: %d\n",
+    fprintf (stderr, "System: %s\nLevel: %d\n", 
              ccp4_errlist[CCP4_ERRGETSYS(ccp4_errno)].system,
              CCP4_ERRGETLEVEL(ccp4_errno));
     if (errno)
@@ -294,8 +295,8 @@ int ccp4_liberr_verbosity(int iverb) {
     param message (const char * const)
     param callback (point to routine)
 */
-void ccp4_signal(const int code, const char * const msg,
-                 void (*callback) ())
+void ccp4_signal(const int code, const char * const msg, 
+		 void (*callback) ())
 {
   int severity = CCP4_ERRGETLEVEL(code),
     system     = CCP4_ERRGETSYS(code),
@@ -309,31 +310,31 @@ void ccp4_signal(const int code, const char * const msg,
   if (!ccp4_liberr_verbosity(-1)) return;
 
   if (system == 0) {
-    if (msg)
+    if (msg) 
       printf(sys_fmt,
-             errno,
-             strerror(errno),
-             error_levels[severity],
-             msg);
-    else
-      printf(">>>>>> System signal %d:%s (%s) <<<<<<",
-             errno,
-             strerror(errno),
-             error_levels[severity]);
+	     errno,
+	     strerror(errno),
+	     error_levels[severity],
+	     msg);
+    else 
+      printf(">>>>>> System signal %d:%s (%s) <<<<<<", 
+	     errno, 
+	     strerror(errno), 
+	     error_levels[severity]);
     ccp4_errno = errno; }
-  else
-    if (msg)
+  else 
+    if (msg) 
       printf(msg_fmt,
-             ccp4_errlist[system].system,
-             ccp4_errlist[system].error_list[msg_no],
-             error_levels[severity],
-             msg);
+	     ccp4_errlist[system].system,
+	     ccp4_errlist[system].error_list[msg_no],
+	     error_levels[severity],
+	     msg);
     else
       printf(">>>>>> CCP4 library signal %s:%s (%s) <<<<<<\n",
-             ccp4_errlist[system].system,
-             ccp4_errlist[system].error_list[msg_no],
-             error_levels[severity]);
-
+	     ccp4_errlist[system].system,
+	     ccp4_errlist[system].error_list[msg_no],
+	     error_levels[severity]);
+  
   if (callback)
     (*callback)();
 

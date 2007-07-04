@@ -53,10 +53,10 @@
 
 #define MTZFILENAME "data::mtzfile::filename"
 #define MTZTITLE "data::mtzfile::title"
-#define MTZSPACEGROUP "data::mtzfile::spacegroup_num"
+#define MTZSPACEGROUP "data::mtzfile::spacegroup_num"        
 #define MTZNUMREFLS "data::mtzfile::num_reflections"
 #define MTZMNF "data::mtzfile::missing_number_flag"
-#define MTZSORTORDER "data::mtzfile::sort_order"
+#define MTZSORTORDER "data::mtzfile::sort_order"          
 
 #define CRYSTALXTALNAME "data::crystal::crystal_name"
 #define CRYSTALPNAME "data::crystal::project_name"

@@ -47,6 +47,7 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
+static char rcsidhv[] = "$Id: cvecmat.h,v 1.3 2004/01/26 11:49:20 pjx Exp $";
 
 void ccp4_dcross(const double a[3], const double b[3], double c[3]);
 void ccp4_3matmul(double c[3][3], const double a[3][3], const double b[3][3]);

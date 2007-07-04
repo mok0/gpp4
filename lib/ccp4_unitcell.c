@@ -44,19 +44,20 @@
 
 /** @file ccp4_unitcell.c
  *  C library for manipulations based on cell parameters.
- *  Martyn Winn
+ *  Martyn Winn 
  */
 
 #include <stdio.h>
 
 #include "ccp4_unitcell.h"
 #include "cvecmat.h"
+static char rcsid[] = "$Id: ccp4_unitcell.c,v 1.3 2004/01/23 16:32:52 pjx Exp $";
 
 /* from input cell and orthogonalisation code, find orthogonalisation
    and fractionalisation matrices. Returns cell volume. */
 
-double ccp4uc_frac_orth_mat(const double cell[6], const int ncode,
-                         double ro[3][3], double rf[3][3])
+double ccp4uc_frac_orth_mat(const double cell[6], const int ncode, 
+			 double ro[3][3], double rf[3][3])
 {
   int i,j;
   double conv,alph,bet,gamm,sina,cosa,sinb,cosb,sing,cosg,
@@ -81,10 +82,10 @@ double ccp4uc_frac_orth_mat(const double cell[6], const int ncode,
   a = cell[0];
   b = cell[1];
   c = cell[2];
-
+	
   /* calculate ro */
-  for ( i = 0; i < 3; i++ )
-    for ( j = 0; j < 3; j++ )
+  for ( i = 0; i < 3; i++ ) 
+    for ( j = 0; j < 3; j++ ) 
       ro[i][j] = 0.0;
 
   /* ncode 1 -  xo along a  zo along c* */
@@ -161,7 +162,7 @@ double ccp4uc_frac_orth_mat(const double cell[6], const int ncode,
 
 }
 
-/* from input cell, find dimensions of reciprocal cell.
+/* from input cell, find dimensions of reciprocal cell. 
    Returns reciprocal cell volume. */
 
 double ccp4uc_calc_rcell(const double cell[6], double rcell[6])
@@ -226,18 +227,18 @@ void ccp4uc_orthu_to_fracu(const double rf[3][3], const double uo[6], double uf[
   int i,j;
   double uomat[3][3], ufmat[3][3], rft[3][3], temp[3][3];
 
-  uomat[0][0] = uo[0]; uomat[0][1] = uo[3]; uomat[0][2] = uo[4];
-  uomat[1][0] = uo[3]; uomat[1][1] = uo[1]; uomat[1][2] = uo[5];
-  uomat[2][0] = uo[4]; uomat[2][1] = uo[5]; uomat[2][2] = uo[2];
-  for ( i = 0; i < 3; i++ )
-    for ( j = 0; j < 3; j++ )
+  uomat[0][0] = uo[0]; uomat[0][1] = uo[3]; uomat[0][2] = uo[4]; 
+  uomat[1][0] = uo[3]; uomat[1][1] = uo[1]; uomat[1][2] = uo[5]; 
+  uomat[2][0] = uo[4]; uomat[2][1] = uo[5]; uomat[2][2] = uo[2]; 
+  for ( i = 0; i < 3; i++ ) 
+    for ( j = 0; j < 3; j++ ) 
       rft[i][j] = rf[j][i];
 
   ccp4_3matmul(temp, (const double (*)[3]) uomat, (const double (*)[3]) rft);
   ccp4_3matmul(ufmat, rf, (const double (*)[3]) temp);
 
-  uf[0] = ufmat[0][0]; uf[1] = ufmat[1][1]; uf[2] = ufmat[2][2];
-  uf[3] = ufmat[0][1]; uf[4] = ufmat[0][2]; uf[5] = ufmat[1][2];
+  uf[0] = ufmat[0][0]; uf[1] = ufmat[1][1]; uf[2] = ufmat[2][2]; 
+  uf[3] = ufmat[0][1]; uf[4] = ufmat[0][2]; uf[5] = ufmat[1][2]; 
 }
 
 /* Convert fractional to orthogonal u matrix. */
@@ -247,18 +248,18 @@ void ccp4uc_fracu_to_orthu(const double ro[3][3], const double uf[6], double uo[
   int i,j;
   double uomat[3][3], ufmat[3][3], rot[3][3], temp[3][3];
 
-  ufmat[0][0] = uf[0]; ufmat[0][1] = uf[3]; ufmat[0][2] = uf[4];
-  ufmat[1][0] = uf[3]; ufmat[1][1] = uf[1]; ufmat[1][2] = uf[5];
-  ufmat[2][0] = uf[4]; ufmat[2][1] = uf[5]; ufmat[2][2] = uf[2];
-  for ( i = 0; i < 3; i++ )
-    for ( j = 0; j < 3; j++ )
+  ufmat[0][0] = uf[0]; ufmat[0][1] = uf[3]; ufmat[0][2] = uf[4]; 
+  ufmat[1][0] = uf[3]; ufmat[1][1] = uf[1]; ufmat[1][2] = uf[5]; 
+  ufmat[2][0] = uf[4]; ufmat[2][1] = uf[5]; ufmat[2][2] = uf[2]; 
+  for ( i = 0; i < 3; i++ ) 
+    for ( j = 0; j < 3; j++ ) 
       rot[i][j] = ro[j][i];
 
   ccp4_3matmul(temp, (const double (*)[3]) ufmat, (const double (*)[3]) rot);
   ccp4_3matmul(uomat, ro, (const double (*)[3]) temp);
 
-  uo[0] = uomat[0][0]; uo[1] = uomat[1][1]; uo[2] = uomat[2][2];
-  uo[3] = uomat[0][1]; uo[4] = uomat[0][2]; uo[5] = uomat[1][2];
+  uo[0] = uomat[0][0]; uo[1] = uomat[1][1]; uo[2] = uomat[2][2]; 
+  uo[3] = uomat[0][1]; uo[4] = uomat[0][2]; uo[5] = uomat[1][2]; 
 }
 
 /* Calculate cell volume from cell parameters */
@@ -283,7 +284,7 @@ int ccp4uc_cells_differ(const double cell1[6], const double cell2[6], const doub
   int i;
   double vol1, vol2, acheck;
 
-  vol1 = ccp4uc_calc_cell_volume(cell1);
+  vol1 = ccp4uc_calc_cell_volume(cell1);  
   vol2 = ccp4uc_calc_cell_volume(cell2);
 
   /* check cell volumes */
@@ -298,25 +299,21 @@ int ccp4uc_cells_differ(const double cell1[6], const double cell2[6], const doub
 
   /* check cell parameters */
   acheck = 0.0;
-  for ( i = 0; i < 6; i++ )
+  for ( i = 0; i < 6; i++ ) 
     acheck += fabs(0.5*(cell2[i]-cell1[i]))/(cell2[i]+cell1[i]);
   if (acheck > 3.0*tolerance) {
-    if (ccp4_liberr_verbosity(-1)) {
-      printf("Large difference in cell parameters detected.\n");
-      printf("  cell1 = %lf %lf %lf %lf %lf %lf \n",
-             cell1[0],cell1[1],cell1[2],cell1[3],cell1[4],cell1[5]);
-      printf("  cell2 = %lf %lf %lf %lf %lf %lf \n",
-             cell2[0],cell2[1],cell2[2],cell2[3],cell2[4],cell2[5]);
-    }
+    printf("Large difference in cell parameters detected.\n");
+    printf("  cell1 = %lf %lf %lf %lf %lf %lf \n",
+	   cell1[0],cell1[1],cell1[2],cell1[3],cell1[4],cell1[5]);
+    printf("  cell2 = %lf %lf %lf %lf %lf %lf \n",
+	   cell2[0],cell2[1],cell2[2],cell2[3],cell2[4],cell2[5]);
     return 1;
   } else if (acheck > tolerance) {
-    if (ccp4_liberr_verbosity(-1)) {
-      printf("Small difference in cell parameters detected.\n");
-      printf("  cell1 = %lf %lf %lf %lf %lf %lf \n",
-             cell1[0],cell1[1],cell1[2],cell1[3],cell1[4],cell1[5]);
-      printf("  cell2 = %lf %lf %lf %lf %lf %lf \n",
-             cell2[0],cell2[1],cell2[2],cell2[3],cell2[4],cell2[5]);
-    }
+    printf("Small difference in cell parameters detected.\n");
+    printf("  cell1 = %lf %lf %lf %lf %lf %lf \n",
+	   cell1[0],cell1[1],cell1[2],cell1[3],cell1[4],cell1[5]);
+    printf("  cell2 = %lf %lf %lf %lf %lf %lf \n",
+	   cell2[0],cell2[1],cell2[2],cell2[3],cell2[4],cell2[5]);
     return 1;
   }
   return 0;

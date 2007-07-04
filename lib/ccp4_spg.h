@@ -50,11 +50,12 @@
  *  quantities. Some items are loaded from syminfo.lib while
  *  others are calculated on the fly.
  *
- *  @author Martyn Winn
+ *  @author Martyn Winn 
  */
 
 #ifndef __CCP4_SPG__
 #define __CCP4_SPG__
+static char rcsidhsp[] = "$Id: ccp4_spg.h,v 1.5 2004/01/23 16:32:52 pjx Exp $";
 
 #ifdef  __cplusplus
 namespace CSym {

@@ -48,6 +48,7 @@
  */
 
 #include "ccp4_array.h"
+static char rcsid[] = "$Id: ccp4_array.c,v 1.2 2004/01/23 16:34:39 pjx Exp $";
 
 ccp4_ptr ccp4array_new_(ccp4_ptr *p)
 {
@@ -134,7 +135,7 @@ void ccp4array_insert_(ccp4_ptr *p, const int i, ccp4_constptr data, const size_
   osize = v->size;
   ccp4array_resize_(p, osize+1, reclen);
   memmove((ccp4_byteptr)(*p)+(i+1)*reclen, (ccp4_byteptr)(*p)+i*reclen, (osize-i)*reclen);
-  memcpy((ccp4_byteptr)(*p)+i*reclen, data, reclen);
+  memcpy((ccp4_byteptr)(*p)+i*reclen, data, reclen);  
 }
 
 void ccp4array_delete_ordered_(ccp4_ptr *p, const int i, const size_t reclen)
