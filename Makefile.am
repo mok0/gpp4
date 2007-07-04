@@ -1,4 +1,5 @@
 ## -*- mode: Makefile ; mode: font-lock -*- 
+## This file is to be processed by automake.
 
 # Build in these directories
 SUBDIRS = lib

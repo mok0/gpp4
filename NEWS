@@ -1,88 +1,9 @@
+2007-07-05  Morten Kjeldgaard  <mok@ghost.bioxray.dk>
 
+	* Version 1.0 of gpp4 now builds and installs correctly with the
+	autotools. Now it's time for testing.
 
-$ patch -p0 < ../ccp4io_502_cci/CCI_DIFFS
-patching file lib/src/ccp4_errno.h
-Hunk #1 FAILED at 111.
-1 out of 1 hunk FAILED -- saving rejects to file lib/src/ccp4_errno.h.rej
-patching file lib/src/ccp4_parser.c
-Hunk #1 FAILED at 1297.
-1 out of 1 hunk FAILED -- saving rejects to file lib/src/ccp4_parser.c.rej
-patching file lib/src/ccp4_sysdep.h
-Hunk #3 FAILED at 164.
-1 out of 4 hunks FAILED -- saving rejects to file lib/src/ccp4_sysdep.h.rej
-patching file lib/src/ccp4_unitcell.c
-Hunk #1 succeeded at 158 (offset 1 line).
-Hunk #2 succeeded at 233 with fuzz 2.
-Hunk #3 succeeded at 255 with fuzz 2 (offset 1 line).
-Hunk #5 FAILED at 301.
-1 out of 5 hunks FAILED -- saving rejects to file lib/src/ccp4_unitcell.c.rej
-patching file lib/src/ccp4_utils.h
-Hunk #1 succeeded at 122 (offset 1 line).
-patching file lib/src/cmtzlib.c
-Hunk #1 succeeded at 85 (offset 1 line).
-Hunk #3 succeeded at 158 (offset 1 line).
-Hunk #5 succeeded at 182 (offset 1 line).
-Hunk #7 succeeded at 225 with fuzz 1 (offset 1 line).
-Hunk #9 succeeded at 278 (offset 1 line).
-Hunk #11 succeeded at 332 (offset 1 line).
-Hunk #12 FAILED at 353.
-Hunk #13 FAILED at 389.
-Hunk #14 succeeded at 447 with fuzz 2.
-Hunk #15 succeeded at 505 with fuzz 2 (offset 1 line).
-Hunk #16 FAILED at 541.
-Hunk #17 FAILED at 562.
-Hunk #18 succeeded at 584 with fuzz 1.
-Hunk #19 succeeded at 680 (offset 1 line).
-Hunk #21 succeeded at 1772 (offset 1 line).
-Hunk #23 FAILED at 2549.
-Hunk #24 succeeded at 2733 (offset 1 line).
-Hunk #26 succeeded at 2993 (offset 1 line).
-Hunk #28 FAILED at 3072.
-Hunk #29 succeeded at 3096 (offset 1 line).
-Hunk #31 succeeded at 3124 (offset 1 line).
-Hunk #33 succeeded at 3212 (offset 1 line).
-Hunk #34 FAILED at 3252.
-7 out of 34 hunks FAILED -- saving rejects to file lib/src/cmtzlib.c.rej
-patching file lib/src/cmtzlib.h
-Hunk #1 succeeded at 153 (offset 2 lines).
-Hunk #2 succeeded at 1002 with fuzz 2.
-patching file lib/src/csymlib.c
-Hunk #1 succeeded at 855 with fuzz 2 (offset 1 line).
-patching file lib/src/cvecmat.c
-Hunk #1 FAILED at 97.
-1 out of 1 hunk FAILED -- saving rejects to file lib/src/cvecmat.c.rej
-patching file lib/src/library_err.c
-Hunk #1 succeeded at 340 (offset 1 line).
-patching file lib/src/library_file.c
-Hunk #2 succeeded at 333 with fuzz 1 (offset 1 line).
-Hunk #3 FAILED at 372.
-Hunk #4 succeeded at 421 with fuzz 2.
-Hunk #5 succeeded at 542 (offset 1 line).
-Hunk #7 succeeded at 800 (offset 1 line).
-Hunk #8 succeeded at 821 with fuzz 2.
-Hunk #9 succeeded at 854 (offset 1 line).
-Hunk #10 succeeded at 869 with fuzz 1.
-Hunk #11 succeeded at 883 (offset 1 line).
-Hunk #12 succeeded at 910 with fuzz 1.
-Hunk #13 succeeded at 927 with fuzz 1 (offset 1 line).
-Hunk #14 succeeded at 942 with fuzz 2.
-Hunk #15 FAILED at 976.
-Hunk #16 FAILED at 998.
-Hunk #17 succeeded at 2058 (offset 1 line).
-Hunk #18 succeeded at 2072 with fuzz 1.
-Hunk #19 succeeded at 2105 with fuzz 2 (offset 1 line).
-3 out of 20 hunks FAILED -- saving rejects to file lib/src/library_file.c.rej
-patching file lib/src/library_utils.c
-Hunk #2 succeeded at 170 (offset 2 lines).
-Hunk #4 succeeded at 237 (offset 2 lines).
-Hunk #6 succeeded at 299 (offset 2 lines).
-Hunk #7 FAILED at 320.
-Hunk #8 FAILED at 355.
-Hunk #9 succeeded at 383 with fuzz 1.
-Hunk #10 FAILED at 417.
-Hunk #11 succeeded at 486 with fuzz 2 (offset 2 lines).
-Hunk #12 FAILED at 673.
-Hunk #14 FAILED at 719.
-5 out of 14 hunks FAILED -- saving rejects to file lib/src/library_utils.c.rej
-
-
+Local variables:
+mode: change-log
+mode: font-lock
+End:

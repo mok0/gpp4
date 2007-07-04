@@ -1,18 +1,71 @@
+-*- mode: text -*-
+
 Using git for gpp4 development
 ==============================
 
 This text is aimed at software developers wanting to contribute to
-this version of the CCP4 library.
+this version of the CCP4 library. Parts of it have been extracted from
+the git manual [1] and customized specifically for gpp4 development.
 
 If you are reading this, you have already cloned the gpp4 directory
 using:
 
   git clone http://www.bioxray.dk/~mok/gpp4.git
 
+giving you a directory containing the gpp4 distribution, including the file
+that you are now reading. This directory is under git revision control, so
+you can now use git to keep track of your development work. First, 
 
+  $ git status
+  # On branch master
+  nothing to commit (working directory clean)
 
+Git tells you that you are on the main branch (called master) and that 
+you have not edited any files. You can see the branches:
 
-git push /u/mok/public_html/gpp4.git master
+  $ git branch
+  * master
+
+telling you that there is just one branch called master. Now, make a branch
+'exp' off master which shall contain some new experimental code:
+
+  $ git branch exp
+
+Again, we can list the branches:
+
+  $ git branch
+  exp
+  * master
+
+Now, we have two branches, but the asterisk shows that master is the active
+one. To switch between branches, use
+
+  $ git checkout exp
+  Switched to branch "exp"
+
+The 'exp' branch is now the one you are working on. You can now modify
+files, add new files, rename files, and so on. All your modifications will
+be local to your branch, and at any time you can monitor diffs to the
+'master' branch, generate patches, etc. When working on gpp4, it will
+simplify exchanging patches with other developers if you keep your
+modifications on private branches.
+
+Now is a good time to study the git manual [1] to learn more about these
+operations. 
+
+When you are ready to exchange code with other developers, you can set up
+your "distribution repository". Git supports a number of ways of doing
+this, but using the http protocol is very easy. The next section -- stolen
+from the git manual -- details how to set this up.
+
+Once you have set up your distribution repository, you can at any time
+synchronize your working git tree with the repository:
+
+  $ git push ~mok/public_html/gpp4.git exp
+
+This operation pushed my 'exp' branch to my distribution repository. You
+can now let other developers know that you have an important new feature
+that they can pull from your repository.
 
 
 Setting up a public repository
@@ -47,9 +100,8 @@ $ git --bare update-server-info
 $ chmod a+x hooks/post-update
 
 
+
+[1] http://www.kernel.org/pub/software/scm/git/docs/user-manual.html
+
 2007-07-04  Morten  Kjeldgaard  <mok@bioxray.dk>
 
-Local variables:
-mode: text
-mode: font-lock
-End:
