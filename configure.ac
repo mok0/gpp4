@@ -1,15 +1,30 @@
+# -*- mode: Autoconf; mode: font-lock -*-
+# Process this file with autoconf to produce a configure script.
 
-AC_INIT(libccp4c, 5.0.2-ysbl-2, emsley@ysbl.york.ac.uk)
-AC_CONFIG_SRCDIR([ccp4_vars.h])
+AC_PREREQ(2.59)
+AC_INIT(gpp4, 1.0, mok@bioxray.dk)
+AC_CONFIG_SRCDIR([lib/ccp4_vars.h])
+AC_CONFIG_AUX_DIR([config])
 
 AM_INIT_AUTOMAKE
 AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
-AC_PROG_RANLIB
+
+# check for libm
+AC_CHECK_LIBM
+AC_SUBST(LIBM)
+
 
 AC_HEADER_STDC([])
 
 AC_CONFIG_FILES([
-Makefile])
+		Makefile
+		lib/Makefile
+		])
+
 AC_OUTPUT
 
+####

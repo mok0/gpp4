@@ -1,0 +1,15 @@
+2007-07-04  Morten Kjeldgaard  <mok@ghost.bioxray.dk>
+
+	* COPYING now contains LGPL version 2.1.
+
+	* Modified configure.ac to use config/ as it's config
+	directory. We don't want all those autotools scripts cluttering
+	the top directory. Also doing more checks.
+
+	* Removed lib/w32mvs.h since it does not appear to be used
+	anywhere.
+
+	* Imported source code branches from Ralf Grosse-Kunstleve
+	and Paul Emsley into git repository.
+
+####
