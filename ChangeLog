@@ -1,5 +1,11 @@
-2007-07-04  Morten Kjeldgaard  <mok@ghost.bioxray.dk>
+2007-07-04  Morten  Kjeldgaard  <mok@bioxray.dk>
 
+	* Replaced license text in all source files in lib with straight
+	LGPL version 2.1 license text.
+
+	* Removed ancient rcsid static variable. Since the code is not
+	under RCS control, it is not updated anymore and therefore useless.
+	
 	* COPYING now contains LGPL version 2.1.
 
 	* Modified configure.ac to use config/ as it's config
