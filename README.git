@@ -1,0 +1,32 @@
+
+Setting up a public repository
+==============================
+
+Assume your personal repository is in the directory ~/gpp4. We first create
+a new clone of the repository and tell git-daemon that it is meant to be
+public:
+
+$ git clone --bare ~/gpp4 gpp4.git
+
+The resulting directory gpp4.git contains a "bare" git repository -- it
+is just the contents of the ".git" directory, without any files checked out
+around it.
+
+Next, copy gpp4.git to the server where you plan to host the public
+repository. You can use scp, rsync, or whatever is most convenient.
+
+Exporting a git repository via http
+===================================
+
+The git protocol gives better performance and reliability, but on a host
+with a web server set up, http exports may be simpler to set up.
+
+All you need to do is place the newly created bare git repository in a
+directory that is exported by the web server, and make some adjustments to
+give web clients some extra information they need:
+
+$ mv gpp4.git /home/you/public_html/gpp4.git
+$ cd gpp4.git
+$ git --bare update-server-info
+$ chmod a+x hooks/post-update
+
