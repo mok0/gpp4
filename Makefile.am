@@ -8,6 +8,6 @@ ACLOCAL_AMFLAGS = -I config
 #Distribute these directories:
 DIST_SUBDIRS = $(SUBDIRS) data
 
-EXTRA_DIST = bootstrap
+EXTRA_DIST = bootstrap README
 
 ####

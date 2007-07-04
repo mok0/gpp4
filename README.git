@@ -1,3 +1,16 @@
+Using git for gpp4 development
+==============================
+
+This text is aimed at software developers wanting to contribute to
+this version of the CCP4 library.
+
+If you are reading this, you have already cloned the gpp4 directory
+using:
+
+  git clone http://www.bioxray.dk/~mok/gpp4.git
+
+
+
 
 Setting up a public repository
 ==============================
@@ -30,3 +43,10 @@ $ cd gpp4.git
 $ git --bare update-server-info
 $ chmod a+x hooks/post-update
 
+
+2007-07-04  Morten  Kjeldgaard  <mok@bioxray.dk>
+
+Local variables:
+mode: text
+mode: font-lock
+End:
