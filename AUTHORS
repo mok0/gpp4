@@ -1,0 +1,24 @@
+Authors of the source files in lib/ are accredited according to
+information found in the source files.
+
+Charles Ballard: ccp4_file_err.h ccp4_sysdep.h ccp4_utils.h
+  cmap_accessor.c, cmap_close.c, cmap_data.c, cmap_data.h, cmap_errno.h,
+  cmap_header.c, cmap_header.h, cmap_labels.c, cmap_labels.h, cmap_open.c,
+  cmap_skew.c, cmap_skew.h, cmap_stats.c, cmap_stats.h, cmap_symop.c,
+  cmaplib.h, cmaplib_f.h, library_err.c, library_f.h, library_file.c,
+  library_file.h, library_utils.c
+
+Charles Ballard and Martyn Winn: ccp4_errno.h
+
+Eugene Krissinel: ccp4_fortran.h
+
+Kevin Cowtan: ccp4_array.c, ccp4_array.h
+
+Martyn Winn: ccp4_spg.h, ccp4_unitcell.c, ccp4_unitcell.h, ccp4_vars.h,
+  cmtzlib.c, cmtzlib.h, csymlib.c, csymlib.h cvecmat.c, cvecmat.h
+  mtzdata.h, overview.h
+
+Peter Briggs: ccp4_parser.c, ccp4_parser.h, ccp4_program.c, ccp4_program.h,
+  ccp4_general.c, ccp4_general.h
+
+Other authors: Paul Emsley, Morten Kjeldgaard.
