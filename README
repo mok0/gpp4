@@ -4,7 +4,7 @@ This distribution is a special version of the CCP4 library, released
 under the Lesser GNU Public License version 2.1.
 
 The last version of the CCP4 library covered by a free license was
-version 5.0.2. This version was patched by Ralf Grosse-Kunstleve to
+version 5.0.2. That version was patched by Ralf Grosse-Kunstleve to
 address some of the more serious deficiencies of the older libraries.
 
 It is the patched version of the CCP4 library that forms the basis for
@@ -22,7 +22,7 @@ additional restirctions and the CCP4 6.* license imposes additional
 restrictions on redistribution - in particular (but not limited to) an
 indemnity clause.
 
-The goal of this project -- named ggp4 to distinguish it from CCP4 --
+The goal of this project -- named gpp4 to distinguish it from CCP4 --
 is to provide a drop-in replacement for the non-free CCP4 libraries,
 that as carefully as possible will implement the current CCP4 library
 interface.

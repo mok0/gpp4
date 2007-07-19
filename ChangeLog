@@ -1,3 +1,11 @@
+2007-07-19  Morten  Kjeldgaard  <mok@bioxray.dk>
+
+	* Removed files created in the build process from the git tree, since
+	they only clutter the diffs and make it harder to see changes to the 
+	source code.
+
+	* Added .gitignore files in top directory, lib/ and data/
+	
 2007-07-04  Morten  Kjeldgaard  <mok@bioxray.dk>
 
 	* Replaced license text in all source files in lib with straight
