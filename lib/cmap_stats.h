@@ -19,6 +19,12 @@
      Boston, MA 02110-1301 USA
 
 */
+
+/*! @file cmap_stats.h
+    @brief Declaration of the stats_update function.
+    @author Charles Ballard.
+*/
+
 #ifndef __GUARD_MAPLIB_STATS
 #define __GUARD_MAPLIB_STATS
 

@@ -19,6 +19,12 @@
      Boston, MA 02110-1301 USA
 
 */
+
+/*! @file cmap_labels.h
+    @brief Declaration of routines to parse and output map labels.
+    @author Charles Ballard.
+*/
+
 #ifndef __GUARD_MAPLIB_LABEL
 #define __GUARD_MAPLIB_LABEL
 

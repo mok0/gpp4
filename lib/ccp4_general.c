@@ -1,6 +1,7 @@
 /*
      ccp4_general.c: General library functions and utilities.
-     Copyright (C) 2001  CCLRC, Peter Briggs et al
+     Copyright (C) 2001, 2003  CCLRC, Peter Briggs et al
+     Copyright (C) 2007  Morten Kjeldgaard.
 
      This library is free software; you can redistribute it and/or
      modify it under the terms of the GNU Lesser General Public
@@ -20,43 +21,12 @@
 
 */
 
-/** @file ccp4_general.c
- *  General library functions and utilities.
- *  Peter Briggs et al
- */
-
-/*   ccp4_general.c
-     Peter Briggs CCP4 May 2001/Feb 2003
-
-     General library functions and utilities
-
-     ccperror(level,message)
-     Error reporting and program termination
-
-     ccp4printf(level,format,printargs)
-     A wrapper for vprintf - acts like printf with an additional
-     argument which is checked against the reference verbosity
-     level.
-
-     ccp4fyp(argc,argv)
-     Initialise environment for CCP4 programs and parse the
-     command line arguments
-
-     ccp4setenv(logical_name,value,envname,envtype,envext,ienv,
-     no_overwrt)
-     Set up file names and associate with logical_name in
-     environment
-
-     ccpexists(filename)
-     Check if file exists and can be opened for reading
-
-     ccpputenv(logical_name,file_name)
-     Set environment variable logical_name to have value file_name
+/*! @file ccp4_general.c
+ *
+ *   @brief General library functions and utilities
+ *   @author Peter Briggs et al.
 */
 
-/*------------------------------------------------------------------*/
-
-/* CCP4 library clones */
 
 #include <stdio.h>
 #include <string.h>
@@ -73,26 +43,26 @@
 #include "csymlib.h"
 #include "ccp4_errno.h"
 
-/*------------------------------------------------------------------*/
 
-/* ccperror
+/*! Error reporting and program termination
 
-   Error reporting and program termination
-
-   ccperror is called with a message level ierr and a message string
+   ccperror is called with a message level ierr and a message string.
    The exact behaviour is determined by the value of ierr:
 
-   0 : normal termination and stop
-   1 : fatal error and stop
-   2 : report severe warning
-   3 : report information
-   4 : report from library
+   - 0 : normal termination and stop
+   - 1 : fatal error and stop
+   - 2 : report severe warning
+   - 3 : report information
+   - 4 : report from library
 
-   ierr=-1 also reports last system error and terminates.
+   ierr=-1 also reports last system error and terminates. The text in
+   message is sent to standard output, and to standard error for
+   ierr=1 (or -1).
 
-   The text in message is sent to standard output, and to standard
-   error for ierr=1 (or -1).
+   @param[in] ierr      error message level
+   @param[in] message   text to be displayed
 
+   @see ccperror_noexit
 */
 int ccperror(int ierr, const char *message)
 {
@@ -105,10 +75,21 @@ int ccperror(int ierr, const char *message)
   return 0;
 }
 
-/* ccperror_noexit
+/*! Error reporting without program termination 
 
-   As above, but doesn't call exit()
+   ccperror_noexit is called with a message level ierr and a message string,
+   The exact behaviour is determined by the value of ierr:
 
+   - 0 : normal termination
+   - 1 : fatal error message
+   - 2 : report severe warning
+   - 3 : report information
+   - 4 : report from library
+
+   @param[in] ierr      error message level
+   @param[in] message   text to be displayed
+
+   @see ccperror
 */
 
 int ccperror_noexit(int ierr, const char *message)
@@ -169,23 +150,24 @@ int ccperror_noexit(int ierr, const char *message)
   return 0;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccp4printf
+/*! Wrapper for vprintf
 
-   This is a wrapper for vprintf
+    A wrapper for vprintf - acts like printf with an additional
+    argument which is checked against the reference verbosity
+    level.
 
-   If the supplied message is less than or equal to the reference
-   verbosity level then the format string and remaining arguments
-   are passed to vprintf to be printed on stdout.
-   Otherwise nothing is printed.
+    If the supplied message is less than or equal to the reference
+    verbosity level then the format string and remaining arguments
+    are passed to vprintf to be printed on stdout.
+    Otherwise nothing is printed.
 
-   The format string has the same format as the format strings
-   passed to printf, with the remaining arguments being the values
-   (if any) to be inserted into placeholders in the format string.
-
-   Returns the number of bytes printed, or zero if no printing was
-   performed, or a negative number for an error from vprintf.
+    The format string has the same format as the format strings
+    passed to printf, with the remaining arguments being the values
+    (if any) to be inserted into placeholders in the format string.
+    
+    @return Returns the number of bytes printed, or zero if no printing was
+    performed, or a negative number for an error from vprintf.
 */
 int ccp4printf(int level, char *format, ...)
 {
@@ -205,15 +187,11 @@ int ccp4printf(int level, char *format, ...)
 
 /*------------------------------------------------------------------*/
 
-/* ccp4fyp
+/*! Initialise environment for CCP4 programs and parse command line arguments.
 
-   Initialise environment for CCP4 programs and parse the
-   command line arguments
-
-   Background:
-   This function processes the command line arguments supplied via
-   the argv array, and performs initialisations of the CCP4
-   environment within the program based on these arguments.
+   This function processes the command line arguments supplied via the
+   argv array, and performs initialisations of the CCP4 environment
+   within the program based on these arguments.
 
    CCP4 programs which use ccp4fyp should be called with the following
    syntax:
@@ -224,9 +202,12 @@ int ccp4printf(int level, char *format, ...)
    follow the program name. The remainer of the arguments are logical
    name-value pairs.
 
-   On successful completion ccp4fyp returns 0 (zero).
-   On encountering an error, ccp4fyp registers the error condition via
-   ccp4_signal and returns a non-zero value.
+   On successful completion ccp4fyp returns 0 (zero). On encountering
+   an error, ccp4fyp registers the error condition via ccp4_signal and
+   returns a non-zero value.
+
+   @param[in] argc  number of command line arguments passed to main
+   @param[in] argv  array of command line parameters passed to main
 */
 int ccp4fyp(int argc, char **argv)
 {
@@ -379,8 +360,7 @@ int ccp4fyp(int argc, char **argv)
   /* Program information requested by -i(nfo) option */
   if (info) {
     /* Print program information and stop */
-    printf("CCP4 software suite: library version %s\n",CCP4_VERSION_NO);
-    printf("CCP4 software suite: patch level     %s\n",CCP4_PATCH_LEVEL);
+    printf("gpp4 library version version %s\n",GPP4_VERSION_NO);
     printf("Program:             %s",ccp4ProgramName(NULL));
     if (ccp4_prog_vers(NULL) && strlen(ccp4_prog_vers(NULL))) 
       printf("; version %s",ccp4_prog_vers(NULL));
@@ -570,6 +550,7 @@ int ccp4fyp(int argc, char **argv)
       /* Set up a ccp4_parser array to deal with the contents of
 	 environ.def */
       parser = (CCP4PARSERARRAY *) ccp4_parse_start(CCP4_MAXTOKS);
+
       /* Set the delimiters to whitespace, = and .
 	 This should split lines into the three components */
       ccp4_parse_delimiters(parser," \t=.",NULL);
@@ -884,15 +865,16 @@ int ccp4fyp(int argc, char **argv)
   return 0;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccp4fyp_cleanup
+
+/*  ccp4fyp_cleanup
 
    Internal function.
    Called on exit from ccp4fyp - free memory associated with
    pointers used inside ccp4fyp.
 */
-int ccp4fyp_cleanup(int ienv, char **envname, char **envtype, char **envext,
+
+static int ccp4fyp_cleanup(int ienv, char **envname, char **envtype, char **envext,
 		    char *logical_name, char *file_name, char *file_type,
 		    char *file_ext, char *env_file, char *def_file,
 		    char *dir, CCP4PARSERARRAY *parser)
@@ -919,23 +901,23 @@ int ccp4fyp_cleanup(int ienv, char **envname, char **envtype, char **envext,
   return 0;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccp4setenv
+/*! Set environment variables
 
-   Set environment variables
+    Set up file names and associate with logical_name in
+    environment.
 
-   Associates logical_name with value. It is passed arrays of name,
-   type and extension for ienv number of name lines read from
-   environ.def, which may be used to modify the value before
-   assignment.
+    Associates logical_name with value. It is passed arrays of name,
+    type and extension for ienv number of name lines read from
+    environ.def, which may be used to modify the value before
+    assignment.
 
-   If no_overwrt is true then any existing logical_names are not
-   redefined.
+    If no_overwrt is true then any existing logical_names are not
+    redefined.
 
-   ccp4setenv returns 0 on sucess, non-zero values on failure.
-   In the case of failure an error code is registered with ccp4_signal
-   and a non-zero value is returned to the calling subprogram.
+    ccp4setenv returns 0 on sucess, non-zero values on failure.
+    In the case of failure an error code is registered with ccp4_signal
+    and a non-zero value is returned to the calling subprogram.
 */
 int ccp4setenv(char *logical_name, char* value, char **envname,
 		char **envtype, char **envext, int *ienv, int no_overwrt)
@@ -1203,7 +1185,7 @@ int ccp4setenv(char *logical_name, char* value, char **envname,
   return 0;
 }
 
-/*------------------------------------------------------------------*/
+
 
 /* ccp4setenv_cleanup
 
@@ -1211,7 +1193,7 @@ int ccp4setenv(char *logical_name, char* value, char **envname,
    Called on exit from ccp4setenv - free memory associated with
    pointers used inside ccp4setenv.
 */
-int ccp4setenv_cleanup(char *file_ext, char *file_root, char *file_path,
+static int ccp4setenv_cleanup(char *file_ext, char *file_root, char *file_path,
 		       char *file_name)
 {
   if (file_ext) free(file_ext);
@@ -1221,17 +1203,15 @@ int ccp4setenv_cleanup(char *file_ext, char *file_root, char *file_path,
   return 1;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccpexists
+/*! Check if named file exists and can be opened for reading
 
-   Check if named file exists
    The check is performed by attempting to fopen the file for
    read only, then immediately closing the file. If this method
    proves to be unsatisfactory then it may be necessary to investigate
    using access or stat instead.
 
-   Returns 1 if the file can be opened for read (=exists), 0 otherwise.
+   @return Returns 1 if the file can be opened for read (=exists), 0 otherwise.
 */
 int ccpexists(char *filename)
 {
@@ -1247,23 +1227,22 @@ int ccpexists(char *filename)
   return 0;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccpputenv
+/*! Wrapper for the ccp4_utils_setenv command.
 
-   This is a wrapper for the ccp4_utils_setenv command.
-
-   It must be supplied with a logical name (the name of a variable
-   which will be set in the environment) and a file name (the value which
+   Set environment variable logical_name to have value file_name. It
+   must be supplied with a logical name (the name of a variable which
+   will be set in the environment) and a file name (the value which
    will be assigned to that variable).
 
    Returns 1 if successful and 0 otherwise.
 
    Notes:
-   1. Platform-dependency is encoded in ccp4_utils_setenv.
-   2. Dynamically allocated strings passed to ccpputenv should be
-   freed by the calling subprogram to avoid memory leaks.
+   -# Platform-dependency is encoded in ccp4_utils_setenv.
+   -# Dynamically allocated strings passed to ccpputenv should be freed by 
+       the calling subprogram to avoid memory leaks.
 */
+
 int ccpputenv(char *logical_name, char *file_name)
 {
   int ltmpstr,diag=0;
@@ -1293,9 +1272,7 @@ int ccpputenv(char *logical_name, char *file_name)
 
 /*------------------------------------------------------------------*/
 
-/* ccp4_banner
-
-   Write CCP4 banner to standard output.
+/*! Write CCP4 banner to standard output.
 */
 void ccp4_banner(void) {
 
@@ -1310,7 +1287,7 @@ void ccp4_banner(void) {
   } else {
     /* If no program version available then use the major library
        version number */
-    sprintf(prog_vers_str,"version %-10s",CCP4_VERSION_NO);
+    sprintf(prog_vers_str,"version %-10s",GPP4_VERSION_NO);
   }
 
   printf(" \n");
@@ -1318,7 +1295,7 @@ void ccp4_banner(void) {
   printf(" ###############################################################\n");
   printf(" ###############################################################\n");
   printf(" ### CCP4 %3s: %-17s  %-18s: %-8s##\n", 
-	 CCP4_VERSION_NO,ccp4ProgramName(NULL),prog_vers_str,ccp4RCSDate(NULL));
+	 GPP4_VERSION_NO,ccp4ProgramName(NULL),prog_vers_str,ccp4RCSDate(NULL));
   printf(" ###############################################################\n");
   printf(" User: %s  Run date: %s Run time: %s \n\n\n",
 	 ccp4_utils_username(),ccp4_utils_date(date),ccp4_utils_time(time)); 

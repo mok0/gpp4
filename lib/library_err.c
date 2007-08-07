@@ -21,8 +21,8 @@
 */
 
 /** @file library_err.c
- *  Error handling library.
- *  Charles Ballard
+ *  @brief Error handling library.
+ *  @author Charles Ballard
  */
 
 #include <stdlib.h>
@@ -30,11 +30,11 @@
 #include <string.h>
 #include "ccp4_errno.h"
 
-/** @global ccp4_errno: global to store data 
+/** ccp4_errno: global to store data 
 */
 int ccp4_errno = 0;
 
-/* error_levels: error level descriptions */
+/*! error_levels: error level descriptions */
 static const char * const error_levels[] =
   {
     "Success",                                   /* 0 */
@@ -44,7 +44,7 @@ static const char * const error_levels[] =
     "FATAL ERROR"                                /* 4 */
 };
 
-/* file io errors */
+/*! file io errors */
 static const char *const cfile_errlist[] =
   {
     "Error 0",                                   /* 0 = CIO_Ok */
@@ -62,7 +62,7 @@ static const char *const cfile_errlist[] =
     "Unlink failed"                              /* 12 = CIO_UnlinkFail */
   };
 
-/* map library errors */
+/*! map library errors */
 static const char *const cmap_errlist[] =
   {
     "Error 0",                                   /* 0 = CMERR_Ok */
@@ -81,7 +81,7 @@ static const char *const cmap_errlist[] =
     "Too many open files",                       /* 13 = CMERR_MaxFile */
   };
 
-/* mtz library errrors */
+/*! mtz library errrors */
 static const char *const cmtz_errlist[] =
   {
     "Error 0",                                   /* 0 = CMTZERR_Ok */
@@ -109,7 +109,7 @@ static const char *const cmtz_errlist[] =
     "Batch headers corrupted",                   /* 22 = CMTZERR_BadBatchHeader */
   };
 
-/* parser library errors */
+/*! parser library errors */
 static const char *const cpars_errlist[] =
   {
     "Error 0",                                   /* 0 = CPARSERR_Ok */
@@ -125,7 +125,7 @@ static const char *const cpars_errlist[] =
     "Failed to interpret symop string",          /* 10 = CPARSERR_SymopToMat */
   };
 
-/* symmetry library errors */
+/*! symmetry library errors */
 static const char *const csym_errlist[] =
   {
     "Error 0",                                   /* 0 = CSYMERR_Ok */
@@ -162,7 +162,7 @@ struct error_system {
   const char * const *error_list;
 };
 
-/* construct error list */
+/*! construct error list */
 static const struct error_system ccp4_errlist[] = {
     {"system", 0, 0, },
     {"library_file", CCP4_COUNT(cfile_errlist), cfile_errlist,},
@@ -177,12 +177,12 @@ static const struct error_system ccp4_errlist[] = {
 
 static const int ccp4_system_nerr = CCP4_COUNT(ccp4_errlist);
 
-/* Obtain character string based upon error code.
+/*! Obtain character string based upon error code.
     Typical use ccp4_strerror(ccp4_errno)
     The returned string is statically allocated in the
     library_err.c file and should not be freed.
-    param error code (int)
-    returns const pointer to error message.
+    @param error error code (int)
+    @return const pointer to error message.
 */
 const char *ccp4_strerror(int error)
 {
@@ -200,11 +200,10 @@ const char *ccp4_strerror(int error)
   return (ccp4_errlist[system].error_list[code]);
 }
 
-/* Print out passed message and internal message based upon
-    ccp4_errno
-    "message : error message "
-    param message (const char *)
-    return void      
+/*! Print out passed message and internal message based upon
+    ccp4_errno "message : error message "
+    @param msg (const char *)
+    @return void      
 */
 void ccp4_error (const char *msg)
 {
@@ -226,8 +225,8 @@ void ccp4_error (const char *msg)
                "Last system message: ",strerror(errno)); }
 }
 
-/* Wrapper for ccp4_error which also calls exit(1)
-   param message (const char *)
+/*! Wrapper for ccp4_error which also calls exit(1)
+   @param message 
 */
 void ccp4_fatal (const char *message)
 {
@@ -235,6 +234,9 @@ void ccp4_fatal (const char *message)
   exit(1);
 }
 
+/*! Output error messaage to stderr.
+  @param msg Error message.
+ */
 int CFile_Perror(const char *msg)
 {
   const char * colon;
@@ -252,6 +254,9 @@ int CFile_Perror(const char *msg)
   return -1;
 }
 
+/*! Set error verbosity level
+@param[in] iverb Error level
+ */
 int ccp4_liberr_verbosity(int iverb) {
   static int verbosity_level=1;
 
@@ -261,16 +266,15 @@ int ccp4_liberr_verbosity(int iverb) {
   return verbosity_level;
 }
 
-/* Routine to set ccp4_errno and print out message for
-    error tracing. This should be the only way in
-    which ccp4_errno is set.
-    See error codes above for levels and systems.
-    A callback with prototype void function(void)
-    may also be passed to the routine.
-    Note: FATAL calls exit(1).
-    param error code (int)
-    param message (const char * const)
-    param callback (point to routine)
+/*! Routine to set ccp4_errno and print out message for error tracing. 
+  This should be the only way in which ccp4_errno is set.  See error
+  codes above for levels and systems.  A callback with prototype
+  void function(void) may also be passed to the routine.  
+
+  @note FATAL calls exit(1).  
+  @param[in] code error code (int)
+  @param[in] msg error message 
+  @param[in] callback point to callback routine
 */
 void ccp4_signal(const int code, const char * const msg, 
 		 void (*callback) ())

@@ -20,9 +20,9 @@
 
 */
 
-/** @file ccp4_unitcell.c
- *  C library for manipulations based on cell parameters.
- *  Martyn Winn 
+/*! @file ccp4_unitcell.c
+  @brief  C library for manipulations based on cell parameters.
+  @author Martyn Winn 
  */
 
 #include <stdio.h>
@@ -30,8 +30,21 @@
 #include "ccp4_unitcell.h"
 #include "cvecmat.h"
 
-/* from input cell and orthogonalisation code, find orthogonalisation
-   and fractionalisation matrices. Returns cell volume. */
+/*! From input cell and orthogonalisation code, find orthogonalisation
+   and fractionalisation matrices.
+
+   @param[in] cell unit cell parameters
+   @param[in] ncode orthogonalisation code:
+   - ncode = 1 -  xo along a  zo along c*
+   - ncode = 2 -  xo along b  zo along a*
+   - ncode = 3 -  xo along c  zo along b* 
+   - ncode = 4 -  trigonal only - xo along a+b  yo alon a-b  zo along c*
+   - ncode = 5 -  xo along a*   zo along c 
+   - ncode = 6 -  xo along a  yo along b* 
+   @param[out] ro  orthogonalization matrix
+   @param[out] rf  fractionalisation matrix
+   @return Cell volume
+ */
 
 double ccp4uc_frac_orth_mat(const double cell[6], const int ncode, 
 			 double ro[3][3], double rf[3][3])
@@ -139,8 +152,12 @@ double ccp4uc_frac_orth_mat(const double cell[6], const int ncode,
 
 }
 
-/* from input cell, find dimensions of reciprocal cell. 
-   Returns reciprocal cell volume. */
+
+/*! From input cell, find dimensions of reciprocal cell.
+   @param[in] cell direct space unit cell parameters.
+   @param[out] rcell reciprocal space unit cell parameters.
+   @return Reciprocal cell volume
+ */
 
 double ccp4uc_calc_rcell(const double cell[6], double rcell[6])
 {
@@ -177,9 +194,15 @@ double ccp4uc_calc_rcell(const double cell[6], double rcell[6])
   return (1.0 / vol);
 }
 
-/* Convert orthogonal to fractional coordinates. Translation only if
-   deliberate origin shift - does this ever happen? Leave it to the
-   application. */
+
+/*! Convert orthogonal to fractional coordinates. Translation only if
+    deliberate origin shift - does this ever happen? Leave it to the
+    application.
+    @param[in] rf   fractionalisation matrix
+    @param[in] xo   orthogonal coordinates
+    @param[out] xf  fractional coordinates
+    @return void
+ */
 
 void ccp4uc_orth_to_frac(const double rf[3][3], const double xo[3], double xf[3])
 {
@@ -188,7 +211,13 @@ void ccp4uc_orth_to_frac(const double rf[3][3], const double xo[3], double xf[3]
   xf[2] = rf[2][0]*xo[0] + rf[2][1]*xo[1] + rf[2][2]*xo[2];
 }
 
-/* Convert fractional to orthogonal coordinates. */
+
+/*! Convert fractional to orthogonal coordinates.
+    @param[in] ro  orthogonalization matrix
+    @param[in] xf  fractional coordinates    
+    @param[out] xo orthogonal coordinates
+    @return void
+ */
 
 void ccp4uc_frac_to_orth(const double ro[3][3], const double xf[3], double xo[3])
 {
@@ -197,7 +226,12 @@ void ccp4uc_frac_to_orth(const double ro[3][3], const double xf[3], double xo[3]
   xo[2] = ro[2][0]*xf[0] + ro[2][1]*xf[1] + ro[2][2]*xf[2];
 }
 
-/* Convert orthogonal to fractional u matrix. */
+/*! Convert orthogonal to fractional u matrix.
+    @param[in] rf fractionalisation matrix
+    @param[in] uo orthogonal u matrix
+    @param[out] uf fractional u matrix
+    @return void
+ */
 
 void ccp4uc_orthu_to_fracu(const double rf[3][3], const double uo[6], double uf[6])
 {
@@ -218,7 +252,13 @@ void ccp4uc_orthu_to_fracu(const double rf[3][3], const double uo[6], double uf[
   uf[3] = ufmat[0][1]; uf[4] = ufmat[0][2]; uf[5] = ufmat[1][2]; 
 }
 
-/* Convert fractional to orthogonal u matrix. */
+
+/*! Convert fractional to orthogonal u matrix.
+    @param[in] ro orthogonalization matrix
+    @param[in] uf fractional u matrix
+    @param[out] uo orthogonal u matrix
+    @return void
+ */
 
 void ccp4uc_fracu_to_orthu(const double ro[3][3], const double uf[6], double uo[6])
 {
@@ -239,7 +279,10 @@ void ccp4uc_fracu_to_orthu(const double ro[3][3], const double uf[6], double uo[
   uo[3] = uomat[0][1]; uo[4] = uomat[0][2]; uo[5] = uomat[1][2]; 
 }
 
-/* Calculate cell volume from cell parameters */
+/*! Calculate cell volume from cell parameters.
+    @param[in] cell direct space cell parameters
+    @return Cell volume.
+ */
 
 double ccp4uc_calc_cell_volume(const double cell[6])
 {
@@ -254,7 +297,13 @@ double ccp4uc_calc_cell_volume(const double cell[6])
   return (2.0*cell[0]*cell[1]*cell[2]*v);
 }
 
-/* Check cells agree within tolerance */
+
+/*! Check cells agree within tolerance.
+    @param[in] cell1 Cell parameters of first cell.
+    @param[in] cell2 Cell parameters of second cell.
+    @param[in] tolerance A tolerance for agreement.
+    @return 1 if cells differ by more than tolerance, 0 otherwise.
+ */
 
 int ccp4uc_cells_differ(const double cell1[6], const double cell2[6], const double tolerance)
 {
@@ -296,6 +345,12 @@ int ccp4uc_cells_differ(const double cell1[6], const double cell2[6], const doub
   return 0;
 }
 
+/*! Check if cell parameters conform to a rhombohedral setting.
+    @param[in] cell Cell parameters. Angles are assumed to be in degrees.
+    @param[in] tolerance A tolerance for agreement.
+    @return 1 if cell parameters conform, 0 otherwise.
+ */
+
 int ccp4uc_is_rhombohedral(const float cell[6], const float tolerance) {
 
   double acheck;
@@ -310,6 +365,12 @@ int ccp4uc_is_rhombohedral(const float cell[6], const float tolerance) {
   return 1;
 
 }
+
+/*! Check if cell parameters conform to a hexagonal setting.
+    @param[in] cell Cell parameters. Angles are assumed to be in degrees.
+    @param[in] tolerance A tolerance for agreement.
+    @return 1 if cell parameters conform, 0 otherwise. 
+ */
 
 int ccp4uc_is_hexagonal(const float cell[6], const float tolerance) {
 

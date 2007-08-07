@@ -20,14 +20,21 @@
 
 */
 
-/** @file cvecmat.c
- *  C library for vector and matrix manipulations.
- *  Martyn Winn 
+/*! @file cvecmat.c
+    @brief C library for vector and matrix manipulations.
+    @author Martyn Winn 
  */
 
 #include "cvecmat.h"
 
-/*  c = a X b  */
+/*! Vector cross product
+   This function computes the vector cross product c = a X b  
+
+  @param[in] a vector 1
+  @param[in] b vector 2
+  @param[out] c cross product vector
+
+*/
 
 void ccp4_dcross(const double a[3], const double b[3], double c[3])
 {
@@ -36,6 +43,14 @@ void ccp4_dcross(const double a[3], const double b[3], double c[3])
   c[2] = a[0]*b[1] - b[0]*a[1];
 }
 
+
+/*! 3x3 matrix product
+  This function computes the matrix product between two 3x3 matrices.
+  @param[out] c matrix product 
+  @param[in] a left matrix
+  @param[in] b right matrix
+*/
+  
 void ccp4_3matmul(double c[3][3], const double a[3][3], const double b[3][3])
 {
   int i,j,k;
@@ -48,6 +63,12 @@ void ccp4_3matmul(double c[3][3], const double a[3][3], const double b[3][3])
     }
 }
 
+/*! 4x4 matrix product.
+  This function computes the matrix product between two 4x4 matrices.
+  @param[out] c matrix product 
+  @param[in] a left matrix
+  @param[in] b right matrix
+*/
 void ccp4_4matmul( float c[4][4], const float  a[4][4], const float b[4][4])
 {
   int i,j,k;
@@ -60,9 +81,12 @@ void ccp4_4matmul( float c[4][4], const float  a[4][4], const float b[4][4])
     }
 }
 
-/*   A (I)   3*3 matrix to be inverted */
-/*   AI (O)   inverse matrix */
-/*   returns determinant */
+
+/*! 3x3 matrix inversion.
+  @param[in] a  3*3 matrix to be inverted 
+  @param[out] ai inverse matrix
+  @return  Determinant 
+*/
 
 double invert3matrix(const double a[3][3], double ai[3][3])
 
@@ -85,9 +109,12 @@ double invert3matrix(const double a[3][3], double ai[3][3])
   return d;
 }
 
-/*   A (I)   4*4 matrix to be inverted */
-/*   AI (O)   inverse matrix */
-/*   returns determinant */
+
+/*! 4x4 matrix inversion.
+  @param[in] a  4x4 matrix to be inverted 
+  @param[out] ai inverse matrix
+  @return Determinant 
+*/
 
 float invert4matrix(const float a[4][4], float ai[4][4])
 
@@ -148,6 +175,12 @@ float invert4matrix(const float a[4][4], float ai[4][4])
   return d;
 } 
 
+/*! Compute powers.
+  This function computes powers of any base to any integer power.
+  @param[in] base 
+  @param[in] power
+  @return result of power calculation
+ */
 float ccp4_pow_ii(const float base, const int power) {
 
   int i = 0;

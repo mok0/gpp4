@@ -19,6 +19,14 @@
      Boston, MA 02110-1301 USA
 
 */
+
+/*! @file cmaplib_f.h
+    @brief Definition of the IOConvMap structure.
+    Apparently not used anywhere (?).
+    @author Charles Ballard.
+*/
+
+
 #ifndef __GUARD_MAPLIB_FORTRAN
 #define __GUARD_MAPLIB_FORTRAN
 

@@ -23,7 +23,7 @@ AC_SUBST(LIBM)
 AC_HEADER_STDC([])
 
 # check for various headers
-AC_CHECK_HEADERS([fcntl.h float.h limits.h stddef.h stdlib.h string.h sys/file.h unistd.h wchar.h])
+AC_CHECK_HEADERS([fcntl.h float.h limits.h stddef.h stdlib.h stdint.h string.h sys/file.h unistd.h wchar.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

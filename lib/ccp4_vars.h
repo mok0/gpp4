@@ -20,7 +20,9 @@
 
 */
 
-/* Standard strings for certain quantites - for future use */
+/*! @file ccp4_vars.h
+    @brief Standard strings for certain quantites - for future use 
+*/
 
 #ifndef __CCP4_VARS__
 #define __CCP4_VARS__

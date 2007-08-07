@@ -1,3 +1,32 @@
+2007-07-25  Morten  Kjeldgaard  <mok@homunculus.local>
+
+	* lib/ccp4_unitcell.c: Reworked doxygen markup, moved from the
+	header file to the C source file.
+
+2007-07-24  Morten  Kjeldgaard  <mok@homunculus.local>
+
+	* lib/ccp4_types.h: Wrote doxygen markup.
+
+	* lib/ccp4_parser.c (symop_to_mat4_err): Internal function,
+	declared static. Probably other functions should be made static,
+	too. This is on the TODO list.
+
+	* lib/ccp4_parser.c: Doxygen markup reworked. I moved it from the
+	header file, to the C source file, which is where the programmer
+	most often will want to read the description. Merged descriptions
+	of functions from comment in top of the file to the individual
+	descriptions. Cleaned up comments everywhere, especially, I
+	removed the ugly /*-----  */ delimiters.
+
+	* lib/ccp4_general.c: Internal routines ccp4fyp_cleanup and
+	ccp4setenv_cleanup declared static.
+
+	* lib/ccp4_general.c: Doxygen markup reworked.
+
+	* lib/ccp4_fortran.h: - ditto -
+
+	* lib/ccp4_program.*: - ditto -
+
 2007-07-19  Morten  Kjeldgaard  <mok@bioxray.dk>
 
 	* Removed files created in the build process from the git tree, since

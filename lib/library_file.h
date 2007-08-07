@@ -21,8 +21,8 @@
 */
 
 /** @file library_file.h
- *  Functions for file i/o.
- *  Charles Ballard
+ *  @brief Functions for file i/o.
+ *  @author Charles Ballard
  */
 
 #ifndef __CCP4_LIB_FILE
@@ -92,7 +92,7 @@ int ccp4_file_itemsize( const CCP4File*);
 
 int ccp4_file_setbyte( CCP4File *, const int);
 
-int ccp4_file_byteorder( CCP4File *);
+  /* int ccp4_file_byteorder( CCP4File *); */
 
 int ccp4_file_is_write(const CCP4File *);
 

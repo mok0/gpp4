@@ -19,6 +19,12 @@
      Boston, MA 02110-1301 USA
 
 */
+
+/*! @file cmap_header.h
+    @brief Declarations of map header i/o routines.
+    @author Charles Ballard
+*/
+
 #ifndef __GUARD_MAPLIB_HEADER
 #define __GUARD_MAPLIB_HEADER
 

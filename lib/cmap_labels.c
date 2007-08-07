@@ -170,8 +170,8 @@ char *ccp4_cmap_get_title(const CMMFile *mfile)
 
 /*! Set the label corresponding to the title,
     wrapping ccp4_cmap_set_label
- \param mfile (CMMFile *)
- \param label
+ \param[in] mfile (CMMFile *)
+ \param[in] title
  \return 0 or EOF on failure */
 int ccp4_cmap_set_title(CMMFile *mfile, const char *title)
 {

@@ -5,22 +5,19 @@ under the Lesser GNU Public License version 2.1.
 
 The last version of the CCP4 library covered by a free license was
 version 5.0.2. That version was patched by Ralf Grosse-Kunstleve to
-address some of the more serious deficiencies of the older libraries.
-
+address some of the more serious deficiencies of the older library.
 It is the patched version of the CCP4 library that forms the basis for
 this distribution, which includes a GNU autotools build environment
 developed by Paul Emsley and Morten Kjeldgaard.
 
 The reason for creating this public fork of the CCP4 libraries is that
 several third party software distributions depend on the CCP4
-libraries.
-
-However, you cannot create a derived work containing both CCP4 6.*
-licensed code and GPL'd code, and distribute the resulting program,
-since the GPL demands that the derived work be distributed without
-additional restirctions and the CCP4 6.* license imposes additional
-restrictions on redistribution - in particular (but not limited to) an
-indemnity clause.
+libraries. However, you cannot create a derived work containing both
+CCP4 6.* licensed code and GPL'd code, and distribute the resulting
+software, since the GPL demands that the derived work be distributed
+without additional restrictions and the CCP4 6.* license imposes
+additional restrictions on redistribution - in particular (but not
+limited to) an indemnity clause.
 
 The goal of this project -- named gpp4 to distinguish it from CCP4 --
 is to provide a drop-in replacement for the non-free CCP4 libraries,
@@ -28,6 +25,3 @@ that as carefully as possible will implement the current CCP4 library
 interface.
 
 2007-07-04  Morten  Kjeldgaard  <mok@bioxray.dk>
-
-
-

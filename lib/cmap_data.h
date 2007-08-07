@@ -19,6 +19,11 @@
      Boston, MA 02110-1301 USA
 
 */
+
+/*! @file cmap_data.h
+    @brief Header file for CCP4 map functions
+ */
+
 #ifndef __GUARD_MAPLIB_DATA
 #define __GUARD_MAPLIB_DATA
 

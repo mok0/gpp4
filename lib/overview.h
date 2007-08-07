@@ -73,18 +73,29 @@ The library divides roughly into the following sections:
 <dt>CMTZ library
 <dd>See the @ref cmtz_page page for C/C++ programmers, and the
 @ref cmtz_f_page page for Fortran programmers.
+
 <dt>CMAP library
 <dd>See the @ref cmap_page page for C/C++ programmers, and the
 @ref cmap_f_page page for Fortran programmers.
+
 <dt>MMDB library
 <dd>See Eugene's <a href="http://www.ebi.ac.uk/~keb/cldoc">documentation</a>.
-<dt>CSYM library
-<dd>See the @ref csym_page page for C/C++ programmers, and the
-@ref csym_f_page page for Fortran programmers.
+
+<dt>CSYM library <dd>See the @ref csym_page page for C/C++
+programmers, and the @ref csym_f_page page for Fortran programmers.
+
 <dt>CCP4 utility library
 <dd>See the @ref utilities_page page for C/C++ programmers.
+
+<dt>CCP4 Parser library
+<dd>See the @ref cparser_page page for details on how to use the CCP4 parser routines from C/C++ programs.
+
+<dt>CCP4 resizable arrays
+<dd>See the @ref ccp4_array_page page for information on Kevin Cowtan's resizable array implementation.
+
 <dt>Low level disk i/o
 <dd>See the @ref diskio_f_page page for Fortran programmers.
+
 </dl>
 
  */

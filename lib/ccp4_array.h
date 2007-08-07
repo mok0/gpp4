@@ -21,12 +21,12 @@
 */
 
 /** @file ccp4_array.h
- *  header file for resizable array implementation.
- *  Kevin Cowtan
+ *  @author Kevin Cowtan
+ *  @brief Header file for resizable array implementation.
  */
 
-/*
-CCP4 resizable array implementation.
+/*! \page ccp4_array_page CCP4 resizable array implementation
+  \section CCP4 resizable array implementation
 
 This defines an object and methods which looks just like a simple C
 array, but can be resized at will without incurring excessive
@@ -85,9 +85,11 @@ typedef char *ccp4_byteptr;
 /*! pointer type */
 typedef void *ccp4_ptr;
 
-/*! struct definition for the array pre-header */
+/*! @struct ccp4array_base 
+  @brief definition for the array pre-header */
 typedef struct ccp4array_base_ {
-  int size, capacity;
+  int size;			/*!< actual size of array */
+  int capacity;                 /*!< maximum capacity of array */
 } ccp4array_base;
 
 /*! Macro to allocate a new array.

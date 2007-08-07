@@ -19,6 +19,12 @@
      Boston, MA 02110-1301 USA
 
 */
+
+/*! @file cmap_skew.h
+    @brief Declaration of the skew_set function.
+    @author Charles Ballard.
+*/
+
 #ifndef __GUARD_MAPLIB_SKEW
 #define __GUARD_MAPLIB_SKEW
 

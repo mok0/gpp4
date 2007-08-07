@@ -1,6 +1,7 @@
 /*
      ccp4_fortran.h: header file for Fortran APIs
      Copyright (C) 2001   Eugene Krissinel
+     Copyright (C) 2007   Morten Kjeldgaard
 
      This library is free software; you can redistribute it and/or
      modify it under the terms of the GNU Lesser General Public
@@ -21,9 +22,128 @@
 */
 
 /** @file ccp4_fortran.h
- *  header file for Fortran APIs
- *  Eugene Krissinel
- */
+
+    @brief Header file for Fortran APIs
+    @author Eugene Krissinel
+
+   Macro  FORTRAN_SUBR(NAME,name,p_send,p_sstruct,p_sflw)
+   makes function header statements that allow for linking with
+   programs written in FORTRAN.
+     
+   @param  NAME      name of the FORTRAN subroutine in capital letters
+   @param  name      name of the FORTRAN subroutine in small letters
+   @param  p_send    parameter list (in brackets) with string lengths
+               attached to the end of it (see below)
+   @param  p_sstruct parameter list (in brackets) with strings passed
+               as complex parameters, or structures
+   @param  p_sflw    parameter list (in brackets) with string lengths
+               following immediately the string parameters
+               (see below)
+  
+     All non-string parameters must be passed as pointers, in
+   the same order as they enter the FORTRAN call. Rules for
+   the string parameters are as follows.
+  <ol>
+  <li> All strings should be specified as of 'fpstr' type.  The 'fpstr'
+      type is defined below and depends on the platform:
+      <dl>
+      <dt>a)</dt><dd> whenever length of string is passed as a separate
+             parameter ( CALL_LIKE_SUN, CALL_LIKE_HPUX, CALL_LIKE_MVS
+             ) 'fpstr' is identical to 'pstr'.  You may choose
+             arbitrary name for the string, but you MUST use the same
+             name, appended with suffix '_len', for its length (see
+             example below).
+  
+        <dt>b)</dt><dd> whenever string and its length are passed as
+             complex parameter, 'fpstr' is identical to the
+             pointer on the corresponding structure:
+@verbatim 
+              CALL_LIKE_STARDENT :
+                   'fpstr' is identical to 'PSStrPar'
+               CALL_LIKE_VMS      :
+                   'fpstr' is identical to 'dsc$descriptor_s *'
+@endverbatim
+     With 'fpstr' type, two important macro definition come:
+          <dl>
+          <dt>i)  FTN_STR(s)</dt><dd>returns pointer to fortran-passed
+                            string s. This pointer is always
+                            of 'pstr' type
+          <dt>ii) FTN_LEN(s)</dt><dd>returns integer length of fortran-
+                            passed string s. For this macro to
+                            work properly with SUN- and MVS-like
+                            machines, always use suffix '_len' 
+                            for the string length parameters as
+                            described in a) above.
+          </dl>
+    </dl>
+   <li> Three parameter lists, each enclosed in brackets, should be
+      given. These lists retain the general order of parameters in the
+      corresponding fortran call. Non-string parameters are passed as
+      pointers. String parameters and their lengths are passed
+      differently in different lists:
+      <dl>
+      <dt>p_send</dt>
+                   <dd>strings enter their place in the list as in
+                   the corresponding FORTRAN call, having 'fpstr'
+                   parameter type. Their lengths are appended as
+                   'int' to the end of the list. They should
+                   retain the order in which the strings appear
+                   in the list.
+      <dt>p_sstruct</dt><dd> strings enter their place in the list as in
+                   the corresponding FORTRAN call, having 'fpstr'
+                   parameter type.
+      <dt>p_sflw</dt><dd> strings enter their place in the list as in
+                   the corresponding FORTRAN call, having 'fpstr'
+                   type and being immediately followed by their
+                   lengths as 'int' parameters.
+      </dl>
+  
+Example:
+  
+FORTRAN statement
+  @code
+       subroutine  SomeSub ( k,s1,a,s2,m )
+       integer       k,m
+       real          a
+       character*(*) s1,s2
+  @endcode
+
+is translated to
+  
+  @code
+       FORTRAN_SUBR ( SOMESUB, somesub,
+         ( int * k, fpstr s1, float * a, fpstr s2, int * m,
+           int s1_len, int s2_len ),
+         ( int * k, fpstr s1, float * a, fpstr s2, int * m ),
+         ( int * k, fpstr s1, int s1_len, float * a,
+           fpstr s2, int s2_len, int * m ) )
+  @endcode
+  
+  The macro should replace ordinary function header
+  statements to assure compatibility with FORTRAN links.
+  In header files, do not forget to add semicolon:
+  
+  @code
+     FORTRAN_SUBR ( .... );
+  @endcode
+
+  while in source files use simply
+  
+  @code
+     FORTRAN_SUBR ( .... )  {
+      <source body, operators>
+     }
+  @endcode  
+  </li>
+</ol>
+  Macro  FORTRAN_CALL(NAME,name,p_send,p_sstruct,p_sflw)
+  calls function defined with macro FORTRAN_SUBR(...), from
+  a C/C++ application. Its parameters and their meaning are
+  exactly identical to those of FORTRAN_SUBR(...).
+  FORTRAN_CALL(...) should be followed by semicolon.                    
+*/
+
+
 
 #ifndef __CCP4_FORTRAN
 #define __CCP4_FORTRAN
@@ -49,121 +169,6 @@
 #define _BTOLV(l) ((int) ((l) == 0 ? 0 : -1))  
 #endif    
 
-/*
-     Macro  FORTRAN_SUBR(NAME,name,p_send,p_sstruct,p_sflw)
-   makes function header statements that allow for linking with
-   programs written in FORTRAN.
-  
-     Parameters:
-  
-     NAME      name of the FORTRAN subroutine in capital letters
-     name      name of the FORTRAN subroutine in small letters
-     p_send    parameter list (in brackets) with string lengths
-               attached to the end of it (see below)
-     p_sstruct parameter list (in brackets) with strings passed
-               as complex parameters, or structures
-     p_sflw    parameter list (in brackets) with string lengths
-               following immediately the string parameters
-               (see below)
-  
-     All non-string parameters must be passed as pointers, in
-   the same order as they enter the FORTRAN call. Rules for
-   the string parameters are as follows.
-  
-     1. All strings should be specified as of 'fpstr' type.
-        The 'fpstr' type is defined below and depends on the
-        platform:
-  
-          a) whenever length of string is passed as a separate
-             parameter ( CALL_LIKE_SUN, CALL_LIKE_HPUX,
-             CALL_LIKE_MVS )  'fpstr' is identical to 'pstr'.
-             You may choose arbitrary name for the string,
-             but you MUST use the same name, appended with
-             suffix '_len', for its length (see example below).
-  
-          b) whenever string and its length are passed as
-             complex parameter, 'fpstr' is identical to the
-             pointer on the corresponding structure:
-               CALL_LIKE_STARDENT :
-                   'fpstr' is identical to 'PSStrPar'
-               CALL_LIKE_VMS      :
-                   'fpstr' is identical to 'dsc$descriptor_s *'
-  
-        With 'fpstr' type, two important macro definition come:
-  
-          i)  FTN_STR(s)  - returns pointer to fortran-passed
-                            string s. This pointer is always
-                            of 'pstr' type
-          ii) FTN_LEN(s)  - returns integer length of fortran-
-                            passed string s. For this macro to
-                            work properly with SUN- and MVS-like
-                            machines, always use suffix '_len' 
-                            for the string length parameters as
-                            described in a) above.
-  
-     2. Three parameter lists, each enclosed in brackets, should
-        be given. These lists retain the general order of
-        parameters in the corresponding fortran call. Non-string
-        parameters are passed as pointers. String parameters
-        and their lengths are passed differently in different
-        lists:
-  
-         p_send    strings enter their place in the list as in
-                   the corresponding FORTRAN call, having 'fpstr'
-                   parameter type. Their lengths are appended as
-                   'int' to the end of the list. They should
-                   retain the order in which the strings appear
-                   in the list.
-  
-         p_sstruct strings enter their place in the list as in
-                   the corresponding FORTRAN call, having 'fpstr'
-                   parameter type.
-  
-         p_sflw    strings enter their place in the list as in
-                   the corresponding FORTRAN call, having 'fpstr'
-                   type and being immediately followed by their
-                   lengths as 'int' parameters.
-  
-  
-  
-   Example:
-  
-     FORTRAN statement
-  
-       subroutine  SomeSub ( k,s1,a,s2,m )
-       integer       k,m
-       real          a
-       character*(*) s1,s2
-  
-     is translated to
-  
-       FORTRAN_SUBR ( SOMESUB, somesub,
-         ( int * k, fpstr s1, float * a, fpstr s2, int * m,
-           int s1_len, int s2_len ),
-         ( int * k, fpstr s1, float * a, fpstr s2, int * m ),
-         ( int * k, fpstr s1, int s1_len, float * a,
-           fpstr s2, int s2_len, int * m ) )
-  
-  
-     The macro should replace ordinary function header
-   statements to assure compatibility with FORTRAN links.
-   In header files, do not forget to add semicolumn:
-  
-     FORTRAN_SUBR ( .... );
-  
-   while in source files use simply
-  
-     FORTRAN_SUBR ( .... )  {
-      <source body, operators>
-     }
-  
-  
-  
-     Macro  FORTRAN_CALL(NAME,name,p_send,p_sstruct,p_sflw)
-   calls function defined with macro FORTRAN_SUBR(...), from
-   a C/C++ application. Its parameters and their meaning are
-   exactly identical to those of FORTRAN_SUBR(...).
-   FORTRAN_CALL(...) should be followed by semicolon.                    */
 
 
 #if  defined(CALL_LIKE_SUN)

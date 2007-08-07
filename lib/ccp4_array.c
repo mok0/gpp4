@@ -21,8 +21,8 @@
 */
 
 /** @file ccp4_array.c
- *  implementation file for resizable array implementation.
- *  Kevin Cowtan
+ *  @author Kevin Cowtan
+ *  @brief  Resizable array implementation
  */
 
 #include "ccp4_array.h"

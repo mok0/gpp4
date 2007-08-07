@@ -19,6 +19,12 @@
      Boston, MA 02110-1301 USA
 
 */
+
+/*! @file cmap_errno.h
+    @brief Error codes for the library
+    @author Charles Ballard.
+*/
+
 #ifndef __GUARD_MAPLIB_ERR
 #define __GUARD_MAPLIB_ERR
 

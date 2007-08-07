@@ -18,19 +18,15 @@
      Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
      Boston, MA 02110-1301 USA
 
-
-
-/*   ccp4_general.c
-
-     Header file for CCP4 library clones
-     Peter Briggs et al CCP4 April 2001
 */
 
-/*------------------------------------------------------------------*/
+/**  @file ccp4_general.h
+     @brief Header file for CCP4 library clones
+*/
+
 
 /* Macro definitions */
 
-/*------------------------------------------------------------------*/
 
 #ifndef __CCPGeneral__
 #define __CCPGeneral__
@@ -44,16 +40,20 @@ namespace CCP4 {
 extern "C" {
 #endif
 
-/* MAXLINE = maximum number of characters in lines read
-   from environ.def and default.def files (ccp4fyp)
-   MAXTOKS = maximum number of tokens in lines read from
-   environ.def and default.def files (ccp4fyp)
-   MAXNAMES = maximum number of logical names that can be
-   read and stored from environ.def (ccp4fyp)
-*/
-#define CCP4_MAXLINE  200
-#define CCP4_MAXTOKS  3
-#define CCP4_MAXNAMES 150
+  /** Maximum number of characters in lines read from
+     environ.def and default.def files (@ref ccp4fyp) */
+#define CCP4_MAXLINE  200 
+
+  /** Maximum number of tokens in lines read from environ.def
+     and default.def files (@ref ccp4fyp) */
+#define CCP4_MAXTOKS  3   
+
+  /** Maximum number of logical names that can be read and
+      stored from environ.def (@ref ccp4fyp) */
+#define CCP4_MAXNAMES 150 
+
+  /** To guarantee that process id is always 5 characters,
+	 take the id number modulo 100,000 */
 #define CCP4_MODULO   100000
 
 /* stuff for error reporting */
@@ -101,7 +101,7 @@ int ccp4printf(int level, char *format, ...);
 
 int ccp4fyp(int argc, char **argv);
 
-int ccp4fyp_cleanup(int ienv, char **envname, char **envtype, char **envext,
+static int ccp4fyp_cleanup(int ienv, char **envname, char **envtype, char **envext,
 		    char *logical_name, char *file_name, char *file_type,
 		    char *file_ext, char *env_file, char *def_file,
 		    char *dir, CCP4PARSERARRAY *parser);
@@ -109,7 +109,7 @@ int ccp4fyp_cleanup(int ienv, char **envname, char **envtype, char **envext,
 int ccp4setenv(char *logical_name, char* value, char **envname,
 	       char **envtype, char **envext, int *ienv, int no_overwrt);
 
-int ccp4setenv_cleanup(char *file_ext, char *file_root, char *file_path,
+static int ccp4setenv_cleanup(char *file_ext, char *file_root, char *file_path,
 		       char *file_name);
 
 int ccpexists(char *filename);

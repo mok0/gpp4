@@ -1,6 +1,7 @@
 /*
      ccp4_parser.c: Functions to read in and "parse" CCP4 keyworded input. 
      Copyright (C) 2001  CCLRC, Peter Briggs
+     Copyright (C) 2007  Morten Kjeldgaard.
 
      This library is free software; you can redistribute it and/or
      modify it under the terms of the GNU Lesser General Public
@@ -21,72 +22,13 @@
 */
 
 
-/** @file ccp4_parser.c
- *
- *  @brief Functions to read in and "parse" CCP4-style keyworded input.
- *
- *  @author Peter Briggs
- *  @date April 2001
+/*! @file ccp4_parser.c
+ 
+   @brief Functions to read in and "parse" CCP4-style keyworded input, plus utility routines.
+   @author Peter Briggs
+   @date April 2001
  */
 
-/*   ccp4_parser.c
-     Peter Briggs CCP4 April 2001
-
-     Functions to read in and "parse" (scan, in reality) CCP4-style
-     "keyworded" input, plus utility routines.
-
-     ccp4_parse_start(maxtokens)
-     initialise a CCP4PARSERARRAY to be used in subsequent calls to
-     ccp4_parser routines.
-
-     ccp4_parse_end(parser)
-     clean up CCP4PARSERARRAY parser after use
-
-     ccp4_parse_init_token(parser,itok)
-     initialise a single token in CCP4PARSERARRAY before use
-
-     ccp4_parse_reset(parser)
-     initialise CCP4PARSERARRAY before use (includes calls to
-     ccp4_parse_init_token to initialise all tokens)
-
-     ccp4_parse_delimiters(parser,delimiters,nulldelimiters)
-     set up or restore non-default delimiters
-
-     int ccp4_parse_comments(parser,comment_chars)
-     set up or restore non-default comment characters
-
-     ccp4_parse_maxmin(parser,max_exp,min_exp)
-     set non-default maximum and minimum values for numerical tokens
-
-     ccp4_parse(line,parser)
-     given a string "line", break up into tokens and store in
-     CCP4PARSERARRAY "parser"
-
-     ccp4_parser(line,parser,print)
-     read input from stdin or external file, break up into tokens
-     and store in CCP4PARSERARRAY "parser"
-
-     ccp4_keymatch(keyin1,keyin2)
-     compare input strings to see if they match as CCP4-style keywords
-
-     strtoupper(str1,str2)
-     convert string to uppercase
-
-     strmatch(str1,str2)
-     check if strings are identical
-
-     charmatch(character,charlist)
-     check if character appears in a list of possibilities
-
-     doublefromstr(str,....)
-     convert a string representation of a number into the number, also
-     checks for exponent over/underflow, returns numbers of digits and
-     values of "components" (integer and fractional parts, and base-10
-     exponent)
-
-*/
-
-/* Header files */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -115,18 +57,19 @@
 #define  CPARSERR_MatToSymop          9
 #define  CPARSERR_SymopToMat         10
 
-/*------------------------------------------------------------------*/
 
-/* Parser Functions */
 
-/*------------------------------------------------------------------*/
+/*! Initialise a CCP4PARSERARRAY 
 
-/* ccp4_parse_start
+   This function initialises a CCP4PARSERARRAY to be used in
+   subsequent calls to ccp4_parser routines. The calling function must
+   supply the maximum number of tokens on a line (including continuation
+   lines).
 
-   This initialises a CCP4PARSERARRAY to be used with the ccp4_parse/
-   ccp4_parser functions.
-   The calling function must supply the maximum number of tokens.
+   @param maxtokens maximum number of tokens on a line
+   @return pointer to a new CCP4PARSERARRAY structure
 */
+
 CCP4PARSERARRAY* ccp4_parse_start(const int maxtokens)
 {
   int itok,diag=0;
@@ -189,13 +132,16 @@ CCP4PARSERARRAY* ccp4_parse_start(const int maxtokens)
   return parsePtr;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccp4_parse_end
+/*! Cleans up a CCP4PARSEARRAY 
 
-   This cleans up a CCP4PARSEARRAY after being used by ccp4_parse/
-   ccp4_parser functions.
-*/
+    This function cleans up a CCP4PARSERARRAY after being used by
+    ccp4_parse/ ccp4_parser functions.
+
+    @param parsePtr pointer to a CCP4PARSERARRAY structure
+    @return 0 on completion
+ */
+
 int ccp4_parse_end(CCP4PARSERARRAY *parsePtr)
 {
   int i,maxtokens;
@@ -220,12 +166,11 @@ int ccp4_parse_end(CCP4PARSERARRAY *parsePtr)
   return 0;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccp4_parse_init_token
+/*! Initialise a token in a parser array
 
-   Initialise a token in a parser array
-   This sets all string members of the specified token to NULL and
+   This function initialise a single token in CCP4PARSERARRAY before
+   use.  It sets all string members of the specified token to NULL and
    all numerical values (including flags) to zero
 */
 
@@ -256,17 +201,18 @@ int ccp4_parse_init_token(const CCP4PARSERARRAY *parsePtr, const int itok)
   return 0;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccp4_parse_reset
+/*! Reinitialise a parser array before calling ccp4_parse
 
-   Reinitialise a parser array before calling ccp4_parse
+  Call this function to initialise CCP4PARSERARRAY before use
+  (includes calls to ccp4_parse_init_token to initialise all tokens).
 
    An application using ccp4_parse (rather than ccp4_parser, which
    also calls this function) can call this function to reset the
    parser array, rather than reinitialising the structure members
    explicitly
 */
+
 int ccp4_parse_reset(CCP4PARSERARRAY *parsePtr)
 {
   int itok;
@@ -281,17 +227,16 @@ int ccp4_parse_reset(CCP4PARSERARRAY *parsePtr)
   return 0;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccp4_parse_delimiters
+/*! Set up or restore non-default delimiter characters.
 
-   This allows the application to set its own delimiter characters
+    This function allows the application to set its own delimiter characters
    to be used in the ccp4_parser routines.
 
    If a NULL pointer is supplied for either of the two lists then
    then the default delimiters are (re)set.
 
-   Returns 1 on success, 0 if there was an error. In the event of
+   @return Returns 1 on success, 0 if there was an error. In the event of
    an error the delimiter lists will be unchanged.
 */
 
@@ -318,7 +263,7 @@ int ccp4_parse_delimiters(CCP4PARSERARRAY *parsePtr,
       } else {
 	strncpy(delimPtr,delim,ldelim+1);
       }
-      delimPtr[ldelim] = '\0';
+      delimPtr[ldelim] = '\000';
     }
 
     /* If supplied nulldelim is NULL then set to the default */
@@ -335,7 +280,7 @@ int ccp4_parse_delimiters(CCP4PARSERARRAY *parsePtr,
       } else {
 	strncpy(nulldelimPtr,nulldelim,lnulldelim+1);
       }
-      nulldelimPtr[lnulldelim] = '\0';
+      nulldelimPtr[lnulldelim] = '\000';
     }
 
     /* Assign new delimiters in parser array */
@@ -356,9 +301,8 @@ int ccp4_parse_delimiters(CCP4PARSERARRAY *parsePtr,
   return istatus;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccp4_parse_comments
+/*! Set up or restore non-default comment characters.
 
    This allows the application to set its own comment characters
    to be used in the ccp4_parser routines.
@@ -366,7 +310,7 @@ int ccp4_parse_delimiters(CCP4PARSERARRAY *parsePtr,
    If a NULL pointer is supplied for the list of comment characters
    then the default comment characters are (re)set.
 
-   Returns 1 on success, 0 if there was an error. In the event of
+   @return Returns 1 on success, 0 if there was an error. In the event of
    an error the comment lists will be unchanged.
 */
 
@@ -392,7 +336,7 @@ int ccp4_parse_comments(CCP4PARSERARRAY *parsePtr, const char *comment_chars)
 	strncpy(commentPtr,comment_chars,lcomment);
       }
       lcomment--;
-      commentPtr[lcomment] = '\0';
+      commentPtr[lcomment] = '\000';
     }
 
     /* Assign the new comments in the parser array */
@@ -410,9 +354,8 @@ int ccp4_parse_comments(CCP4PARSERARRAY *parsePtr, const char *comment_chars)
   return istatus;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccp4_parse_maxmin
+/*! Set non-default maximum and minimum values for numerical tokens.
 
    This allows the application to set its own maximum and minimum
    exponent values, which are used as limits when evaluating the values
@@ -429,13 +372,15 @@ int ccp4_parse_maxmin(CCP4PARSERARRAY *parsePtr, const double max_exponent,
   return 1;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccp4_parse
+
+/*! Parsing scanner 
 
    This is a scanner based on the old CCP4 Fortranic PARSE routine.
+   Given a string "line", break up into tokens and store in
+   CCP4PARSERARRAY "parser"
  
-   It takes an input string ("line") and returns the number of
+   The function takes an input string ("line") and returns the number of
    tokens ("ntokens") which are delimited by certain characters
    (defaulted to space, tab, comma, equals - these can be changed by
    the application using a call to ccp4_parse_delimiters).
@@ -454,17 +399,15 @@ int ccp4_parse_maxmin(CCP4PARSERARRAY *parsePtr, const double max_exponent,
    to comma and equals - these can be changed by the application
    using a call to ccp4_parse_delimiters).
 
-   ccp4_parse returns the number of tokens found in the line. The
-   tokens are returned via the CCP4PARSERARRAY parser.
-
-   Arguments:
-
-   line   = pointer to a null-terminated string of characters,
+   @param line = pointer to a null-terminated string of characters,
             forming the input to be processed. Unaltered on
 	    output.
-   parser = pointer to a CCP4PARSERARRAY structure which will
+   @param parser = pointer to a CCP4PARSERARRAY structure which will
             be used to hold the results of processing the input
 	    line.
+
+   @return ccp4_parse returns the number of tokens found in the line. The
+   tokens are returned via the CCP4PARSERARRAY parser.
 */
 
 int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
@@ -696,7 +639,7 @@ int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
 	tokenarray[ntok].fullstring = (char *) ccp4_utils_malloc(sizeof(char)*(lword+1));
 	if (tokenarray[ntok].fullstring) {
 	  strncpy(tokenarray[ntok].fullstring,&line[ibeg],lword);
-	  tokenarray[ntok].fullstring[lword] = '\0';
+	  tokenarray[ntok].fullstring[lword] = '\000';
 	  if (diag) printf("CCP4_PARSE: Token is \"%s\"\n",tokenarray[ntok].fullstring);
 	} else {
           ccp4_signal(CPARSER_ERRNO(CPARSERR_AllocFail),"ccp4_parse",NULL);
@@ -706,7 +649,7 @@ int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
 	/* Store the 4 character token in the array */
 	if (lword > 4) lword = 4; 
 	strncpy(tokenarray[ntok].word,&line[ibeg],lword);
-	tokenarray[ntok].word[lword] = '\0';
+	tokenarray[ntok].word[lword] = '\000';
 	/* Determine numerical value (if any) */
 	if (doublefromstr(tokenarray[ntok].fullstring,parser->max_exponent,
 			  parser->min_exponent,&value,&intvalue,&intdigits,
@@ -743,53 +686,55 @@ int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
   return ntok;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccp4_parser
+/*! The main function for parsing lines
 
-   This is based on the old CCP4 Fortranic PARSER routine.
+  ccp4_parser is the main function for reading lines, either supplied
+  or read from stdin. It is based on the old CCP4 Fortranic PARSER
+  routine. The function reads input from stdin or external file,
+  breaks it up into tokens that are stored in CCP4PARSERARRAY "parser".
 
-   The normal behaviour is to read "keyworded" data from the input
-   stream, and interpret it. Stdin is the default, but a line
-   starting with @<name> starts reading from file <name> until eof.
+  The normal behaviour is to read "keyworded" data from the input
+  stream, and interpret it. Stdin is the default, but a line starting
+  with @<name> starts reading from file <name> until eof.
 
-   Each input line may be continued on the next line by the continuation
-   characters `&', `-' or `\' at the end of the input line. This
-   character is dropped from the list returned to the calling application.
+  Each input line may be continued on the next line by the
+  continuation characters `&', `-' or `\' at the end of the input
+  line. This character is dropped from the list returned to the
+  calling application.
 
-   Pass in a zero length line to force reading from the command line.
-   nchars is the maximum number of characters which will be read into the line.
-   (If line is not blank then it will be processed and more input
-   read in if it ends in a continuation character, or forces reading from
-   an external file.)
+  Pass in a zero length line to force reading from the command line.
+  nchars is the maximum number of characters which will be read into
+  the line.  (If line is not blank then it will be processed and more
+  input read in if it ends in a continuation character, or forces
+  reading from an external file.)
 
-   The "print" argument should be supplied as 0 to suppress echoing of the
-   input lines to standard output.
+  The "print" argument should be supplied as 0 to suppress echoing of the
+  input lines to standard output.
 
-   ccp4_parser returns the number of tokens parsed in the input line. The
-   results of the parsing are stored as members of the CCP4PARSEARRAY
-   structure "parser" and can be accessed by the application program.
+  ccp4_parser returns the number of tokens parsed in the input
+  line. The results of the parsing are stored as members of the
+  CCP4PARSEARRAY structure "parser" and can be accessed by the
+  application program.
 
-   The function returns the number of tokens, or 0 on reaching end of file.
-   On encountering an unrecoverable error ccp4_parser returns -1. 
+  @param line pointer to a null-terminated string of characters,
+  forming the input to be processed. On input can either be an empty 
+  string ("") which forces reading from stdin, or contain characters 
+  to be processed. On output "line" will be overwritten with the actual
+  input line, up to nchar characters.
 
-   Arguments:
+  @param nchars maximum number of characters that can be read into
+  "line" i.e. the size of "line" in memory.
 
-   line   = pointer to a null-terminated string of characters,
-            forming the input to be processed.
-	    On input can either be an empty string ("") or
-	    contain characters to be processed (see above for
-	    description).
-	    On output "line" will be overwritten with the actual
-	    input line, up to nchar characters.
-   nchars = maximum number of characters that can be read into
-            "line" i.e. the size of "line" in memory.
-   parser = pointer to a CCP4PARSERARRAY structure which will
-            be used to hold the results of processing the input
-	    line.
-   print  = flag controlling echoing of input lines to stdout.
-            print=0: suppress echoing of lines to stdout
-	    Otherwise echoing is turned on.
+  @param parser pointer to a CCP4PARSERARRAY structure which will
+  be used to hold the results of processing the input line.
+
+  @param print flag controlling echoing of input lines to stdout.
+  print=0: suppress echoing of lines to stdout. Otherwise echoing is 
+  turned on.
+
+  @return Number of tokens found, or 0 on reaching end of file. On
+   encountering an unrecoverable error ccp4_parser returns -1.
 */
 
 int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
@@ -902,7 +847,7 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
 	fromstdin = 1;
 	/* Blank the line and reset the first flag to
 	   force reading from standard input immediately */
-	linein[0] = '\0';
+	linein[0] = '\000';
 	ntok      = 0;
 	parser->ntokens = ntok;
 	first     = 1;
@@ -912,14 +857,14 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
       /* If this line contains a continuation mark then
 	 read from stdin next time around */
       strncpy(linein,line,nchars);
-      linein[nchars]='\0';
+      linein[nchars]='\000';
     }
 
     /* Strip any trailing newline e.g. from fgets */
     llen = strlen(linein);
     if (llen > 0)
       if (linein[llen-1] == '\n') {
-	linein[llen-1] = '\0';
+	linein[llen-1] = '\000';
 	llen--;
       }
     
@@ -976,7 +921,7 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
 	}
 	/* Blank the line and reset the number of tokens
 	   to force reading from the external file immediately */
-	line[0] = '\0';
+	line[0] = '\000';
 	ntok    = 0;
 	parser->ntokens = ntok;
 
@@ -997,7 +942,7 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
 	else
 	  trunc = 0;
 	if (diag) printf("CCP4_PARSER: Continuation character should be at position %d\n\"%c\" is the character at this position\n",trunc,line[trunc]);
-	line[trunc] = '\0';
+	line[trunc] = '\000';
 	/* Lose the last token */ 
 	ntok--;
 	parser->ntokens = ntok;
@@ -1014,7 +959,7 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
 	   the line */
 	if (strlen(line) > 0) {
 	  if (print) printf(" Comment line--- %s\n",line);
-	  line[0] = '\0';
+	  line[0] = '\000';
           nch = nchars;
 	}
         if (fromapp) continuation = 0;
@@ -1034,12 +979,12 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
   /* Fetch and uppercase keyword */
     if (ntok > 0) {
       strtoupper(parser->keyword,tokenarray[0].word);
-      parser->keyword[strlen(tokenarray[0].word)] = '\0';
+      parser->keyword[strlen(tokenarray[0].word)] = '\000';
       if (diag) printf("CCP4_PARSER: Keyword is %s\n",parser->keyword);
       /*Echo the line to standard output */ 
       if (print) printf(" Data line--- %s\n",line); 
     } else {
-      parser->keyword[0] = '\0';
+      parser->keyword[0] = '\000';
     }
 
   free(linein);
@@ -1050,15 +995,18 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
   return ntok;
 }
 
-/*------------------------------------------------------------------*/
 
-/* ccp4_keymatch
+/*! Test whether two keywords are identical. 
 
-   Returns 1 if keywords keyin1 and keyin2 are "identical", 0 otherwise.
+ This function compares input strings to see if they match as
+ CCP4-style keywords.  Keywords are identical if they are the same up
+ to the first four characters, independent of case.
 
-   Keywords are identical if they are the same up to the first four
-   characters, independent of case.
-*/
+ @param keyin1 keyword 1.
+ @param keyin2 keyword 2.
+ @return 1 if keywords keyin1 and keyin2 are "identical", 0 otherwise.
+ */
+
 int ccp4_keymatch(const char *keyin1, const char *keyin2)
 {
   int  len1,len2;
@@ -1080,20 +1028,28 @@ int ccp4_keymatch(const char *keyin1, const char *keyin2)
   /* If supplied words are longer than four characters then
      truncate them after the fourth character */
   strncpy(key1,keyin1,len1);
-  key1[len1] = '\0';
+  key1[len1] = '\000';
 
   strncpy(key2,keyin2,4);
-  key2[len2] = '\0';
+  key2[len2] = '\000';
 
   /* Convert strings to uppercase */
   strtoupper(keyup1,key1);
-  keyup1[len1] = '\0';
+  keyup1[len1] = '\000';
   strtoupper(keyup2,key2);
-  keyup2[len2] = '\0';
+  keyup2[len2] = '\000';
 
   /* Compare using strmatch */
   return strmatch(keyup1,keyup2);
 }
+
+
+/*! Convert string to uppercase.
+
+   @param str1 On exit str1 will contain uppercased copy of str2
+   @param str2 Input string
+   @return str1
+ */
 
 char *strtoupper (char *str1, const char *str2)
 {
@@ -1103,9 +1059,17 @@ char *strtoupper (char *str1, const char *str2)
   
   len2 = strlen(str2);
   if (len2 > 0) for (i=0; i<len2 ; i++) str1[i] = toupper(str2[i]);
-  str1[len2] = '\0';
+  str1[len2] = '\000';
   return str1;
 }
+
+
+/*! Convert string to lowercase.
+
+   @param str1 On exit str1 will contain lowercased copy of str2
+   @param str2 Input string
+   @return str1
+ */
 
 char *strtolower (char *str1, const char *str2)
 {
@@ -1115,17 +1079,15 @@ char *strtolower (char *str1, const char *str2)
   
   len2 = strlen(str2);
   if (len2 > 0) for (i=0; i<len2 ; i++) str1[i] = tolower(str2[i]);
-  str1[len2] = '\0';
+  str1[len2] = '\000';
   return str1;
 }
 
-/*------------------------------------------------------------------*/
 
-/* strmatch
+/*! Compare two strings.
 
-   Compare two strings.
-
-   Returns 1 if strings are identical, 0 if they differ.
+   This function checks if character appears in a list of possibilities.
+   @return Returns 1 if strings are identical, 0 if they differ.
 */
 int strmatch (const char *str1, const char *str2)
 {
@@ -1149,11 +1111,12 @@ int strmatch (const char *str1, const char *str2)
   return 1;
 }
 
-/*------------------------------------------------------------------*/
 
-/* charmatch
+/*! Match characters
 
-   Returns 1 if character matches one of the characters in the string,
+   @param[in] character character to find
+   @param[in] charlist string to search in
+   @return Returns 1 if character matches one of the characters in the string,
    0 otherwise.
 */
 int charmatch(const char character, const char *charlist)
@@ -1171,12 +1134,14 @@ int charmatch(const char character, const char *charlist)
   return ismatch;
 }
 
-/*------------------------------------------------------------------*/
 
-/* doublefromstr
+
+/*! Convert a string representation of a number into the number.
 
    Determine whether string represents a valid number, and return the
-   numerical value if it is.
+   numerical value if it is.  The function also checks for exponent
+   over/underflow, returns numbers of digits and values of
+   "components" (integer and fractional parts, and base-10 exponent)
    The function returns 1 for a valid number, 0 otherwise.
 
    Valid numbers are represented by:
@@ -1296,7 +1261,7 @@ int doublefromstr(const char *str, const double max_exp, const double min_exp,
       if (diag) printf(" is a digit ...\n");
 
       this_str[0] = this_char;
-      this_str[1] = '\0';
+      this_str[1] = '\000';
       char_value = atoi(this_str);
 
       if (is_int) {
@@ -1374,6 +1339,14 @@ int doublefromstr(const char *str, const double max_exp, const double min_exp,
   return 1;
 }
 
+/*! Convert symmetry operator as string to ccp4_symop struct.
+
+  @param symchs_begin pointer to beginning of string
+  @param symchs_end pointer to end of string (i.e. last character
+    is *(symchs_end-1) )
+  @return pointer to ccp4_symop struct
+ */
+
 ccp4_symop symop_to_rotandtrn(const char *symchs_begin, const char *symchs_end) {
 
   float rsm[4][4];
@@ -1383,13 +1356,11 @@ ccp4_symop symop_to_rotandtrn(const char *symchs_begin, const char *symchs_end) 
 
 }
 
-/*------------------------------------------------------------------*/
-
-/* symop_to_mat4
+/*! Convert symmetry operator as string to matrix.
 
    Translates a single symmetry operator string into a 4x4 quine
-   matrix representation
-   NB Uses a utility function (symop_to_mat4_err) when reporting
+   matrix representation. 
+   NB! Uses a utility function (symop_to_mat4_err) when reporting
    failures.
 
    Syntax of possible symop strings:
@@ -1404,7 +1375,20 @@ ccp4_symop symop_to_rotandtrn(const char *symchs_begin, const char *symchs_end) 
 
    The function returns 1 on success, 0 if there was a failure to
    generate a matrix representation.
-*/
+
+  @param symchs_begin pointer to beginning of string
+
+  @param symchs_end pointer to end of string (i.e. last character
+         is *(symchs_end-1) )
+
+  @param rot 4 x 4 matrix operator
+
+  @return NULL on error, final position pointer on success
+
+  @note This is Charles' version of symfr. Note that translations
+  are held in elements [*][3] and [3][3] is set to 1.0
+ */
+
 const char *symop_to_mat4(const char *symchs_begin, const char *symchs_end, float *rot)
 {
   int no_real =0, no_recip = 0, no_axis = 0;          /* counters */
@@ -1554,13 +1538,22 @@ const char *symop_to_mat4(const char *symchs_begin, const char *symchs_end, floa
 }
 
 /* Internal function: report error from symop_to_mat4_err */
-int symop_to_mat4_err(const char *symop)
+static int symop_to_mat4_err(const char *symop)
 {
   printf("\n **SYMMETRY OPERATOR ERROR**\n\n Error in interpreting symop \"%s\"\n\n",
 	 symop);
   ccp4_signal(CPARSER_ERRNO(CPARSERR_SymopToMat),"symop_to_mat4",NULL);
   return 1;
 }
+
+/*! Convert symmetry operator as matrix to string.
+
+  This is Charles' version of symtr. Note that translations
+  are held in elements [*][3] and [3][3] is set to 1.0.
+
+  @param rsm 4 x 4 matrix operator
+  @return pointer to beginning of string
+ */
 
 ccp4_symop mat4_to_rotandtrn(const float rsm[4][4]) {
 
@@ -1576,6 +1569,15 @@ ccp4_symop mat4_to_rotandtrn(const float rsm[4][4]) {
   return (symop);
 }
 
+/*! Convert rotation/translation string to symmetry operator.
+
+  @param symchs_begin pointer to beginning of string
+  @param symchs_end pointer to end of string (i.e. last character
+         is *(symchs_end-1) )
+  @param symop
+   @return pointer to beginning of string
+ */
+
 char *rotandtrn_to_symop(char *symchs_begin, char *symchs_end, const ccp4_symop symop)
 {
   float rsm[4][4];
@@ -1584,6 +1586,10 @@ char *rotandtrn_to_symop(char *symchs_begin, char *symchs_end, const ccp4_symop 
   return(mat4_to_symop(symchs_begin,symchs_end,(const float (*)[4])rsm));
 }
 
+/*! Convert rotation/translation string to 4x4 matrix data structure.
+  @param rsm 4x4 matrix
+  @param symop
+ */
 void rotandtrn_to_mat4(float rsm[4][4], const ccp4_symop symop) {
 
   int i,j;
@@ -1596,6 +1602,19 @@ void rotandtrn_to_mat4(float rsm[4][4], const ccp4_symop symop) {
   }
   rsm[3][3]=1.0;
 }
+
+/*! Convert symmetry operator as matrix to string.
+
+   Note that translations are held in elements [*][3] and [3][3] is
+   set to 1.0
+
+   @param symchs_begin pointer to beginning of string
+   @param symchs_end pointer to end of string (i.e. last character
+          is *(symchs_end-1) )
+   @param rsm 4 x 4 matrix operator
+
+   @return pointer to beginning of string
+ */
 
 char *mat4_to_symop(char *symchs_begin, char *symchs_end, const float rsm[4][4])
 {
@@ -1692,6 +1711,22 @@ char *mat4_to_symop(char *symchs_begin, char *symchs_end, const float rsm[4][4])
   }
   return symchs_begin;
 }
+
+
+/*! Convert symmetry operator as matrix to string in reciprocal space notation.
+
+   This is Charles' version of symtr. Note that translations
+   are held in elements [*][3] and [3][3] is set to 1.0
+
+   @param symchs_begin pointer to beginning of string
+
+   @param symchs_end pointer to end of string (i.e. last character
+          is *(symchs_end-1) )
+
+   @param rsm 4 x 4 matrix operator
+
+   @return pointer to beginning of string
+ */
 
 char *mat4_to_recip_symop(char *symchs_begin, char *symchs_end, const float rsm[4][4])
 {

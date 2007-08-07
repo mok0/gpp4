@@ -19,6 +19,12 @@
      Boston, MA 02110-1301 USA
 
 */
+/** 
+ @file ccp4_file_err.h
+ @brief  Header file with file handling error codes
+ @author Charles Ballard
+*/
+
 #ifndef _GUARD_FILE_ERR
 #define _GUARD_FILE_ERR
 
@@ -38,4 +44,3 @@
 #define CIO_UnlinkFail 12
 
 #endif
-

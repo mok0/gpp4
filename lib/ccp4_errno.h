@@ -20,8 +20,9 @@
 
 */
 /** @file ccp4_errno.h
- *  Header file for error handling routines
- *  base error codes on system errors. 
+ *  @brief Header file for error handling routines
+ *  Error codes based on system errors.
+ *  @author Charles Ballard and Martyn Winn
  */
 
 #ifndef __CCP4_ERROR_GUARD

@@ -19,6 +19,12 @@
      Boston, MA 02110-1301 USA
 
 */
+
+/*! @file cmap_data.c
+    @brief Functions to manipulate CCP4 map files.
+*/
+
+
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
@@ -430,8 +436,7 @@ int ccp4_cmap_seek_data(CMMFile *mfile, int offset, unsigned int whence)
 /*! raw write of nelements items to file, according to the datamode,
    at current location
  \param mfile (const CMMFile *)
- \param section (void *) values written, should contain at least 
- nelements items
+ \param items (void *) values written, should contain at least n_items items
  \param n_items (int) number of items to be written
  \return number of items written or EOF */
 int ccp4_cmap_write_data(CMMFile *mfile, const void *items, int n_items)

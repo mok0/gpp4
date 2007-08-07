@@ -21,17 +21,16 @@
 */
 
 /** @page utilities_page CCP4 Library Utilities
- *
- *  @section utilities_list File list
 
-<ul>
-<li>library_utils.c
-<li>ccp4_general.c
-<li>ccp4_parser.c
-<li>ccp4_program.c
-</ul>
+@section utilities_list File list
 
- *  @section utilities_overview Overview
+ - library_utils.c
+ - ccp4_general.c
+ - ccp4_parser.c
+ - ccp4_program.c
+ .
+
+@section utilities_overview Overview
  
 The CCP4 C-library provides many utility functions which either give
 specific CCP4 functionality (e.g. traditional keyword parsing) or
@@ -67,7 +66,7 @@ are just generally useful (platform independent date).
 /* static uint16 nativeIT = NATIVEIT; */ /* machine integer type - currently unused here */
 static uint16 nativeFT = NATIVEFT; /* machine float type */
 
-/** .
+/**
  * 
  * @return 
  */
@@ -126,9 +125,8 @@ size_t ccp4_utils_flength (char *s, int len)
   return (++len);
 }
 
-/** .
- * 
- * @return 
+/*!
+  Print message on stdout.
  */
 void ccp4_utils_print (const char *message)
 {
@@ -136,9 +134,8 @@ void ccp4_utils_print (const char *message)
  }
 
 #if ! defined (VMS)
-/** .
- * 
- * @return 
+/*!
+  Set variable in the environment
  */
 int ccp4_utils_setenv (char *str)
 {
@@ -177,9 +174,8 @@ int ccp4_utils_setenv (char *str)
 #endif
 
 #if ! defined (VMS)
-/** .
- * 
- * @return 
+
+/*! Alter buffering behaviour of stdout.
  */
 int ccp4_utils_outbuf(void)
 {
@@ -201,9 +197,7 @@ int ccp4_utils_outbuf(void)
 #endif
 }
 
-/** .
- * 
- * @return 
+/*! Turn off buffering of input stream.
  */
 int ccp4_utils_noinpbuf(void)
 {
@@ -211,6 +205,8 @@ int ccp4_utils_noinpbuf(void)
 }
 #endif
 
+/*! Return floating point representation of NaN
+ */
 union float_uint_uchar ccp4_nan ()
 
 #if NATIVEFT == DFNTF_BEIEEE || NATIVEFT == DFNTF_LEIEEE
@@ -235,9 +231,8 @@ union float_uint_uchar ccp4_nan ()
   return (realnum);
 }
 
-/** .
- * 
- * @return 
+/*! Check if a number is NaN
+  @return true or false
  */
 int ccp4_utils_isnan (const union float_uint_uchar *realnum)
 {
@@ -256,9 +251,7 @@ int ccp4_utils_isnan (const union float_uint_uchar *realnum)
 }
 
 #define MDFBIG -1.0E10          /* BIOMOL absence flag value */
-/** .
- * 
- * @return 
+/*! Check for BIOMOL absence flag.
  */
 void ccp4_utils_bml (int ncols, union float_uint_uchar cols[])
 {
@@ -268,7 +261,7 @@ void ccp4_utils_bml (int ncols, union float_uint_uchar cols[])
       if (cols[i].f <= MDFBIG) cols[i].f = 0.0;
 }
 
-/** .
+/*
  * 
  * @return 
  */
@@ -282,9 +275,7 @@ void ccp4_utils_wrg (int ncols, union float_uint_uchar cols[], float wminmax[])
          if (cols[i].f > wminmax[1+2*i]) wminmax[1+2*i] = cols[i].f; }
 }
 
-/** .
- * 
- * @return 
+/*! Define numbers representing integer max and floating point max.
  */
 void ccp4_utils_hgetlimits (int *IValueNotDet, float *ValueNotDet)
 {
@@ -292,9 +283,9 @@ void ccp4_utils_hgetlimits (int *IValueNotDet, float *ValueNotDet)
   *ValueNotDet  = FLT_MAX;
 }
 
-/** .
+/** Make a directory in the computer filesystem.
  * 
- * @return 
+ * @return 1 if successful.
  */
 int ccp4_utils_mkdir (const char *path, const char *cmode)
 #if !defined (_MVS) && !defined(_WIN32)
@@ -357,9 +348,8 @@ int ccp4_utils_mkdir (const char *path, const char *cmode)
    }
 #endif
 
-/** .
- * 
- * @return 
+/** Change protection mode on a file.
+ * @return 1 if successful.
  */
 int ccp4_utils_chmod (const char *path, const char *cmode)
 #if !defined (_MSC_VER) || !defined(_WIN32)
@@ -406,10 +396,9 @@ int ccp4_utils_chmod (const char *path, const char *cmode)
    }
 #endif
 
-/** This is a wrapper for the malloc function, which adds some
+/** Wrapper for the malloc function, which adds some
  * error trapping.
  * 
- * @return void
  */
 void *ccp4_utils_malloc(size_t size)
 
@@ -423,10 +412,8 @@ void *ccp4_utils_malloc(size_t size)
     }
   return val;}
 
-/** This is a wrapper for the realloc function, which adds some
+/**  Wrapper for the realloc function, which adds some
  * error trapping.
- * 
- * @return 
  */
 void *ccp4_utils_realloc(void *ptr, size_t size)
 { void *val; 
@@ -439,10 +426,8 @@ void *ccp4_utils_realloc(void *ptr, size_t size)
     }
   return val;}
 
-/** This is a wrapper for the calloc function, which adds some
+/**  Wrapper for the calloc function, which adds some
  * error trapping.
- * 
- * @return 
  */
 void *ccp4_utils_calloc(size_t nelem , size_t elsize)
 { void *val; 
@@ -457,7 +442,6 @@ void *ccp4_utils_calloc(size_t nelem , size_t elsize)
 
 
 /** Return the user's login name.
- * (MVisualStudio version in w32mvs.c)
  * Note that getlogin only works for processes attached to
  * a terminal (and hence won't work from the GUI).
  * In these instances use getpwuid instead.
@@ -586,7 +570,7 @@ char *ccp4_utils_joinfilenames(char *dir, char *file)
   return join;
 }
 
-/** .
+/*! Return an integer array containing the day, month and year.
  * 
  * @return 
  */
@@ -601,9 +585,10 @@ void ccp4_utils_idate (int iarray[3])
      iarray[2] = lt->tm_year + 1900;
 }
 
-/** .
- * 
- * @return 
+/** Return day, month and year printed in a string.  
+  @param date string to receive the date information. The string must
+  have size >= 11.  
+  @return pointer to date string.
  */
 char *ccp4_utils_date(char *date)
 {
@@ -684,14 +669,22 @@ void _objcInit(void) {}
 #endif
 
 #if defined (__APPLE__) && defined (__GNUC__) && ( __GNUC__ == 3 ) && (__GNUC_MINOR__ == 1)
+
+/*! return cosinus in float representation
+ */
+
 float acosf(float x) {
   return (float) acos( (double) x);
 }
 
+/*! return arctan in float representation
+ */
 float atanf(float x) {       
   return (float) atan( (double) x);
 }
 
+/*! return sinus in float representation
+ */
 float asinf(float x) {       
   return (float) asin( (double) x);
 }
@@ -699,6 +692,8 @@ float asinf(float x) {
 #endif
 
 #  if (defined _MVS)
+/*! return rounded int in double representation
+ */
 double rint(double x) { 
   if (x >= 0.) {
    return (double)(int)(x+.5);

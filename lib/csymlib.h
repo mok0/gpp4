@@ -21,78 +21,69 @@
 */
 
 /** @page csym_page CSYM library
- *
- * @verbatim
 
-<!-- ::INDEX_INFO::CSYM library::Library::::C/C++ Software Library for symmetry information:::::::: -->
+@section csym_file_list File list
 
-   @endverbatim
- *
- *  @section csym_file_list File list
+ - csymlib.h - contains details of the C/C++ API
+ - ccp4_spg.h - contains details of the spacegroup data structure
 
-<ul>
-<li>csymlib.h - contains details of the C/C++ API
-<li>ccp4_spg.h - contains details of the spacegroup data structure
-</ul>
- *
- *  @section csym_overview Overview
+@section csym_overview Overview
  
-The CSYM library is centred around a data file <tt>syminfo.lib</tt> which is
+The CSYM library is centred around a data file \c syminfo.lib which is
 auto-generated from sgtbx (the Space Group Toolbox of 
 <a href="http://cctbx.sourceforge.net/">cctbx</a>). A description of
 the contents of this file is given in the <a href="../symlib.html">
 documentation</a> of the Fortran API.
 
-<p>A particular spacegroup in a particular setting
-is loaded into an in-memory data structure by requesting a particular
-spacegroup name, number, or set of operators. See the functions
-<tt>ccp4spg_load_by_standard_num</tt>, <tt>ccp4spg_load_by_ccp4_num</tt>, 
-<tt>ccp4spg_load_by_spgname</tt>,  <tt>ccp4spg_load_by_ccp4_spgname</tt>
-and <tt>ccp4_spgrp_reverse_lookup</tt>. Information on the in-memory 
-data structure is given in ccp4_spg.h The memory can be freed by the
-function <tt>ccp4spg_free</tt>.
+A particular spacegroup in a particular setting is loaded into an
+in-memory data structure by requesting a particular spacegroup name,
+number, or set of operators. See the functions
+\c ccp4spg_load_by_standard_num,
+\c ccp4spg_load_by_ccp4_num, \c ccp4spg_load_by_spgname,
+\c ccp4spg_load_by_ccp4_spgname and
+\c ccp4_spgrp_reverse_lookup. Information on the in-memory data
+structure is given in ccp4_spg.h The memory can be freed by the
+function \c ccp4spg_free.
 
-<p>Functions are provided to:
-<ul>
-<li>Query the data structure, e.g. <tt>ccp4spg_symbol_Hall</tt>, etc. (members
-of the structure can of course be obtained directly)
-<li>Check reciprocal space indices for a particular spacegroup, 
-e.g. <tt>ccp4spg_is_in_asu</tt>, <tt>ccp4spg_is_centric</tt>, 
-<tt>ccp4spg_get_multiplicity</tt>, <tt>ccp4spg_is_sysabs</tt>, etc.
-<li>Set appropriate grids for FFT, e.g. <tt>set_fft_grid</tt>
-</ul>
- *
- *  @section csym_operators Symmetry operators
+Functions are provided to:
+
+ - Query the data structure, e.g. \c ccp4spg_symbol_Hall,
+   etc. (members of the structure can of course be obtained directly)
+ - Check reciprocal space indices for a particular spacegroup,
+   e.g. \c ccp4spg_is_in_asu, \c ccp4spg_is_centric,
+   \c ccp4spg_get_multiplicity, \c ccp4spg_is_sysabs, etc.
+ - Set appropriate grids for FFT, e.g. \c set_fft_grid
+
+@section csym_operators Symmetry operators
 
 Symmetry operators are expressed in a variety of ways:
-<ul>
-<li>Using the struct <tt>ccp4_symop</tt>, which consists of a 3 x 3 rotation
-matrix and a translation vector.
-<li>As a 4 x 4 matrix, in which the rotation matrix is in the top-left-hand
-corner and the translation vector is in elements [*][3]. Element [3][3] is
-set to 1.0
-<li>As a string, such as "-x+1/2,-y,z+1/2"
-</ul>
-Check the function description for which form is expected. Often, there 
-are alternative functions if you wish to supply the operators in a
-different form. There are also the following conversion functions:
-<ul>
-<li>rotandtrn_to_mat4
-<li>rotandtrn_to_symop
-<li>mat4_to_rotandtrn
-<li>mat4_to_symop
-<li>mat4_to_recip_symop
-<li>symop_to_rotandtrn
-<li>symop_to_mat4
-</ul>
-Note that the order of symmetry operators may be important in some cases, for
-example in MTZ files with a M/ISYM column where ISYM encodes the symmetry operation
-used.
 
- *  @section csym_examples Examples
+ - Using the struct \c ccp4_symop, which consists of a 3 x 3 rotation
+   matrix and a translation vector.
+ - As a 4 x 4 matrix, in which the rotation matrix is in the top-left-hand
+   corner and the translation vector is in elements [*][3]. Element [3][3] is
+   set to 1.0
+ - As a string, such as "-x+1/2,-y,z+1/2"
+
+Check the function description for which form is expected. Often,
+there are alternative functions if you wish to supply the operators in
+a different form. There are also the following conversion functions:
+
+ - rotandtrn_to_mat4
+ - rotandtrn_to_symop
+ - mat4_to_rotandtrn
+ - mat4_to_symop
+ - mat4_to_recip_symop
+ - symop_to_rotandtrn
+ - symop_to_mat4
+
+Note that the order of symmetry operators may be important in some
+cases, for example in MTZ files with a M/ISYM column where ISYM
+encodes the symmetry operation used.
+
+@section csym_examples Examples
 
 See examples on <a href="ftp://ftp.ccp4.ac.uk/pub/mdw/csym">ftp area</a>
-
 */
 
 /** @file csymlib.h
@@ -284,7 +275,7 @@ char *ccp4spg_symbol_Hall(CCP4SPG* sp);
 
 /** inverts a symmetry operator. The input operator is
  * converted to a 4 x 4 matrix, inverted, and converted back.
- * @param ccp4_symop input symmetry operator
+ * @param op1 input symmetry operator
  * @return inverted symmetry operator
  */
 ccp4_symop ccp4_symop_invert( const ccp4_symop op1 );
@@ -302,9 +293,9 @@ int ccp4spg_name_equal(const char *spgname1, const char *spgname2);
  * removed when making the comparison. Strings are converted to upper
  * case before making the comparison. If spgname_lib has " 1 " and 
  * spgname_match doesn't, then strip out " 1" to do "short" comparison.
- * @param spgname1 First spacegroup name, assumed to be a standard one
+ * @param spgname_lib First spacegroup name, assumed to be a standard one
  *  obtained at some point from SYMINFO
- * @param spgname2 Second spacegroup name that you are trying to match
+ * @param spgname_match Second spacegroup name that you are trying to match
  *  to a standard SYMINFO one. E.g. it might have been provided by the
  *  user.
  * @return 1 if they are equal else 0.
@@ -368,7 +359,7 @@ int ccp4_symop_code(ccp4_symop op);
 /** Comparison of symmetry operators encoded as integers.
  * In ccp4_spgrp_equal, this is passed to the stdlib qsort.
  * @param p1 pointer to first integer
- * @param p1 pointer to second integer
+ * @param p2 pointer to second integer
  * @return difference between integers
 */
 int ccp4_int_compare( const void *p1, const void *p2 );

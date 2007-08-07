@@ -48,7 +48,9 @@
 #define MSETS      1000      /**< maximum number of datasets (for a few arrays - to be removed!) */
 #define MCOLUMNS  10000      /**< maximum number of columns (for a few arrays - to be removed!) */
 
-/** MTZ column struct. */
+/** @struct MTZCOL 
+    @brief MTZ column descriptor. 
+*/
 typedef struct { char label[31];       /**< column name as given by user */
 		 char type[3];         /**< column type */
                  int active;           /**< whether column in active list */
@@ -56,9 +58,10 @@ typedef struct { char label[31];       /**< column name as given by user */
  		 float min;            /**< minimum data element */
 		 float max;            /**< maximum data element */
 		 float *ref;           /**< data array */
-	       } MTZCOL;
+	       } MTZCOL;               
 
-/** MTZ dataset struct. */
+/*! @struct MTZSET 
+    @brief Structure describing an MTZ dataset. */
 typedef struct { int setid;            /**< Dataset id */
 		 char dname[65];       /**< Dataset name */
 		 float wavelength;     /**< Dataset wavelength */
@@ -66,7 +69,8 @@ typedef struct { int setid;            /**< Dataset id */
 		 MTZCOL **col;         /**< columns */
 	       } MTZSET;
 
-/** MTZ crystal struct. */
+/*! @struct MTZXTAL 
+    @brief Structure describing an MTZ crystal. */
 typedef struct { int xtalid;           /**< Crystal id */
 		 char xname[65];       /**< Crystal name */
 		 char pname[65];       /**< Project name */
@@ -77,7 +81,8 @@ typedef struct { int xtalid;           /**< Crystal id */
 		 MTZSET **set;         /**< datasets */
 	       } MTZXTAL;
 
-/** MTZ batch struct. */
+/*! @struct bathead 
+    @brief MTZ batch descriptor. */
 typedef struct bathead { int num;              /**< batch number */
 		 char title[71];       /**< batch title */
 		 char gonlab[3][9];    /**< names of the three axes */
@@ -137,9 +142,10 @@ typedef struct bathead { int num;              /**< batch number */
 		 float detlm[2][2][2]; /**< min & max values of detector coords
 					  (pixels) */
 		 struct bathead *next; /**< next batch in list */
-	       } MTZBAT;
+	       } MTZBAT;	       /*!< type name for struct bathead */
 
-/** MTZ symmetry struct. */
+/*! @struct SYMGRP 
+    @brief Symmetry structure. */
 typedef struct { int spcgrp;           /**< spacegroup number */
 		 char spcgrpname[MAXSPGNAMELENGTH+1];  /**< spacegroup name */
 		 int nsym;             /**< number of symmetry operations */
@@ -150,11 +156,15 @@ typedef struct { int spcgrp;           /**< spacegroup number */
 		 char pgname[11];      /**< pointgroup name */
                } SYMGRP;
 
-typedef union { char amnf[4]; 
-                float fmnf;
+/*! @union MNF 
+    @brief Missing number flag for the MTZ data structure. */
+typedef union { char amnf[4];          /*!< byte representation of MNF */ 
+                float fmnf;	       /*!< floating point representation of MNF */
               } MNF;
 
-/** Top level of MTZ struct. */
+/*! @struct MTZ 
+    @brief Top level MTZ structure, including crystal, symmetry and batch information */
+
 typedef struct { CCP4File *filein;     /**< file for reading */
                  CCP4File *fileout;    /**< file for writing */
 		 char title[71];       /**< title of mtz structure */
