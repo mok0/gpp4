@@ -40,3 +40,9 @@ int stats_update(CMMFile_Stats *stats, void *section_begin,
 #endif
 
 #endif   /* __GUARD_MAPLIB_STATS */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

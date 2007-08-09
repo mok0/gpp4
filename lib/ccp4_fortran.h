@@ -362,3 +362,9 @@ char *ccp4_FtoCString(fpstr str1, int str1_len);
 void ccp4_CtoFString(fpstr str1, int str1_len, const char *cstring);
 
 #endif    /* __CCP4_FORTRAN */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

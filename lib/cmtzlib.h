@@ -992,3 +992,9 @@ int ccp4_lwbsetid(MTZ *mtz, MTZBAT *batch, const char xname[], const char dname[
 } }
 #endif
 #endif
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

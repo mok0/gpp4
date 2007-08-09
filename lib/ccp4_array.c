@@ -155,3 +155,9 @@ void ccp4array_free_(ccp4_ptr *p)
   v = (ccp4array_base *)((ccp4_byteptr)(*p)-sizeof(ccp4array_base));
   free(v);
 }
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

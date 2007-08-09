@@ -186,3 +186,9 @@ typedef struct { CCP4File *filein;     /**< file for reading */
 	       } MTZ;
 
 #endif
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

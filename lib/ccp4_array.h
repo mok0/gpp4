@@ -253,3 +253,9 @@ void ccp4array_free_(ccp4_ptr *p);
 #endif
 
 #endif /* __CCP4_ARRAY_INC */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

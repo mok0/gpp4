@@ -2231,3 +2231,9 @@ char *ccp4_file_print(CCP4File *cfile, char *msg_start, char *msg_end)
 
   return msg_curr;
 }
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

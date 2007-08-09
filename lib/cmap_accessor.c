@@ -262,3 +262,9 @@ size_t ccp4_cmap_get_local_header(CMMFile *mfile)
   return mfile->data.header_size;
 }
     
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

@@ -701,3 +701,9 @@ double rint(double x) {
   return (double)(int)(x-.5);
 }
 #endif
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

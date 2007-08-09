@@ -112,3 +112,9 @@ double ccp4_erfc( double x );
 #endif
 
 #endif  /* __CCP4_UTILS */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

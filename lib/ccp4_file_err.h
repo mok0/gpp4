@@ -44,3 +44,9 @@
 #define CIO_UnlinkFail 12
 
 #endif
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

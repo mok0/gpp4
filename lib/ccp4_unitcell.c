@@ -384,3 +384,9 @@ int ccp4uc_is_hexagonal(const float cell[6], const float tolerance) {
   return 1;
 
 }
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

@@ -41,3 +41,9 @@ int write_maplabels(const CMMFile *mfile);
 #endif
 
 #endif    /* __GUARD_MAPLIB_LABEL */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

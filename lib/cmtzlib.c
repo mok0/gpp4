@@ -3591,3 +3591,9 @@ MTZXTAL *MtzXtalLookup(const MTZ *mtz, const char *label)
   }
   return NULL;
 }
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

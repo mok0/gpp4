@@ -192,3 +192,9 @@ float ccp4_pow_ii(const float base, const int power) {
   return pow;
 }
 
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

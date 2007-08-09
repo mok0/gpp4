@@ -280,3 +280,9 @@
 #endif
 
 #endif /* __CCP4_BITS */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

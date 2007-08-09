@@ -612,3 +612,9 @@ int ccp4spg_check_symm_cell(int nsym, float rsym[][4][4], float cell[6]);
 } }
 #endif
 #endif
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

@@ -160,3 +160,9 @@ int cfile_perror(const char *);
 #endif
 
 #endif  /*!CCP4_ERROR_GUARD */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

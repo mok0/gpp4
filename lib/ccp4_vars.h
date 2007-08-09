@@ -45,3 +45,9 @@
 #define COLUMNTYPE "data::crystal_i::dataset_i::column_i::type"
 
 #endif  /*!__CCP4_VARS__ */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

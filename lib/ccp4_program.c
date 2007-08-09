@@ -235,3 +235,9 @@ int summary_output(int isumm_in) {
   return isumm;
 }
 
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

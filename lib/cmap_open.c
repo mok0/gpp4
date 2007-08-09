@@ -119,3 +119,9 @@ void *ccp4_cmap_open(const char *filename, int mode)
   return (mfile);
 }
 
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

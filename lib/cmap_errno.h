@@ -59,3 +59,9 @@ extern "C" {
 
 #endif     /* __GUARD_MAPLIB_ERR */
 
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

@@ -137,3 +137,9 @@ typedef struct { double r;             /*!<  radial component  */
 #endif
 
 #endif   /* __CCP4_TYPES */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

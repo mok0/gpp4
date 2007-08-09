@@ -1306,3 +1306,9 @@ void ccp4_banner(void) {
   if (diag) printf("Leaving ccp4_banner \n");
 
 }
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

@@ -54,3 +54,9 @@ int stats_update(CMMFile_Stats *stats, void *section_begin,
   return (stats->total);
 }
 
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

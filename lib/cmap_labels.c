@@ -177,3 +177,9 @@ int ccp4_cmap_set_title(CMMFile *mfile, const char *title)
 {
   return ccp4_cmap_set_label(mfile, title, 0);
 }
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

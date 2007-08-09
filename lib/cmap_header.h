@@ -41,3 +41,9 @@ int write_mapheader(CMMFile *mfile);
 #endif
 
 #endif  /* __GUARD_MAPLIB_HEADER */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

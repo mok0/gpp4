@@ -482,3 +482,9 @@ int ccp4_cmap_read_data(const CMMFile *mfile, void *items, int n_items)
   return (result);
 }
 
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

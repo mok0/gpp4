@@ -97,3 +97,9 @@ typedef struct ccp4_spacegroup_
 #endif
 
 #endif  /*__CCP4_SPG__ */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

@@ -39,3 +39,9 @@ int skew_set(const CMMFile_Skew *skew);
 #endif
 
 #endif    /* __GUARD_MAPLIB_SKEW */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

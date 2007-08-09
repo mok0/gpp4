@@ -142,3 +142,9 @@ int ccp4_cmap_set_symop(CMMFile *mfile, const char *symop)
 }
   return (1);
 }
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

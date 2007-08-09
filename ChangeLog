@@ -1,9 +1,21 @@
-2007-07-25  Morten  Kjeldgaard  <mok@homunculus.local>
+2007-08-09  Morten Kjeldgaard  <mok@bioxray.dk>
+
+        * Bump version to 1.0.1
+	
+	* lib/overview.h: Edit overview, project is no longer called
+	'CINCH' but GPP4.
+
+	* Removed lines INDEX_INFO::* sections from doxygen markup in all
+	files.
+
+	* Added Emacs local variables list to lib/*{c,h}
+	
+2007-07-25  Morten  Kjeldgaard  <mok@bioxray.dk>
 
 	* lib/ccp4_unitcell.c: Reworked doxygen markup, moved from the
 	header file to the C source file.
 
-2007-07-24  Morten  Kjeldgaard  <mok@homunculus.local>
+2007-07-24  Morten  Kjeldgaard  <mok@bioxray.dk>
 
 	* lib/ccp4_types.h: Wrote doxygen markup.
 
@@ -26,6 +38,10 @@
 	* lib/ccp4_fortran.h: - ditto -
 
 	* lib/ccp4_program.*: - ditto -
+
+	* lib/library_f.h: Header file deleted, since it is not being used
+	anywhere.
+	
 
 2007-07-19  Morten  Kjeldgaard  <mok@bioxray.dk>
 

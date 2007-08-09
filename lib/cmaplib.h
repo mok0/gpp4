@@ -21,13 +21,7 @@
 */
 
 /** @page cmap_page CMAP library
- *
- * @verbatim
 
-<!-- ::INDEX_INFO::CMAP library::Library::::C/C++ Software Library for CCP4 map files:::::::: -->
-
-   @endverbatim
- *
  *  @section cmap_file_list File list
 
 <ul>
@@ -239,3 +233,9 @@ char *ccp4_cmap_get_title(const CMMFile *mfile);
 #endif
 
 #endif  /* __GUARD_MAPLIB */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

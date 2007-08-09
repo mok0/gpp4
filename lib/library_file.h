@@ -164,3 +164,9 @@ int ccp4_file_raw_setstamp( CCP4File *, const size_t);
 #endif
 
 #endif  /* __CCP4_LIB_FILE */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

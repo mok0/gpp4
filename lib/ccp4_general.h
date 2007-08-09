@@ -124,3 +124,9 @@ void ccp4_banner(void);
 #endif
 
 #endif   /* __CCPGeneral__ */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

@@ -43,3 +43,9 @@ struct _IOConvMap {
 };
 
 #endif  /*  __GUARD_MAPLIB_FORTRAN */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

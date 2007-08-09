@@ -156,3 +156,9 @@ int write_mapheader(CMMFile *mfile)
   return ( (result == write_total) ? 1 : EOF);
 }
 
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

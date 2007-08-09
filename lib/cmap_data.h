@@ -38,3 +38,9 @@ int number_sections(CMMFile *mfile);
 #endif
 
 #endif    /* __GUARD_MAPLIB_DATA */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

@@ -1763,3 +1763,9 @@ char *mat4_to_recip_symop(char *symchs_begin, char *symchs_end, const float rsm[
   free (symop);
   return symchs_begin;
 }
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

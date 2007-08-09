@@ -71,3 +71,9 @@ int summary_output(int isumm_in);
 #endif
 
 #endif   /* __CCP4Program__ */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

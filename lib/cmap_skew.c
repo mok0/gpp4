@@ -103,3 +103,9 @@ int skew_set(const CMMFile_Skew *skew)
     skew->rotation[2][1] != 0.0F ||
     skew->rotation[2][2] != 0.0F;
 }
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

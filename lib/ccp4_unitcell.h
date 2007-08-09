@@ -61,3 +61,9 @@ int ccp4uc_is_hexagonal(const float cell[6], const float tolerance);
 #endif
 
 #endif  /*!CCP4_UNITCELL */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

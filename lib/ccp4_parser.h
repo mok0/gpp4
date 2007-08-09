@@ -22,12 +22,6 @@
 */
 
 /** @page cparser_page CParser library
- *
- * @verbatim
-
-<!-- ::INDEX_INFO::CParser library::Library::::C Software Library for CCP4-style parsing:::::::: -->
-
-* @endverbatim
  
 * @section cparser_file_list File list
 
@@ -218,3 +212,9 @@ char *mat4_to_recip_symop(char *symchs_begin, char *symchs_end, const float rsm[
 #endif
 
 #endif  /* __CCP4_Parser__ */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

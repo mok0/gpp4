@@ -321,3 +321,9 @@ void ccp4_signal(const int code, const char * const msg,
 
   if (fatal_err) exit(1);
 }
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

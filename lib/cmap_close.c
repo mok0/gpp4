@@ -79,3 +79,9 @@ void ccp4_cmap_closemode(CMMFile *mfile, unsigned int mask)
 {
   mfile->close_mode = mask;
 }
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

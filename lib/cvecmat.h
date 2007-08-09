@@ -44,3 +44,9 @@ float ccp4_pow_ii(const float base, const int power);
 #endif
 
 #endif  /*!CCP4_VECMAT */
+
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/

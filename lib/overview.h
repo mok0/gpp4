@@ -1,6 +1,6 @@
 /*
-     overview.h: overview of CINCH - Crystallography IN C Headers
-     Copyright (C) 2003  CCLRC, Martyn Winn
+     overview.h: overview of the GGP4 library
+     (C) 2003 CCLRC, Martyn Winn, modified by Morten Kjeldgaard 2007.
 
      This library is free software; you can redistribute it and/or
      modify it under the terms of the GNU Lesser General Public
@@ -19,18 +19,40 @@
      Boston, MA 02110-1301 USA
 
 */
-/** @mainpage CINCH - Crystallography IN C Headers
- *
- * @note I'm fed up of the uninspiring "new library" and here's
- *       my first attempt at a funky name. Alternatives welcome!
- *
- * @verbatim
 
-<!-- ::INDEX_INFO::C libraries::Library::::CCP4 C/C++ Software Library:::::::: -->
+/** @mainpage The GPP4 library
 
-   @endverbatim
- *
- * @section aims Aims
+@section introduction Introduction
+
+This distribution is a special version of the CCP4 library, released
+under the Lesser GNU Public License version 2.1.
+
+The last version of the CCP4 library covered by a free license was
+version 5.0.2. This version was patched by Ralf Grosse-Kunstleve to
+address some of the more serious deficiencies of the older libraries.
+
+It is the patched version of the CCP4 library that forms the basis for
+this distribution, which includes a GNU autotools build environment
+developed by Paul Emsley and Morten Kjeldgaard.
+
+The reason for creating this public fork of the CCP4 libraries is that
+several third party software distributions depend on the CCP4
+libraries.
+
+However, you cannot create a derived work containing both CCP4 6.*
+licensed code and GPL'd code, and distribute the resulting program,
+since the GPL demands that the derived work be distributed without
+additional restrictions. The CCP4 6.* license imposes additional
+restrictions on redistribution - in particular (but not limited to) an
+indemnity clause.
+
+The goal of this project -- named gpp4 to distinguish it from CCP4 --
+is to provide a drop-in replacement for the non-free CCP4 libraries,
+that as carefully as possible will implement the current CCP4 library
+interface.
+
+
+@section aims Aims
 
 The CCP4 software suite is based around a library of routines which
 cover common tasks, such as file opening, parsing keyworded input,
@@ -56,13 +78,13 @@ existing programs will be migrated to using the new library directly.
 for Python, Tcl and Perl automatically from the core C code. Thus, much
 of the standard CCP4 functionality wil be available to scripts used
 e.g. in ccp4i or the molecular graphics project.
-</ul>
+</ul> 
 
 This incremental approach, maintaining the existing suite while
 improving the underlying code, puts constraints on what is possible, but
 is considered more appropriate for a collaborative project like CCP4.
 
- * @section start This documentation
+@section start This documentation
 
 <p>
 This documentation is generated automatically by 
@@ -100,3 +122,8 @@ programmers, and the @ref csym_f_page page for Fortran programmers.
 
  */
 
+/*
+  Local variables:
+  mode: font-lock
+  End:
+*/
