@@ -2,7 +2,7 @@
 ## This file is to be processed by automake.
 
 # Build in these directories
-SUBDIRS = lib
+SUBDIRS = lib test
 
 ACLOCAL_AMFLAGS = -I config
 

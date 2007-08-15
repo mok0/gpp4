@@ -1291,20 +1291,15 @@ void ccp4_banner(void) {
   }
 
   printf(" \n");
+
   printf(" ###############################################################\n");
-  printf(" ###############################################################\n");
-  printf(" ###############################################################\n");
-  printf(" ### CCP4 %3s: %-17s  %-18s: %-8s##\n", 
-	 GPP4_VERSION_NO,ccp4ProgramName(NULL),prog_vers_str,ccp4RCSDate(NULL));
+  printf(" ### program name: %s, %s\n", ccp4ProgramName(NULL),prog_vers_str);
+  printf(" ### gpp4 library version: %-6s, compiled: %s\n", GPP4_VERSION_NO,__DATE__);
+  printf(" ### (derived from CCP4 library patch level: %-6s)\n", CCP4_PATCH_LEVEL);
   printf(" ###############################################################\n");
   printf(" User: %s  Run date: %s Run time: %s \n\n\n",
 	 ccp4_utils_username(),ccp4_utils_date(date),ccp4_utils_time(time)); 
-  printf(" Please reference: Collaborative Computational Project, Number 4. 1994.\n");
-  printf(" \"The CCP4 Suite: Programs for Protein Crystallography\". Acta Cryst. D50, 760-763.\n");
-  printf(" as well as any specific reference in the program write-up.\n\n");
-
   if (diag) printf("Leaving ccp4_banner \n");
-
 }
 
 /*

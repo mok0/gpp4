@@ -34,6 +34,7 @@
 #include "cvecmat.h"
 #include "ccp4_errno.h"
 #include "ccp4_unitcell.h"
+#include "ccp4_sysdep.h"
 
 /* stuff for error reporting */
 #define CSYM_ERRNO(n) (CCP4_ERR_SYM | (n))
@@ -45,6 +46,75 @@
 #define  CSYMERR_NullSpacegroup      3
 #define  CSYMERR_NoAsuDefined        4
 #define  CSYMERR_NoLaueCodeDefined   5
+
+ /*!
+   Find the path of the SYMINFO file. We will try to locate the file
+   in several places (in increasing order of significance):
+      -# $SYMINFO environment variable
+      -# ./syminfo.lib
+      -# $prefix/share/gpp4/syminfo.lib
+      -# $prefix/lib/syminfo.lib
+      -# $CCP4/lib/data/syminfo.lib
+   where $prefix is defined by the --prefix switch to the configure script.
+   The function allocates memory for the pathname that must be free'd
+   by the caller in order to avoid a memory leak.
+   @return path to syminfo.lib file.
+ */
+static char *open_syminfo_file()
+{
+  struct stat statbuf;
+  char *str;
+  char *fnam = (char *)ccp4_utils_malloc(512);
+
+  if ((str = getenv("SYMINFO"))) {
+    /* SYMINFO was defined, now check to see if file exists */
+    strncpy (fnam, str, 512);
+    if( stat(fnam,&statbuf) == 0) {
+      printf("\n Spacegroup information obtained from library file: \n");
+      printf(" Logical Name: SYMINFO   Filename: %s\n\n", fnam);
+      return fnam;
+    }
+  }
+
+  printf("Environment variable SYMINFO not set ... guessing location of symmetry file.\n");
+
+  strncpy (fnam, "./syminfo.lib", 14);
+  if( stat(fnam,&statbuf) == 0) {
+    printf("\n Spacegroup information obtained from local file: %s\n", fnam);
+    return fnam;
+  }
+
+  strncpy (fnam, GPP4_PREFIX, 512-24);
+  strncat (fnam, "/share/gpp4/syminfo.lib", 24);
+  if( stat(fnam,&statbuf) == 0) {
+    printf("\n Spacegroup information obtained from system file: %s\n", fnam);
+    return fnam;
+  }
+
+  strncpy (fnam, GPP4_PREFIX, 512-17);
+  strncpy (fnam, "/lib/syminfo.lib", 17);
+  if( stat(fnam,&statbuf) == 0) {
+    printf("\n Spacegroup information obtained from system file: %s\n", fnam);
+    return fnam;
+  }
+
+  /* Hmmm. Try one last time in the CCP4 installation */
+
+  if (!(str = getenv("CCP4"))) {
+    printf("Environment variable CCP4 not set ... big trouble! \n");
+    return NULL;
+  }
+
+  strncpy(fnam, str, 512);
+  strncat(fnam,"/lib/data/syminfo.lib", 22);
+  if( stat(fnam,&statbuf) == 0) {
+    printf("\n Spacegroup information obtained from CCP4 library: %s\n", fnam);
+    return fnam;
+  }
+
+  /* We give up... */
+  return NULL;
+}
 
 CCP4SPG *ccp4spg_load_by_standard_num(const int numspg) 
 { 
@@ -133,30 +203,17 @@ CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
   }
 
   /* Open the symop file: */
-  if (!(symopfile = getenv("SYMINFO"))) {
-    printf("Environment variable SYMINFO not set ... guessing location of symmetry file. \n");
-    if (!(ccp4dir = getenv("CCP4"))) {
-      printf("Environment variable CCP4 not set ... big trouble! \n");
-      return NULL;
-    }
 
-    symopfile = ccp4_utils_malloc((strlen(ccp4dir)+22)*sizeof(char));
-    strcpy(symopfile,ccp4dir);
-    strcat(symopfile,"/lib/data/syminfo.lib");
-    symopfile[strlen(ccp4dir)+21] = '\0';
-    printf(" SYMINFO file set to %s \n",symopfile);
-  } else {
-    printf("\n Spacegroup information obtained from library file: \n");
-    printf(" Logical Name: SYMINFO   Filename: %s\n\n",symopfile);
-  }
+  if (!(symopfile = open_syminfo_file()))
+    return NULL;
 
   filein = fopen(symopfile,"r");
+  free(symopfile);
+
   if (!filein) {
     ccp4_signal(CSYM_ERRNO(CSYMERR_NoSyminfoFile),"ccp4spg_load_spacegroup",NULL); 
     return NULL;
   }
-
-  if (!(getenv("SYMINFO"))) free(symopfile);
 
   parser = ccp4_parse_start(20);
   if (parser == NULL) 

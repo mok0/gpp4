@@ -1,3 +1,23 @@
+2007-08-10  Morten  Kjeldgaard  <mok@bioxray.dk>
+
+	* Bump version to 1.0.2
+
+	* lib/csymlib.c: Changed the way the library searches for
+	syminfo.lib. The code is now in a static function
+	open_syminfo_file(). This is to make the library more standalone
+	and independent of the CCP4 distribution. The search strategy is
+	to search the environmental variable SYMINFO first, then a number
+	of standard locations in the file system, and finally the CCP4
+	data directory.
+
+	* lib/symlib.h: Added description of the FORTRAN API, which contains
+	some more detail on the format of syminfo.lib.
+
+	* Doxygen config file 'Doxyfile' has been moved to Doxyfile.in,
+	and configure.ac now defines the software version in that file.
+
+	* lib/ccp4_general.c: Banner modified to reflect gpp4 library version.
+
 2007-08-09  Morten Kjeldgaard  <mok@bioxray.dk>
 
         * Bump version to 1.0.1
@@ -41,7 +61,6 @@
 
 	* lib/library_f.h: Header file deleted, since it is not being used
 	anywhere.
-	
 
 2007-07-19  Morten  Kjeldgaard  <mok@bioxray.dk>
 

@@ -20,7 +20,7 @@
 
 */
 
-/** @mainpage The GPP4 library
+/** @mainpage The gpp4 library
 
 @section introduction Introduction
 

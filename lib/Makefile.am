@@ -1,6 +1,8 @@
 ## -*- mode: Makefile ; mode: font-lock -*-
 ## This file is to be processed by automake.
 
+EXTRA_DIST = Doxygen.in
+
 lib_LTLIBRARIES = libgpp4.la
 
 library_includedir=$(pkgincludedir)/ccp4
@@ -22,6 +24,6 @@ ccp4_errno.h ccp4_utils.h cmtzlib.h ccp4_file_err.h ccp4_vars.h		\
 csymlib.h ccp4_fortran.h cmap_data.h cvecmat.h ccp4_general.h		\
 cmap_errno.h ccp4_parser.h cmap_header.h library_file.h ccp4_program.h	\
 cmap_labels.h mtzdata.h ccp4_spg.h cmaplib_f.h overview.h		\
-ccp4_sysdep.h cmaplib.h ccp4_types.h cmap_skew.h
+ccp4_sysdep.h cmaplib.h ccp4_types.h cmap_skew.h symlib.h
 
 ####

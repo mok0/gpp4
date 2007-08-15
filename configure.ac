@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(gpp4, 1.0.1, mok@bioxray.dk)
+AC_INIT(gpp4, 1.0.2, mok@bioxray.dk)
 AC_CONFIG_SRCDIR([lib/ccp4_vars.h])
 AC_CONFIG_AUX_DIR([config])
 AM_INIT_AUTOMAKE
@@ -23,7 +23,7 @@ AC_SUBST(LIBM)
 AC_HEADER_STDC([])
 
 # check for various headers
-AC_CHECK_HEADERS([fcntl.h float.h limits.h stddef.h stdlib.h stdint.h string.h sys/file.h unistd.h wchar.h])
+AC_CHECK_HEADERS([fcntl.h float.h limits.h stddef.h stdlib.h stdint.h string.h sys/file.h sys/stat.h unistd.h wchar.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -42,11 +42,16 @@ AC_FUNC_VPRINTF
 # check for various c library functions
 AC_CHECK_FUNCS([memmove memset mkdir pow putenv rint setenv sqrt strchr strdup strerror strrchr strstr])
 
+# gpp4 wants to know it's prefix
+AC_DEFINE_UNQUOTED([GPP4_PREFIX],["$prefix"],[Base directory of gpp4 installation])
+
 # output the Makefiles
 AC_CONFIG_FILES([
 		Makefile
 		lib/Makefile
+		lib/Doxyfile
 		data/Makefile
+		test/Makefile
 		])
 
 AC_OUTPUT

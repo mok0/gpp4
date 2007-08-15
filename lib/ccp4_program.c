@@ -149,11 +149,12 @@ char *ccp4RCSDate(const char *rcs_string)
   return RCSDate;
 }
 
-/*! Set or print program time information
-   @param init
-   The timer is started when this routine is called with a non-zero argument. When
-   the routine is called with a 0 argument, timing information is printed to stdout.
-   @note Only one timer can be handled.
+/*! Set or print program time information 
+   @param init 
+   The timer is started when this routine is called with a non-zero
+   argument. When the routine is called with a 0 argument, timing
+   information is printed to stdout. @note Only one timer can be
+   handled.
  */
 
 void ccp4ProgramTime(int init)
