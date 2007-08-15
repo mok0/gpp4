@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(gpp4, 1.0.2, mok@bioxray.dk)
+AC_INIT(gpp4, 1.0.3, mok@bioxray.dk)
 AC_CONFIG_SRCDIR([lib/ccp4_vars.h])
 AC_CONFIG_AUX_DIR([config])
 AM_INIT_AUTOMAKE
@@ -43,11 +43,13 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([memmove memset mkdir pow putenv rint setenv sqrt strchr strdup strerror strrchr strstr])
 
 # gpp4 wants to know it's prefix
+test "x$prefix" = xNONE && prefix=$ac_default_prefix
 AC_DEFINE_UNQUOTED([GPP4_PREFIX],["$prefix"],[Base directory of gpp4 installation])
 
 # output the Makefiles
 AC_CONFIG_FILES([
 		Makefile
+		gpp4.pc
 		lib/Makefile
 		lib/Doxyfile
 		data/Makefile

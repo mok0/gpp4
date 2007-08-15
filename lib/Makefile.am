@@ -1,7 +1,7 @@
 ## -*- mode: Makefile ; mode: font-lock -*-
 ## This file is to be processed by automake.
 
-EXTRA_DIST = Doxygen.in
+EXTRA_DIST = Doxyfile.in
 
 lib_LTLIBRARIES = libgpp4.la
 
