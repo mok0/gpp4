@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: gpp4
+Description: alternative to the CCP4 library
+Version: @VERSION@
+Requires:
+Conflicts:
+Libs: -L\${libdir} -lgpp4
+Cflags: -I\${includedir}/gpp4
