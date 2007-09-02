@@ -1,7 +1,7 @@
-prefix=/usr
-exec_prefix=/usr
-libdir=/usr/lib
-includedir=/usr/include
+prefix=@GPP4_PREFIX@
+exec_prefix=@GPP4_PREFIX@
+libdir=@GPP4_PREFIX@/lib
+includedir=@GPP4_PREFIX@/include
 
 Name: gpp4
 Description: alternative to the CCP4 library

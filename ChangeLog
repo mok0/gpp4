@@ -1,3 +1,12 @@
+2007-09-02  Morten  Kjeldgaard  <mok@bioxray.dk>
+
+	* Wrote spec file to generate rpm packages.
+
+	* Wrote info file to build fink packages under Mac OS X.
+	
+	* Use declarative rules to install pkgconfig data instead
+	  of local install hooks.
+
 2007-08-15  Morten Kjeldgaard  <mok@bioxray.dk>
 
 	* Bumped version to 1.0.3

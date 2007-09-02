@@ -45,11 +45,15 @@ AC_CHECK_FUNCS([memmove memset mkdir pow putenv rint setenv sqrt strchr strdup s
 # gpp4 wants to know it's prefix
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
 AC_DEFINE_UNQUOTED([GPP4_PREFIX],["$prefix"],[Base directory of gpp4 installation])
+GPP4_PREFIX=$prefix
+AC_SUBST(GPP4_PREFIX)
 
 # output the Makefiles
 AC_CONFIG_FILES([
 		Makefile
 		gpp4.pc
+		gpp4.spec
+		gpp4.info
 		lib/Makefile
 		lib/Doxyfile
 		data/Makefile
