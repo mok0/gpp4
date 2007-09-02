@@ -1,0 +1,105 @@
+# -*- mode: rpm-spec ; mode: font-lock -*-
+
+Summary: Library providing specific CCP4 functionality 
+Name: @PACKAGE_NAME@
+Version: @VERSION@
+Release: 1%{?reltag}%{?repotag}
+License: LGPL
+Group: Science/Crystallography/Development
+URL: http://www.bioxray.au.dk/~mok/%{name}
+Source0: ftp://ftp.bioxray.au.dk/pub/mok/src/%{name}-%{version}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+
+%description
+
+The CCP4 software suite is based around a library of routines which
+cover common tasks, such as file opening, parsing keyworded input,
+reading and writing of standard data formats, applying symmetry
+operations, etc. Programs in the suite call these routines which, as
+well as saving the programmer some effort, ensure that the varied
+programs in the suite have a similar look-and-feel.
+
+The library contains several subcomponents: 
+  * CMTZ library -- Contains a variety of functions for manipulating 
+    the data structure, for example adding crystals, datasets or columns. 
+    The data structure can be dumped to an output MTZ data file.
+  * CMAP library -- Functions defining the C-level API for accessing 
+    CCP4 map files.
+  * CSYM library -- a collection of functions centred around a data file 
+    syminfo.lib which is auto-generated from sgtbx (the Space Group Toolbox 
+    of cctbx).
+  * CCP4 utility library -- many utility functions which either give 
+    specific CCP4 or platform independent functionality.
+  * CCP4 Parser library -- provides CCP4-style parsing, as used for 
+    processing keywords of CCP4 programs, MTZ header records, etc.
+  * CCP4 resizable arrays -- defines an object and methods which looks 
+    just like a simple C array, but can be resized at will without 
+    incurring excessive overheads.
+
+This is the source rpm package, when compiled it will build two packages
+libgpp4 and libgpp4-devel.
+
+%package -n libgpp4-devel
+Requires: libgpp4
+Group: Science/Crystallography/Development
+
+%description libgpp4-devel
+The CCP4 software suite is based around a library of routines which
+cover common tasks, such as file opening, parsing keyworded input,
+reading and writing of standard data formats, applying symmetry
+operations, etc. Programs in the suite call these routines which, as
+well as saving the programmer some effort, ensure that the varied
+programs in the suite have a similar look-and-feel.
+
+This package contains libraries and header files needed for program
+development.
+
+%package -n libgpp4
+%description libgpp4
+Group: Science/Crystallography/Libraries
+
+The CCP4 software suite is based around a library of routines which
+cover common tasks, such as file opening, parsing keyworded input,
+reading and writing of standard data formats, applying symmetry
+operations, etc. Programs in the suite call these routines which, as
+well as saving the programmer some effort, ensure that the varied
+programs in the suite have a similar look-and-feel.
+
+This package contains the shared library components needed for programs
+that have been compiled with the gpp4 library. 
+
+%prep
+%setup -q  
+
+%build
+%configure
+make
+
+%install
+rm -rf %{buildroot}
+%makeinstall
+
+%clean
+rm -rf %{buildroot}
+
+%files libgpp4
+%defattr(-,root,root,-)
+%doc README COPYING NEWS AUTHORS
+%{_datadir}/gpp4/
+%{_libdir}/libgpp4.so.0
+%{_libdir}/libgpp4.so.0.0.0
+
+%files libgpp4-devel
+%doc README COPYING NEWS AUTHORS doc test
+%defattr(-,root,root,-)
+%{_includedir}/gpp4
+%{_libdir}/libgpp4.so
+%{_libdir}/libgpp4.a
+%{_libdir}/libgpp4.la
+%{_libdir}/pkgconfig/%{name}.pc
+
+%changelog
+* Sun Sep 02 2007 Morten Kjeldgaard <mok@bioxray.dk> - 
+- Initial build. 
+
+####
