@@ -185,6 +185,68 @@ int ccp4printf(int level, char *format, ...)
   return nbytes;
 }
 
+
+ /*!  Search for a file (i.e. the default.def or environ.def files) in
+   standard places.  We will try to locate the file in several places
+   (in increasing order of significance):
+   -# $prefix/share/
+   -# $prefix/lib/
+   -# $CCP4/include
+   where $prefix is defined by the --prefix switch to the configure
+   script.  The function allocates memory for the pathname that must
+   be free'd by the caller in order to avoid a memory leak.  
+   @return the directory path to default.def file.
+ */
+static char *search_def_file(char *fnam)
+{
+  struct stat statbuf;
+  char *str, *join;
+  char *dnam = (char *)ccp4_utils_malloc(512);
+
+  // Try $prefix/share/gpp4/fnam:
+  strncpy (dnam, GPP4_PREFIX, 400);
+  strncat (dnam, "/share/gpp4/", 12);
+  join = ccp4_utils_joinfilenames(dnam, fnam);
+  if( stat(join,&statbuf) == 0) {
+    free (join);
+    return dnam;
+  }
+  free(join);
+
+  // Try $prefix/lib/fnam:
+  strncpy (dnam, GPP4_PREFIX, 400);
+  strncpy (dnam, "/lib", 4);
+  join = ccp4_utils_joinfilenames(dnam, fnam);
+  if( stat(dnam,&statbuf) == 0) {
+    free(join);
+    return dnam;
+  }
+  free(join);
+
+  /* Hmmm. Try one last time in the CCP4 installation */
+
+  if (!(str = getenv("CCP4"))) {
+    printf("Environment variable CCP4 not set ... big trouble! \n");
+    free(dnam);
+    return NULL;
+  }
+
+  strncpy(dnam, str, 512);
+  strncat(dnam,"/include", 8);
+  join = ccp4_utils_joinfilenames(dnam, fnam);
+  if( stat(dnam,&statbuf) == 0) {
+    free(join);
+    return dnam;
+  }
+  free(join);
+
+  /* We give up... */
+  free(dnam);
+  return NULL;
+}
+
+
+
 /*------------------------------------------------------------------*/
 
 /*! Initialise environment for CCP4 programs and parse command line arguments.
@@ -500,12 +562,9 @@ int ccp4fyp(int argc, char **argv)
   if (!env_file) {
     /* Use the standard environ.def file in CINCL */
     if (diag) printf("--> use standard environ.def file\n");
-    std_dir = NULL;
-    if (cinclude) {
-      std_dir = cinclude;
-    } else if (home) {
-      std_dir = home;
-    }
+    std_dir = search_def_file("environ.def");
+    if (std_dir && diag) printf ("--> found environ.def in %s\n", std_dir);
+
     /* Set the full path for the environ.def file */
     if (env_file) free(env_file);
     if (std_dir) {
@@ -702,14 +761,13 @@ int ccp4fyp(int argc, char **argv)
      3. use the filename as is (in current directory).
   */
   if (!def_file) {
+
     /* Use the standard default.def */
     if (diag) printf("--> use standard default.def file\n");
     std_dir = NULL;
-    if (cinclude) {
-      std_dir = cinclude;
-    } else if (home) {
-      std_dir = home;
-    }
+    std_dir = search_def_file("default.def");
+    if (std_dir && diag) printf ("--> found default.def in %s\n", std_dir);
+
     /* Set the full path for the default.def file */
     if (def_file) free(def_file);
     if (std_dir) {
@@ -1048,12 +1106,25 @@ int ccp4setenv(char *logical_name, char* value, char **envname,
 	  strncpy(file_path,clibd,(lpath+1));
 	  if (diag) printf("CCP4SETENV: set file path to CLIBD = \"%s\"\n",file_path);
 	} else {
+	  /* Couldn't get CLIBD from the environment. Use
+	     our standard directory $prefix/share/gpp4 */
+	  clibd = (char *)ccp4_utils_malloc(512);
+	  strncpy (clibd, GPP4_PREFIX, 400);
+	  strncat(clibd, "/share/gpp4", 12);
+	  lpath = strlen(clibd);
+	  file_path = (char *) ccp4_utils_malloc(sizeof(char)*(lpath+1));
+	  strncpy(file_path,clibd,(lpath+1));
+	  free (clibd);
+	  if (diag) printf("CCP4SETENV: set file path to CLIBD = \"%s\"\n",file_path);	  
+
 	  /* Couldn't get CLIBD from the environment
 	     Clean up, set message and return an error */
+	  /*
 	  ccp4setenv_cleanup(file_ext,file_root,file_path,file_name);
 	  ccp4_signal(CGEN_ERRNO(CGENERR_CantGetClibd),"ccp4setenv",NULL);
 	  printf("Couldn't CLIBD from the environment - check setup\n");
 	  return 1;
+	  */
 	}
 
       } else if (strmatch(file_ext,"scr")) {
@@ -1071,12 +1142,22 @@ int ccp4setenv(char *logical_name, char* value, char **envname,
 	  strncpy(file_path,cscr,(lpath+1));
 	  if (diag) printf("CCP4SETENV: set file path to CCP4_SCR = \"%s\"\n",file_path);
 	} else {
+
+	  /* Couldn't get CCP4_SCR from the environment. Use
+	     our standard directory /tmp */
+	  file_path = (char *) ccp4_utils_malloc(sizeof(char)*5);
+	  strncpy(file_path,"/tmp", 5);
+	  if (diag) printf("CCP4SETENV: set file path to CCP4_SCR = \"%s\"\n",file_path);
+
 	  /* Couldn't get CCP4_SCR
 	     Clean up, set message and return an error */
+	  /*
 	  ccp4setenv_cleanup(file_ext,file_root,file_path,file_name);
 	  ccp4_signal(CGEN_ERRNO(CGENERR_CantGetCcp4Scr),"ccp4setenv",NULL);
 	  return 1;
+	  */
 	}
+
         /* Replace <file_root> with <prognam>_<file_root> */
 	lprognam = strlen(ccp4ProgramName(NULL));
         tmpstr1 = ccp4_utils_malloc(sizeof(char)*(lprognam + lroot + 2));

@@ -102,6 +102,7 @@ static char *open_syminfo_file()
 
   if (!(str = getenv("CCP4"))) {
     printf("Environment variable CCP4 not set ... big trouble! \n");
+    free(fnam);
     return NULL;
   }
 
@@ -113,6 +114,7 @@ static char *open_syminfo_file()
   }
 
   /* We give up... */
+  free(fnam);
   return NULL;
 }
 

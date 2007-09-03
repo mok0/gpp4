@@ -19,7 +19,7 @@ AS_IF([test "x$CCP4_LIBS" != x && test "x$CCP4_CXXFLAGS" != x ],
   have_gpp4=yes
 ],
 [
-AC_MSG_CHECKING([for ccp4_errno in GPP4])
+AC_MSG_CHECKING([for ccp4_errno in gpp4])
 
 saved_LIBS="$LIBS"
 saved_CXXFLAGS="$CXXFLAGS"

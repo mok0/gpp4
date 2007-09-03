@@ -11,3 +11,10 @@ Makefile.in
 aclocal.m4
 configure
 libtool
+gpp4.info
+gpp4.pc
+gpp4.spec
+#	lib/Doxyfile
+#	lib/LICENSE
+#	lib/doit.sh
+#	test/load_syminfo

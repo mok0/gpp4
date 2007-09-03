@@ -1,3 +1,21 @@
+2007-09-03  Morten  Kjeldgaard  <mok@bioxray.dk>
+
+	* Renamed directory lib -> src
+	
+	* src/ccp4_general.c (ccp4fyp): Modified strategy used when
+	  searching for environ.def and default.def; also
+	  $prefix/share/gpp4 and $prefix/lib/ are searched. (By default,
+	  we install those files in $prefix/share/gpp4).
+
+	* src/ccp4_general.c (ccp4fyp): Now guaranteed to use sensible
+	  defaults if environmental variables CLIBD and CCP4_SCR are not
+	  defined. In the first case, use our standard $prefix/share/gpp4
+	  directory, in the second case, use /tmp.
+
+	* src/csymlib.c (open_syminfo_file): memory leak fixed.
+
+	* Bump version to 1.0.4, and release.
+	
 2007-09-02  Morten  Kjeldgaard  <mok@bioxray.dk>
 
 	* Wrote spec file to generate rpm packages.
