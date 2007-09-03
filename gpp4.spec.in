@@ -9,6 +9,7 @@ Group: Science/Crystallography/Development
 URL: http://www.bioxray.au.dk/~mok/%{name}
 Source0: ftp://ftp.bioxray.au.dk/pub/mok/src/%{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+BuildRequires: doxygen
 
 %description
 
@@ -40,10 +41,11 @@ This is the source rpm package, when compiled it will build two packages
 libgpp4 and libgpp4-devel.
 
 %package -n libgpp4-devel
-Requires: libgpp4
+Summary: Header files and library for developing free CCP4 programs
+Requires: libgpp4 = %{version}-%{release}
 Group: Science/Crystallography/Development
 
-%description libgpp4-devel
+%description -n libgpp4-devel
 The CCP4 software suite is based around a library of routines which
 cover common tasks, such as file opening, parsing keyworded input,
 reading and writing of standard data formats, applying symmetry
@@ -55,8 +57,10 @@ This package contains libraries and header files needed for program
 development.
 
 %package -n libgpp4
-%description libgpp4
+Summary: Shared libraries for programs developed with the gpp4 library
 Group: Science/Crystallography/Libraries
+
+%description -n libgpp4
 
 The CCP4 software suite is based around a library of routines which
 cover common tasks, such as file opening, parsing keyworded input,
@@ -74,6 +78,8 @@ that have been compiled with the gpp4 library.
 %build
 %configure
 make
+cd src
+doxygen
 
 %install
 rm -rf %{buildroot}
@@ -82,14 +88,14 @@ rm -rf %{buildroot}
 %clean
 rm -rf %{buildroot}
 
-%files libgpp4
+%files -n libgpp4
 %defattr(-,root,root,-)
 %doc README COPYING NEWS AUTHORS
 %{_datadir}/gpp4/
 %{_libdir}/libgpp4.so.0
 %{_libdir}/libgpp4.so.0.0.0
 
-%files libgpp4-devel
+%files -n libgpp4-devel
 %doc README COPYING NEWS AUTHORS doc test
 %defattr(-,root,root,-)
 %{_includedir}/gpp4

@@ -36,7 +36,7 @@ The library contains several subcomponents:
 # Unpack phase
 
 Source: ftp://ftp.bioxray.au.dk/pub/mok/src/gpp4-%v.tar.gz
-Source-MD5: 92b002f657a6a6fe0a6ad1275358d8f1
+Source-MD5: 48931781425a5b79a8255ebefaed24b3
 NoSourceDirectory: false
 Depends: %N-0-shlibs (= %v-%r)
 # No other package can depend on this one:
