@@ -38,17 +38,20 @@ The library contains several subcomponents:
 Source: ftp://ftp.bioxray.au.dk/pub/mok/src/gpp4-%v.tar.gz
 Source-MD5: 92b002f657a6a6fe0a6ad1275358d8f1
 NoSourceDirectory: false
-Depends: %N-0-shlibs
+Depends: %N-0-shlibs (= %v-%r)
 # No other package can depend on this one:
 BuildDependsOnly: true
 
 
 CompileScript: <<
-./configure --prefix=%i
-make
+  ./configure --prefix=%p
+  make
 <<
 
 # Install phase
+InstallScript: <<
+  make install DESTDIR=%d
+<<
 
 SplitOff: <<
   Package: %N-0-shlibs

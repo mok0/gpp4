@@ -13,6 +13,6 @@ DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = bootstrap README gpp4.pc.in gpp4.spec.in gpp4.info.in
 
 # Build in these directories
-SUBDIRS = lib test data
+SUBDIRS = src test data
 
 ####

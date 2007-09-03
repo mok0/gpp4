@@ -2,8 +2,8 @@
 ## Copyright 2007 Morten Kjeldgaard
 ## This code is distributed under the GPL license.
 
-AM_CPPFLAGS = -I$(top_srcdir)/lib
-AM_LDFLAGS = $(top_srcdir)/lib/libgpp4.la
+AM_CPPFLAGS = -I$(top_srcdir)/src
+AM_LDFLAGS = $(top_srcdir)/src/libgpp4.la
 
 noinst_PROGRAMS = load_syminfo
 

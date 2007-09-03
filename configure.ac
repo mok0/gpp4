@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(gpp4, 1.0.3, mok@bioxray.dk)
-AC_CONFIG_SRCDIR([lib/ccp4_vars.h])
+AC_INIT(gpp4, 1.0.4, mok@bioxray.dk)
+AC_CONFIG_SRCDIR([src/ccp4_vars.h])
 AC_CONFIG_AUX_DIR([config])
 AM_INIT_AUTOMAKE
 
@@ -54,8 +54,8 @@ AC_CONFIG_FILES([
 		gpp4.pc
 		gpp4.spec
 		gpp4.info
-		lib/Makefile
-		lib/Doxyfile
+		src/Makefile
+		src/Doxyfile
 		data/Makefile
 		test/Makefile
 		])
