@@ -1,3 +1,13 @@
+2007-10-21  Morten Kjeldgaard  <mok@bioxray.dk>
+
+	* gpp4.info.in: New conformant .info file from Bill Scott.
+
+2007-10-20  Morten Kjeldgaard  <mok@bioxray.dk>
+
+	* test/Makefile.am: Variable $top_srcdir changed to $top_builddir
+	  to allow linking with newly built shared library if building
+	  with --prefix=blabla
+
 2007-09-03  Morten  Kjeldgaard  <mok@bioxray.dk>
 
 	* Renamed directory lib -> src
