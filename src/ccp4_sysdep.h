@@ -237,7 +237,7 @@
 #  define NATIVEIT DFNTI_IBO
 #endif
 
-#if defined(MIPSEL) || defined(i386) || defined(i860) || defined(__ia64__) || defined(__amd64__) || defined(__x86_64__)
+#if defined(MIPSEL) || defined(i386) || defined(i860) || defined(__ia64__) || defined(__amd64__) || defined(__x86_64__) || defined(__ARMEL__)
 #  define NATIVEIT DFNTI_IBO
 #  define NATIVEFT DFNTF_LEIEEE
 #endif
@@ -260,7 +260,7 @@
 #  define NATIVEIT DFNTI_IBO
 #endif
 
-#if defined(MIPSEB) || defined(__hpux) || defined(_AIX) || defined(m68k) || defined(mc68000) || defined(sparc) || defined (__sparc__)
+#if defined(MIPSEB) || defined(__hpux) || defined(_AIX) || defined(m68k) || defined(mc68000) || defined(sparc) || defined (__sparc__) || defined (__hppa__)
 #  define NATIVEIT DFNTI_MBO
 #  define NATIVEFT DFNTF_BEIEEE
 #endif
