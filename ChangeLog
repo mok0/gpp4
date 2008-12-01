@@ -1,3 +1,8 @@
+2008-12-01  Morten Kjeldgaard  <mok@bioxray.au.dk>
+
+	* src/ccp4_sysdep.h: patch from Ubuntu to allow building on
+	  the hppa and armel platforms
+
 2007-09-03  Morten  Kjeldgaard  <mok@bioxray.dk>
 
 	* Renamed directory lib -> src
