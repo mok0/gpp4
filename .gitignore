@@ -14,6 +14,7 @@ libtool
 gpp4.info
 gpp4.pc
 gpp4.spec
+Doxyfile
 #	lib/Doxyfile
 #	lib/LICENSE
 #	lib/doit.sh
