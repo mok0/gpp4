@@ -40,7 +40,7 @@
     @return Program version string.
  */
 
-char *ccp4_prog_vers(char *progvers) 
+char *ccp4_prog_vers(const char *progvers) 
 {
   static char programversion[MAXLEN_PROGVERSION]="";
   int         i;
@@ -122,7 +122,7 @@ char *ccp4RCSDate(const char *rcs_string)
     tmpstr2[2] = '\0';
     if (strncmp(tmpstr1,"$Date: ",7) == 0) {
       /* Raw form of RCS string (not exported) i.e.:
-	 "$Date: 2004/01/23 16:32:52 $"
+	 "$Date: 2008/06/18 17:34:27 $"
       */
       /* Build the date string in the form DD/MM/YY */
       strncpy(RCSDate,rcs_string+15,2);
@@ -194,11 +194,67 @@ int ccp4VerbosityLevel(int level)
   return verbositylevel;
 }
 
+/*!
+   Set or invoke a user-defined callback function.
+   Internal function: applications should use the API functions
+   ccp4SetCallback and ccp4InvokeCallback
+ */
+int ccp4Callback(CCP4INTFUNCPTR mycallback, char *mode, int ierr, char *message)
+{
+  static CCP4INTFUNCPTR callback=ccp4NullCallback;
+
+  if (strncmp(mode,"set",3) == 0) {
+    /* Set callback
+       Store the pointer to the callback function */
+    callback=mycallback;
+    return 1;
+  } else if (strncmp(mode,"invoke",3) == 0) {
+    /* Invoke callback
+       Execute the callback function */
+    return callback(ierr,message);
+  }
+  /* Unrecognised mode */
+  return 0;
+}
+
+/*!
+   Store a pointer to a user-defined callback function of
+   the form "int func(int, char *)"
+   This is a wrapper to ccp4Callback in "set" mode.
+ */
+int ccp4SetCallback(CCP4INTFUNCPTR mycallback)
+{
+  return ccp4Callback(mycallback,"set",-1,"No message");
+}
+
+/*!
+   Execute the user-defined callback function (previously
+   set up using ccp4SetCallback) with the supplied
+   arguments.
+   This is a wrapper to ccp4Callback in "invoke" mode.
+ */
+int ccp4InvokeCallback(int ierr, char *message)
+{
+  return ccp4Callback(ccp4NullCallback,"invoke",ierr,message);
+}
+
+/*! 
+  Default null callback function
+   Internal function: this is the default callback function
+   used by ccp4Callback if no user-defined function has been
+   specified.
+ */
+int ccp4NullCallback(int level, char *message)
+{
+  /* This is the default callback function which takes no
+     action */
+  return 1;
+}
 
 /*! Check existence of licence agreement
-   @param name Name of licence, e.g. "CCP4".
-   @return always return 1.
-   This is a dummy routine in gpp4.
+    @param name Name of licence, e.g. "CCP4".
+    @return always return 1.
+    This is a dummy routine in gpp4.
 */
 
 int ccp4_licence_exists(const char *name)
@@ -206,14 +262,13 @@ int ccp4_licence_exists(const char *name)
   return 1;
 }
 
-
 /*! Register or query html output level.
-    @param ihtml_in 0 = turn off html output, 1 = turn on html output, -1 = query existing value
+    @param ihtml_in 0 = turn off html output, 1 = turn on html output, 
+    -1 = query existing value
     @return 0 = no html output, 1 = html output
     html_log_output and summary_output currently only used by ccperror to
     tidy up Fortran program output. Defaults are 0 for C programs.
  */
-
 int html_log_output(int ihtml_in) {
   static int ihtml=0;
 

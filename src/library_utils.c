@@ -62,6 +62,7 @@ are just generally useful (platform independent date).
 
 #define CCP4_ERRNO(y) (CCP4_ERR_UTILS | (y))          
                                        
+/* rcsid[] = "$Id: library_utils.c,v 1.39 2008/09/16 08:40:28 ccb Exp $" */
 
 /* static uint16 nativeIT = NATIVEIT; */ /* machine integer type - currently unused here */
 static uint16 nativeFT = NATIVEFT; /* machine float type */
@@ -288,12 +289,12 @@ void ccp4_utils_hgetlimits (int *IValueNotDet, float *ValueNotDet)
  * @return 1 if successful.
  */
 int ccp4_utils_mkdir (const char *path, const char *cmode)
-#if !defined (_MVS) && !defined(_WIN32)
+#if !defined (_MVS_VER) && !defined(_WIN32)
 {  
   mode_t mode = 0;
   int result; 
 #if defined (__APPLE__)
-  static const unsigned short TBM = 0x07;
+  static const unsigned TBM = 0x07;
 
   switch (strlen(cmode)) {
   case 4:
@@ -323,7 +324,7 @@ int ccp4_utils_mkdir (const char *path, const char *cmode)
   Try also S_IRWXU, S_IRWXG, etc. */
   sscanf(cmode,"%o",&mode);
 #endif   
-  result = mkdir(path,mode); 
+  result = mkdir(path, (mode_t) mode); 
 
   if (result == -1) {
     if (errno == EEXIST) {
@@ -386,7 +387,7 @@ int ccp4_utils_chmod (const char *path, const char *cmode)
   Try also S_IRWXU, S_IRWXG, etc. */
   sscanf(cmode,"%o",&mode);
 #endif
-  return (chmod(path,mode)); 
+  return (chmod(path, (mode_t) mode)); 
 }
 #else
    {
@@ -442,19 +443,27 @@ void *ccp4_utils_calloc(size_t nelem , size_t elsize)
 
 
 /** Return the user's login name.
+ * (MVisualStudio version in w32mvs.c)
  * Note that getlogin only works for processes attached to
  * a terminal (and hence won't work from the GUI).
  * In these instances use getpwuid instead.
  * @return pointer to character string containing login name.
  */
 #if ! defined (_MSC_VER)
+static const char userid_unknown[] = "unknown";
+
 char *ccp4_utils_username(void)
 { 
   struct passwd *passwd_struct=NULL;
   char *userid=NULL;
   if (!(userid = getlogin())) {
+    /*
     passwd_struct = getpwuid(getuid());
-    userid = passwd_struct->pw_name;
+    if (passwd_struct) {
+      userid = passwd_struct->pw_name;
+    }
+    */
+    userid = userid_unknown;
   }
   return(userid); 
 }
@@ -465,7 +474,7 @@ char *ccp4_utils_username(void)
  * @param filename full file name string.
  * @return pointer to basename
  */
-char *ccp4_utils_basename(char *filename)
+char *ccp4_utils_basename(const char *filename)
 {
   int i, indx1=-1, length;
   char *basename;
@@ -496,7 +505,7 @@ char *ccp4_utils_basename(char *filename)
  * @param filename full file name string.
  * @return pointer to pathname with trailing separator.
  */
-char *ccp4_utils_pathname(char *filename)
+char *ccp4_utils_pathname(const char *filename)
 {
   int i, indx1=-1, length;
   char *pathname;
@@ -519,7 +528,7 @@ char *ccp4_utils_pathname(char *filename)
  * @param filename full file name string.
  * @return pointer to extension
  */
-char *ccp4_utils_extension(char *filename)
+char *ccp4_utils_extension(const char *filename)
 {
   int i, indx1=-1, length=1;
   char *extension;
@@ -635,7 +644,7 @@ char *ccp4_utils_time(char *time)
  * @param tarray Array containing User and System times.
  * @return Sum of User and System times.
  */
-#if ! defined (_MVS) 
+#if ! defined (_MSC_VER) 
 float ccp4_utils_etime (float tarray[2])
 {
   static long clk_tck = 0;

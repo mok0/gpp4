@@ -25,7 +25,35 @@
 
     @brief Header file for Fortran APIs
     @author Eugene Krissinel
+*/
 
+
+
+#ifndef __CCP4_FORTRAN
+#define __CCP4_FORTRAN
+
+#include "ccp4_types.h"
+
+/* stardent is now obsolete, but we retain this category in case it is useful later */
+#ifdef CALL_LIKE_STARDENT
+  /* SStrParam is used in Ardent-like machines' fortran calls */
+  /* for passing a string parameter */
+  DefineStructure(SStrPar)
+  struct SStrPar  {
+    pstr S;
+    int  len;
+    int  id;
+  };
+#endif
+
+#define _LVTOB(l) ((long) ((l) == 0 ? 0 : 1))  
+#define _BTOLV(l) ((int) ((l) == 0 ? 0 : 1))
+#if defined (__OSF1__) || defined (__osf__)
+#undef _BTOLV
+#define _BTOLV(l) ((int) ((l) == 0 ? 0 : -1))  
+#endif    
+
+/**
    Macro  FORTRAN_SUBR(NAME,name,p_send,p_sstruct,p_sflw)
    makes function header statements that allow for linking with
    programs written in FORTRAN.
@@ -58,7 +86,7 @@
              complex parameter, 'fpstr' is identical to the
              pointer on the corresponding structure:
 @verbatim 
-              CALL_LIKE_STARDENT :
+               CALL_LIKE_STARDENT :
                    'fpstr' is identical to 'PSStrPar'
                CALL_LIKE_VMS      :
                    'fpstr' is identical to 'dsc$descriptor_s *'
@@ -119,7 +147,7 @@ is translated to
            fpstr s2, int s2_len, int * m ) )
   @endcode
   
-  The macro should replace ordinary function header
+    The macro should replace ordinary function header
   statements to assure compatibility with FORTRAN links.
   In header files, do not forget to add semicolon:
   
@@ -145,54 +173,28 @@ is translated to
 
 
 
-#ifndef __CCP4_FORTRAN
-#define __CCP4_FORTRAN
-
-#include "ccp4_types.h"
-
-/* stardent is now obsolete, but we retain this category in case it is useful later */
-#ifdef CALL_LIKE_STARDENT
-  /* SStrParam is used in Ardent-like machines' fortran calls */
-  /* for passing a string parameter */
-  DefineStructure(SStrPar)
-  struct SStrPar  {
-    pstr S;
-    int  len;
-    int  id;
-  };
-#endif
-
-#define _LVTOB(l) ((long) ((l) == 0 ? 0 : 1))  
-#define _BTOLV(l) ((int) ((l) == 0 ? 0 : 1))
-#if defined (__OSF1__) || defined (__osf__)
-#undef _BTOLV
-#define _BTOLV(l) ((int) ((l) == 0 ? 0 : -1))  
-#endif    
-
-
-
 #if  defined(CALL_LIKE_SUN)
 
   typedef pstr fpstr;
 
-#  define FTN_STR(s)  s
-#  define FTN_LEN(s)  s##_len
+#define FTN_STR(s)  s
+#define FTN_LEN(s)  s##_len
 
-#  define char_struct(s)           \
+#define char_struct(s)           \
     pstr  s;                       \
     int   s##_len;
-#  define fill_char_struct(s,str)  \
+#define fill_char_struct(s,str)  \
     s  = str;                      \
     s##_len = strlen(str);
-#  define init_char_struct(s,str,size)  \
+#define init_char_struct(s,str,size)  \
     s  = str;                      \
     s##_len = size;
 
-#  define FORTRAN_SUBR(NAME,name,p_sun,p_stardent,p_mvs) \
+#define FORTRAN_SUBR(NAME,name,p_sun,p_stardent,p_mvs) \
     void name##_ p_sun
-#  define FORTRAN_CALL(NAME,name,p_sun,p_stardent,p_mvs) \
+#define FORTRAN_CALL(NAME,name,p_sun,p_stardent,p_mvs) \
     name##_ p_sun
-#  define FORTRAN_FUN(val,NAME,name,p_sun,p_stardent,p_mvs) \
+#define FORTRAN_FUN(val,NAME,name,p_sun,p_stardent,p_mvs) \
     val name##_ p_sun
 #elif defined(CALL_LIKE_HPUX)
 
@@ -271,6 +273,32 @@ is translated to
 
 #elif defined(CALL_LIKE_MVS)
 
+#if (CALL_LIKE_MVS == 2)
+
+  typedef pstr fpstr;
+
+#define FTN_STR(s)  s
+#define FTN_LEN(s)  s##_len
+
+#define char_struct(s)           \
+    pstr  s;                       \
+    int   s##_len;
+#define fill_char_struct(s,str)  \
+    s  = str;          \
+	s##_len = strlen(str);
+#define init_char_struct(s,str,size)  \
+    s  = str;			\
+	s##_len = size;
+
+#define FORTRAN_SUBR(NAME,name,p_sun,p_stardent,p_mvs) \
+    void NAME p_sun
+#define FORTRAN_CALL(NAME,name,p_sun,p_stardent,p_mvs) \
+    NAME p_sun
+#define FORTRAN_FUN(val,NAME,name,p_sun,p_stardent,p_mvs) \
+    val NAME p_sun
+
+#else
+
   typedef pstr fpstr;
 
 #  define FTN_STR(s)  s
@@ -292,6 +320,8 @@ is translated to
     NAME p_mvs
 #  define FORTRAN_FUN(val,NAME,name,p_sun,p_stardent,p_mvs) \
     val __stdcall NAME p_mvs
+
+# endif
 
 #else
 

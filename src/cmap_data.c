@@ -170,9 +170,10 @@ int ccp4_cmap_read_section(CMMFile *mfile, void *section)
              mfile->data.block_size);
 
 /* ensure legit section (although rely upon EOF ) */  
-  if (secs.quot < 0 || secs.rem < 0) 
+  if (secs.quot < 0 || secs.rem < 0) {
     ccp4_file_raw_seek(mfile->stream, mfile->data.offset, SEEK_SET);
-  else if( secs.rem > data_offset && secs.rem < mfile->data.section_size ) 
+    secs.quot = 0;
+  } else if( secs.rem > data_offset && secs.rem < mfile->data.section_size ) 
     ccp4_file_raw_seek(mfile->stream, - secs.rem, SEEK_CUR);
   else if ( secs.rem >= mfile->data.section_size ) {
     ccp4_file_raw_seek(mfile->stream, (mfile->data.block_size-secs.rem), SEEK_CUR);
@@ -180,7 +181,7 @@ int ccp4_cmap_read_section(CMMFile *mfile, void *section)
 
   read_dim = mfile->map_dim[0] * mfile->map_dim[1];
 /* do not read if at end */
-  if (secs.quot < mfile->data.number)
+  if (secs.quot < 0 || secs.quot < mfile->data.number)
     result = ccp4_file_read(mfile->stream, section, read_dim);
 
   if (result != read_dim)
@@ -436,7 +437,8 @@ int ccp4_cmap_seek_data(CMMFile *mfile, int offset, unsigned int whence)
 /*! raw write of nelements items to file, according to the datamode,
    at current location
  \param mfile (const CMMFile *)
- \param items (void *) values written, should contain at least n_items items
+ \param section (void *) values written, should contain at least 
+ nelements items
  \param n_items (int) number of items to be written
  \return number of items written or EOF */
 int ccp4_cmap_write_data(CMMFile *mfile, const void *items, int n_items)

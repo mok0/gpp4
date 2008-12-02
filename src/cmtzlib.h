@@ -68,18 +68,18 @@ and SYMM records in the file header. This information is copied
 into the in-memory data structure. The list of symmetry operators
 (copied from the SYMM header records) is taken to be the definitive
 indicator of the spacegroup.
-
-The functions @c ccp4_lrsymi, @c ccp4_lrsymm and 
-@c ccp4_lwsymm read from and write to the symmetry sections
+<p>
+The functions <tt>ccp4_lrsymi</tt>, <tt>ccp4_lrsymm</tt> and 
+<tt>ccp4_lwsymm</tt> read from and write to the symmetry sections
 of the data structure. No symmetry manipulations are done within
 the CMTZ library itself. Within CCP4, the CSYM library provides 
 appropriate functions, but other symmetry libraries could be used.
 
-@section cmtz_examples Examples
+ *  @section cmtz_examples Examples
 
 See examples on <a href="ftp://ftp.ccp4.ac.uk/pub/mdw/cmtz">ftp area</a>
 
-*/
+ */
 
 /** @file cmtzlib.h
  *
@@ -90,7 +90,7 @@ See examples on <a href="ftp://ftp.ccp4.ac.uk/pub/mdw/cmtz">ftp area</a>
  *  structure defined in mtzdata.h  Other functions allow one
  *  to access data structure members, and to manipulate the structure
  *  and the values of structure members. Functions with names
- *  beginning @c ccp4_lr or @c ccp4_lw are primarily 
+ *  beginning <tt>ccp4_lr</tt> or <tt>ccp4_lw</tt> are primarily 
  *  to support the Fortran API.
  *
  *  @author Martyn Winn 
@@ -99,6 +99,7 @@ See examples on <a href="ftp://ftp.ccp4.ac.uk/pub/mdw/cmtz">ftp area</a>
 #ifndef __CMTZLib__
 #define __CMTZLib__
 
+/* rcsidhm[100] = "$Id: cmtzlib.h,v 1.45 2008/06/18 16:55:56 mdw Exp $" */
 
 /* defines CCP4::CCP4File */
 #include "ccp4_utils.h"
@@ -115,21 +116,25 @@ typedef CCP4::CCP4File CCP4File;
 /**** MTZ i/o ****/
 
 /** Reads the contents of the MTZ file into an MTZ structure.
- * @param logname logical name of MTZ file
- * @param read_refs whether to read reflections into memory (non-zero) or
+ * @param logname (I) Logical name of MTZ file
+ * @param read_refs (I) Whether to read reflections into memory (non-zero) or
  *        to read later from file (zero)
- * @return pointer to MTZ struct
+ * @return Pointer to MTZ struct
  */
 MTZ *MtzGet(const char *logname, int read_refs);
 
-/*! For compatibility with main CCP4 version.
-  @param logname logical name of MTZ file
-  @param read_refs whether to read reflections into memory (non-zero) or
-         to read later from file (zero)
-  @param cell_tolerance tolerance within unit cells are considered equal.
-*/
-MTZ *MtzGetUserCellTolerance(
-  const char *logname, int read_refs, const double cell_tolerance);
+/** Reads the contents of the MTZ file into an MTZ structure. As for function
+ * MtzGet except for extra argument cell_tolerance.
+ * @param logname (I) Logical name of MTZ file
+ * @param read_refs (I) Whether to read reflections into memory (non-zero) or
+ *        to read later from file (zero)
+ * @param cell_tolerance (I) User-defined tolerance for ccp4uc_cells_differ.
+ *        Setting this to zero means that a new crystal is generated whenever
+ *        dataset cell dimensions are different. MtzGet allows for a certain
+ *        variation within a single crystal.
+ * @return Pointer to MTZ struct
+ */
+MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double cell_tolerance);
 
 /** Reads reflection data from MTZ file.
  * @param filein pointer to input file
@@ -147,8 +152,11 @@ int MtzRrefl(CCP4File *filein, int ncol, float *refldata);
  */
 int MtzPut(MTZ *mtz, const char *logname);
 
-/** Opens a new MTZ file for writing.
- * @param logname logical name for output file.
+/** Opens a new MTZ file for writing. The output file can be specified
+ * either with a true filename, or more likely as a logical name
+ * corresponding to an environment variable or a CCP4 command line
+ * argument such as HKLOUT.
+ * @param logname logical name or filename for output file.
  * @return pointer to file or NULL on failure
  */
 CCP4File *MtzOpenForWrite(const char *logname);
@@ -332,7 +340,6 @@ MTZXTAL *MtzAddXtal(MTZ *mtz, const char *xname, const char *pname,
 int MtzNsetsInXtal(const MTZXTAL *xtal);
 
 /** For a given crystal, return number of active datasets in that crystal.
- * @param mtz pointer to MTZ struct
  * @param xtal pointer to the crystal struct
  * @return number of datasets
  */
@@ -388,8 +395,8 @@ char *MtzSetPath(const MTZ *mtz, const MTZSET *set);
 
 /** Returns a pointer to the dataset of MTZ with the given label.
  * @param mtz pointer to MTZ struct.
- * @param label Label of desired set. This could be @c dname or
- *        @c xname/dname.
+ * @param label Label of desired set. This could be <dname> or
+ *   <xname>/<dname>.
  * @return pointer to set or NULL if not found
  */
 MTZSET *MtzSetLookup(const MTZ *mtz, const char *label);
@@ -845,21 +852,22 @@ int MtzAddHistory(MTZ *mtz, const char history[][MTZRECORDLENGTH], const int nli
 /** Write or update symmetry information for MTZ header. This provides support
  * for the Fortran API, and is not particularly convenient for C programs. 
  * Note: ordering of matrices in rsymx was changed in November 2003.
- * @param mtz pointer to MTZ struct
- * @param nsymx number of symmetry operators
- * @param nsympx number of primitive symmetry operators
- * @param rsymx array of symmetry operators (dimensions ordered in C convention,
+ * @param mtz Pointer to MTZ struct
+ * @param nsymx Number of symmetry operators. If zero, symmetry operations
+ *   are not updated.
+ * @param nsympx Number of primitive symmetry operators.
+ * @param rsymx Array of symmetry operators (dimensions ordered in C convention,
  *   with translations in elements [*][3])
- * @param ltypex lattice type
- * @param nspgrx spacegroup number
- * @param spgrnx spacegroup name
- * @param pgnamx point group name
+ * @param ltypex Lattice type. If blank, not updated.
+ * @param nspgrx Spacegroup number. If zero, not updated.
+ * @param spgrnx Spacegroup name. If blank, not updated.
+ * @param pgnamx Point group name. If blank, not updated.
  * @return 1 on success, 0 on failure 
  */
 int ccp4_lwsymm(MTZ *mtz, int nsymx, int nsympx, float rsymx[192][4][4], 
 		char ltypex[], int nspgrx, char spgrnx[], char pgnamx[]);
 
-/*! Assign columns for writing. Check to see if columns already exist,
+/* Assign columns for writing. Check to see if columns already exist,
  * else create them. New columns are assigned to the base dataset if it 
  * exists, else the first dataset.
  * @param mtz pointer to MTZ struct
@@ -874,7 +882,7 @@ int ccp4_lwsymm(MTZ *mtz, int nsymx, int nsympx, float rsymx[192][4][4],
 MTZCOL **ccp4_lwassn(MTZ *mtz, const char labels[][31], const int nlabels, 
              const char types[][3], const int iappnd);
 
-/*! Add or update a dataset in the MTZ structure. If the crystal name is
+/* Add or update a dataset in the MTZ structure. If the crystal name is
  * not recognised, then a new crystal is created containing a single
  * dataset. If the crystal name is recognised, then the parameters of
  * the crystal are updated. The child dataset is then created if necessary
@@ -895,12 +903,17 @@ int ccp4_lwidx(MTZ *mtz, const char crystal_name[],  const char dataset_name[],
 
 
 /** Function to output reflection values for iref'th reflection.
- * In "in-memory" mode, values are added/updated for columns for which 
- * a column-pointer is given in lookup, up to a maximum of ncol columns.
- * In the traditional file-based mode, a reflection record is written
- * to file.
+ * The reflection values are provided in an array "adata". The value
+ * in adata[i] will be assigned to the MTZ column pointed to by lookup[i].
+ * Typically, lookup[i] is a pointer returned from an earlier call to
+ * MtzAddColumn().
+ * In "in-memory" mode, values are added/updated to column data held
+ * in memory. In the traditional file-based mode, a reflection record is
+ * written to file.
+ * This function will also update the column ranges and the crystal/file
+ * resolution limits.
  * @param mtz pointer to MTZ struct
- * @param adata array of values.
+ * @param adata array of reflection column values.
  * @param lookup array of pointers to columns.
  * @param ncol number of columns.
  * @param iref Reflection number such that 1st reflection is iref=1.
@@ -924,12 +937,6 @@ int ccp4_lwrefl(MTZ *mtz, const float adata[], MTZCOL *lookup[],
  */
 int ccp4_lwbat(MTZ *mtz, MTZBAT *batch, const int batno, const float *buf, const char *charbuf);
 
-/*!
- @param mtz pointer to MTZ struct
- @param batch pointer to batch
- @param xname Crystal name
- @param dname Dataset name
-*/
 int ccp4_lwbsetid(MTZ *mtz, MTZBAT *batch, const char xname[], const char dname[]);
 
 /* -- Below here there are no implementations -- */
@@ -992,9 +999,3 @@ int ccp4_lwbsetid(MTZ *mtz, MTZBAT *batch, const char xname[], const char dname[
 } }
 #endif
 #endif
-
-/*
-  Local variables:
-  mode: font-lock
-  End:
-*/

@@ -263,7 +263,7 @@ int ccp4_parse_delimiters(CCP4PARSERARRAY *parsePtr,
       } else {
 	strncpy(delimPtr,delim,ldelim+1);
       }
-      delimPtr[ldelim] = '\000';
+      delimPtr[ldelim] = '\0';
     }
 
     /* If supplied nulldelim is NULL then set to the default */
@@ -280,7 +280,7 @@ int ccp4_parse_delimiters(CCP4PARSERARRAY *parsePtr,
       } else {
 	strncpy(nulldelimPtr,nulldelim,lnulldelim+1);
       }
-      nulldelimPtr[lnulldelim] = '\000';
+      nulldelimPtr[lnulldelim] = '\0';
     }
 
     /* Assign new delimiters in parser array */
@@ -336,7 +336,7 @@ int ccp4_parse_comments(CCP4PARSERARRAY *parsePtr, const char *comment_chars)
 	strncpy(commentPtr,comment_chars,lcomment);
       }
       lcomment--;
-      commentPtr[lcomment] = '\000';
+      commentPtr[lcomment] = '\0';
     }
 
     /* Assign the new comments in the parser array */
@@ -416,7 +416,7 @@ int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
   char this_char,next_char,matchquote;
 
   int llen,ich,lword,diag=0;
-  int token,nulltoken,isquote,iscommt,isdelim;
+  int token,nulltoken,isquote,iscommt=0,isdelim;
   double value;
   char *delim,*nulldelim,*comm;
   char quot[]="\"\'";
@@ -522,6 +522,9 @@ int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
 
 	  /* Is the current character the start of a comment? */
 	  iscommt = charmatch(this_char,comm);
+	  if (diag)
+	    printf("CCP4_PARSE: character = %c comments = %s iscommt = %d\n",
+		   this_char,comm,iscommt);
 	  if (iscommt) {
 	    if (diag) printf("CCP4_PARSE: start of a comment\n");
 	  }
@@ -639,7 +642,7 @@ int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
 	tokenarray[ntok].fullstring = (char *) ccp4_utils_malloc(sizeof(char)*(lword+1));
 	if (tokenarray[ntok].fullstring) {
 	  strncpy(tokenarray[ntok].fullstring,&line[ibeg],lword);
-	  tokenarray[ntok].fullstring[lword] = '\000';
+	  tokenarray[ntok].fullstring[lword] = '\0';
 	  if (diag) printf("CCP4_PARSE: Token is \"%s\"\n",tokenarray[ntok].fullstring);
 	} else {
           ccp4_signal(CPARSER_ERRNO(CPARSERR_AllocFail),"ccp4_parse",NULL);
@@ -649,7 +652,7 @@ int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
 	/* Store the 4 character token in the array */
 	if (lword > 4) lword = 4; 
 	strncpy(tokenarray[ntok].word,&line[ibeg],lword);
-	tokenarray[ntok].word[lword] = '\000';
+	tokenarray[ntok].word[lword] = '\0';
 	/* Determine numerical value (if any) */
 	if (doublefromstr(tokenarray[ntok].fullstring,parser->max_exponent,
 			  parser->min_exponent,&value,&intvalue,&intdigits,
@@ -675,6 +678,7 @@ int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
       /* Don't do any more processing after a comment */
       if (iscommt) {
 	parser->ntokens = ntok;
+	if (diag) printf("CCP4_PARSE: returning after a comment\n");
 	return ntok;
       }
       /* Check the next pair of characters */
@@ -847,7 +851,7 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
 	fromstdin = 1;
 	/* Blank the line and reset the first flag to
 	   force reading from standard input immediately */
-	linein[0] = '\000';
+	linein[0] = '\0';
 	ntok      = 0;
 	parser->ntokens = ntok;
 	first     = 1;
@@ -857,14 +861,14 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
       /* If this line contains a continuation mark then
 	 read from stdin next time around */
       strncpy(linein,line,nchars);
-      linein[nchars]='\000';
+      linein[nchars]='\0';
     }
 
     /* Strip any trailing newline e.g. from fgets */
     llen = strlen(linein);
     if (llen > 0)
       if (linein[llen-1] == '\n') {
-	linein[llen-1] = '\000';
+	linein[llen-1] = '\0';
 	llen--;
       }
     
@@ -921,7 +925,7 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
 	}
 	/* Blank the line and reset the number of tokens
 	   to force reading from the external file immediately */
-	line[0] = '\000';
+	line[0] = '\0';
 	ntok    = 0;
 	parser->ntokens = ntok;
 
@@ -942,7 +946,7 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
 	else
 	  trunc = 0;
 	if (diag) printf("CCP4_PARSER: Continuation character should be at position %d\n\"%c\" is the character at this position\n",trunc,line[trunc]);
-	line[trunc] = '\000';
+	line[trunc] = '\0';
 	/* Lose the last token */ 
 	ntok--;
 	parser->ntokens = ntok;
@@ -959,7 +963,7 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
 	   the line */
 	if (strlen(line) > 0) {
 	  if (print) printf(" Comment line--- %s\n",line);
-	  line[0] = '\000';
+	  line[0] = '\0';
           nch = nchars;
 	}
         if (fromapp) continuation = 0;
@@ -979,12 +983,12 @@ int ccp4_parser(char *line, const int nchars, CCP4PARSERARRAY *parser,
   /* Fetch and uppercase keyword */
     if (ntok > 0) {
       strtoupper(parser->keyword,tokenarray[0].word);
-      parser->keyword[strlen(tokenarray[0].word)] = '\000';
+      parser->keyword[strlen(tokenarray[0].word)] = '\0';
       if (diag) printf("CCP4_PARSER: Keyword is %s\n",parser->keyword);
       /*Echo the line to standard output */ 
       if (print) printf(" Data line--- %s\n",line); 
     } else {
-      parser->keyword[0] = '\000';
+      parser->keyword[0] = '\0';
     }
 
   free(linein);
@@ -1028,16 +1032,16 @@ int ccp4_keymatch(const char *keyin1, const char *keyin2)
   /* If supplied words are longer than four characters then
      truncate them after the fourth character */
   strncpy(key1,keyin1,len1);
-  key1[len1] = '\000';
+  key1[len1] = '\0';
 
   strncpy(key2,keyin2,4);
-  key2[len2] = '\000';
+  key2[len2] = '\0';
 
   /* Convert strings to uppercase */
   strtoupper(keyup1,key1);
-  keyup1[len1] = '\000';
+  keyup1[len1] = '\0';
   strtoupper(keyup2,key2);
-  keyup2[len2] = '\000';
+  keyup2[len2] = '\0';
 
   /* Compare using strmatch */
   return strmatch(keyup1,keyup2);
@@ -1059,7 +1063,7 @@ char *strtoupper (char *str1, const char *str2)
   
   len2 = strlen(str2);
   if (len2 > 0) for (i=0; i<len2 ; i++) str1[i] = toupper(str2[i]);
-  str1[len2] = '\000';
+  str1[len2] = '\0';
   return str1;
 }
 
@@ -1079,7 +1083,7 @@ char *strtolower (char *str1, const char *str2)
   
   len2 = strlen(str2);
   if (len2 > 0) for (i=0; i<len2 ; i++) str1[i] = tolower(str2[i]);
-  str1[len2] = '\000';
+  str1[len2] = '\0';
   return str1;
 }
 
@@ -1240,6 +1244,11 @@ int doublefromstr(const char *str, const double max_exp, const double min_exp,
 	is_frc = 1;
 
       } else if (toupper(this_char) == 'E') {
+        char next_char = (ichar+1 < lstr ) ? str[ichar+1] : '\0';
+        if ( next_char == '+' || next_char == '-')
+	   next_char = (ichar+2 < lstr ) ? str[ichar+2] : '\0';
+        /* require the next active character after E to be a digit */
+        if ( !isdigit(next_char) )  return 0;
 	/* Exponent? i.e. e or E
 	   There can only be one exponent */
 	if (exponent > -1) return 0;
@@ -1247,7 +1256,6 @@ int doublefromstr(const char *str, const double max_exp, const double min_exp,
 	is_int = 0;
 	is_frc = 0;
 	is_exp = 1;
-
       } else {
 	/* Not a permissible character
 	   This is not a number so get out now */
@@ -1261,7 +1269,7 @@ int doublefromstr(const char *str, const double max_exp, const double min_exp,
       if (diag) printf(" is a digit ...\n");
 
       this_str[0] = this_char;
-      this_str[1] = '\000';
+      this_str[1] = '\0';
       char_value = atoi(this_str);
 
       if (is_int) {

@@ -99,12 +99,12 @@ double invert3matrix(const double a[3][3], double ai[3][3])
 
   d = a[0][0]*c[0][0] + a[0][1]*c[0][1] + a[0][2]*c[0][2];
 
-  if (d > 1.0e-30) {
+  if (fabs(d) > 1.0e-30) {
     for ( i = 0; i < 3; i++ ) 
       for ( j = 0; j < 3; j++ ) 
         ai[i][j] = c[j][i] / d;
   } else {
-    return 0;
+    return 0.0;
   }
   return d;
 }
@@ -115,20 +115,20 @@ double invert3matrix(const double a[3][3], double ai[3][3])
   @param[out] ai inverse matrix
   @return Determinant 
 */
-
 float invert4matrix(const float a[4][4], float ai[4][4])
 
 {
-    float c[4][4], d;
+    double c[4][4], d;
     int i, j;
-    float x[3][3];
+    double x[3][3];
     int i1, j1, i2 ;
-    float am;
+    double am, q;
     int ii, jj;
 
     /* Function Body */
     for (ii = 0; ii < 4; ++ii) {
 	for (jj = 0; jj < 4; ++jj) {
+            ai[ii][jj] = 0.0;
 	    i = -1;
 	    for (i1 = 0; i1 < 4; ++i1) {
 		if (i1 != ii) {
@@ -144,8 +144,8 @@ float invert4matrix(const float a[4][4], float ai[4][4])
 	    }
 
 	    am = x[0][0]*x[1][1]*x[2][2] - x[0][0]*x[1][2]*x[2][1] +
-     +         x[0][1]*x[1][2]*x[2][0] - x[0][1]*x[1][0]*x[2][2] +
-     +         x[0][2]*x[1][0]*x[2][1] - x[0][2]*x[1][1]*x[2][0];
+                 x[0][1]*x[1][2]*x[2][0] - x[0][1]*x[1][0]*x[2][2] +
+                 x[0][2]*x[1][0]*x[2][1] - x[0][2]*x[1][1]*x[2][0];
 	    i2 = ii + jj;
 	    c[ii][jj] = ccp4_pow_ii(-1.0, i2) * am;
 	}
@@ -162,17 +162,18 @@ float invert4matrix(const float a[4][4], float ai[4][4])
 /* ---- Get inverse matrix */
 
 
-  if (d > 1.0e-30) {
+  if (fabs(d) > 1.0e-30) {
+    q = 1.0/d;
     for (i = 0; i < 4; ++i) {
 	for (j = 0; j < 4; ++j) {
-	    ai[i][j] = c[j][i] / d;
+	  ai[i][j] = (float) (c[j][i] * q);
 	}
     }
   } else {
-    return 0;
+    return 0.0;
   }
 
-  return d;
+  return ((float) d);
 } 
 
 /*! Compute powers.

@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "ccp4_errno.h"
+/* rcsid[] = "$Id: library_err.c,v 1.23 2008/06/18 16:55:57 mdw Exp $" */
 
 /** ccp4_errno: global to store data 
 */
@@ -44,7 +45,7 @@ static const char * const error_levels[] =
     "FATAL ERROR"                                /* 4 */
 };
 
-/*! file io errors */
+/* file io errors */
 static const char *const cfile_errlist[] =
   {
     "Error 0",                                   /* 0 = CIO_Ok */
@@ -62,7 +63,7 @@ static const char *const cfile_errlist[] =
     "Unlink failed"                              /* 12 = CIO_UnlinkFail */
   };
 
-/*! map library errors */
+/* map library errors */
 static const char *const cmap_errlist[] =
   {
     "Error 0",                                   /* 0 = CMERR_Ok */
@@ -81,7 +82,7 @@ static const char *const cmap_errlist[] =
     "Too many open files",                       /* 13 = CMERR_MaxFile */
   };
 
-/*! mtz library errrors */
+/* mtz library errrors */
 static const char *const cmtz_errlist[] =
   {
     "Error 0",                                   /* 0 = CMTZERR_Ok */
@@ -103,10 +104,12 @@ static const char *const cmtz_errlist[] =
     "Missing or incomplete dataset information in input file.", /* 16 = CMTZERR_DatasetIncomplete */
     "No architecture information in file.",      /* 17 = CMTZERR_NoArch */
     "Attempt to access unallocated dataset",     /* 18 = CMTZERR_NullDataset */
-    "Input MTZ file has incorrect version",      /* 19 = CMTZERR_BadVersion */
+    "Input MTZ file has incorrect major version for current library",      /* 19 = CMTZERR_BadVersion */
     "MTZ header is corrupted: missing tokens in SYMINF record", /* 20 = CMTZERR_SYMINFIncomplete */
     "MTZ header is corrupted: missing tokens in COLUMN record", /* 21 = CMTZERR_COLUMNIncomplete */
     "Batch headers corrupted",                   /* 22 = CMTZERR_BadBatchHeader */
+    "Input MTZ file has different minor version to that supported by current library",      /* 23 = CMTZERR_DifferentVersion */
+    "File column type different from type expected by program",      /* 24 = CMTZERR_ColTypeMismatch */
   };
 
 /*! parser library errors */
@@ -125,7 +128,7 @@ static const char *const cpars_errlist[] =
     "Failed to interpret symop string",          /* 10 = CPARSERR_SymopToMat */
   };
 
-/*! symmetry library errors */
+/* symmetry library errors */
 static const char *const csym_errlist[] =
   {
     "Error 0",                                   /* 0 = CSYMERR_Ok */
@@ -134,6 +137,7 @@ static const char *const csym_errlist[] =
     "Pointer to spacegroup structure is NULL",   /* 3 = CSYMERR_NullSpacegroup */
     "ASU definition not found for this spacegroup", /* 4 = CSYMERR_NoAsuDefined */
     "Undefined Laue code for this spacegroup",   /* 5 = CSYMERR_NoLaueCodeDefined */
+    "Not enough tokens on SYMINFO line",         /* 6 = CSYMERR_SyminfoTokensMissing */
   };
 
 static const char *const cgen_errlist[] =
@@ -162,7 +166,7 @@ struct error_system {
   const char * const *error_list;
 };
 
-/*! construct error list */
+/* construct error list */
 static const struct error_system ccp4_errlist[] = {
     {"system", 0, 0, },
     {"library_file", CCP4_COUNT(cfile_errlist), cfile_errlist,},
@@ -177,12 +181,12 @@ static const struct error_system ccp4_errlist[] = {
 
 static const int ccp4_system_nerr = CCP4_COUNT(ccp4_errlist);
 
-/*! Obtain character string based upon error code.
+/* Obtain character string based upon error code.
     Typical use ccp4_strerror(ccp4_errno)
     The returned string is statically allocated in the
     library_err.c file and should not be freed.
-    @param error error code (int)
-    @return const pointer to error message.
+    param error code (int)
+    returns const pointer to error message.
 */
 const char *ccp4_strerror(int error)
 {
@@ -200,10 +204,11 @@ const char *ccp4_strerror(int error)
   return (ccp4_errlist[system].error_list[code]);
 }
 
-/*! Print out passed message and internal message based upon
-    ccp4_errno "message : error message "
-    @param msg (const char *)
-    @return void      
+/* Print out passed message and internal message based upon
+    ccp4_errno
+    "message : error message "
+    param message (const char *)
+    return void      
 */
 void ccp4_error (const char *msg)
 {
@@ -225,8 +230,8 @@ void ccp4_error (const char *msg)
                "Last system message: ",strerror(errno)); }
 }
 
-/*! Wrapper for ccp4_error which also calls exit(1)
-   @param message 
+/* Wrapper for ccp4_error which also calls exit(1)
+   param message (const char *)
 */
 void ccp4_fatal (const char *message)
 {
@@ -234,9 +239,6 @@ void ccp4_fatal (const char *message)
   exit(1);
 }
 
-/*! Output error messaage to stderr.
-  @param msg Error message.
- */
 int CFile_Perror(const char *msg)
 {
   const char * colon;
@@ -254,9 +256,6 @@ int CFile_Perror(const char *msg)
   return -1;
 }
 
-/*! Set error verbosity level
-@param[in] iverb Error level
- */
 int ccp4_liberr_verbosity(int iverb) {
   static int verbosity_level=1;
 
@@ -266,15 +265,16 @@ int ccp4_liberr_verbosity(int iverb) {
   return verbosity_level;
 }
 
-/*! Routine to set ccp4_errno and print out message for error tracing. 
-  This should be the only way in which ccp4_errno is set.  See error
-  codes above for levels and systems.  A callback with prototype
-  void function(void) may also be passed to the routine.  
-
-  @note FATAL calls exit(1).  
-  @param[in] code error code (int)
-  @param[in] msg error message 
-  @param[in] callback point to callback routine
+/* Routine to set ccp4_errno and print out message for
+    error tracing. This should be the only way in
+    which ccp4_errno is set.
+    See error codes above for levels and systems.
+    A callback with prototype void function(void)
+    may also be passed to the routine.
+    Note: FATAL calls exit(1).
+    param error code (int)
+    param message (const char * const)
+    param callback (point to routine)
 */
 void ccp4_signal(const int code, const char * const msg, 
 		 void (*callback) ())
@@ -321,9 +321,3 @@ void ccp4_signal(const int code, const char * const msg,
 
   if (fatal_err) exit(1);
 }
-
-/*
-  Local variables:
-  mode: font-lock
-  End:
-*/

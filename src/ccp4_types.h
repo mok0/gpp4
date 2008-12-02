@@ -31,24 +31,14 @@
 
 #include "ccp4_sysdep.h"
 
-#ifdef HAVE_STDINT_H
-#include <stdint.h>
-typedef uint16_t uint16;
-typedef uint32_t uint32;
-typedef unsigned char uint8;
-
-#else
-
 typedef unsigned short uint16;
 #ifdef SIXTEENBIT
 typedef unsigned long uint32;
 #else
 typedef unsigned int uint32;
 #endif
-typedef unsigned char uint8;
-#endif
-
 typedef float float32;
+typedef unsigned char uint8;
 
 /*! @union float_uint_uchar
   @brief Common data structure for floats, ints, and chars
@@ -65,8 +55,8 @@ typedef char *pstr;
 /* CCP4 library.c macro definitions */
 
 #ifndef FALSE
-#  define FALSE 0
-#  define TRUE 1
+#define FALSE 0
+#define TRUE 1
 #endif
 
 /*! @struct COMPLEX 
@@ -89,7 +79,7 @@ typedef struct { double r;             /*!<  radial component  */
 @brief A macro that returns the square of x.
 */
 #ifndef SQR
-#  define SQR(x) ((x)*(x))
+#define SQR(x) ((x)*(x))
 #endif
 
 /*! @def DEGREE(x) 
@@ -97,7 +87,7 @@ typedef struct { double r;             /*!<  radial component  */
   The result will be in [0:360].
 */
 #ifndef DEGREE
-#  define DEGREE(x) ((((x < 0)?(x)+2*M_PI:(x))*360)/(2*M_PI))
+#define DEGREE(x) ((((x < 0)?(x)+2*M_PI:(x))*360)/(2*M_PI))
 #endif
 
 /*! @def RADIAN(x) 
@@ -105,35 +95,35 @@ typedef struct { double r;             /*!<  radial component  */
   The result will be in [0:pi].
 */
 #ifndef RADIAN
-#  define RADIAN(x) ((((x<0)?(x)+360:(x))*2*M_PI)/360)
+#define RADIAN(x) ((((x<0)?(x)+360:(x))*2*M_PI)/360)
 #endif
 
 /*! @def MAX(x,y) 
 @brief A macro that returns the maximum of \a x and \a y. 
 */
 #ifndef MAX
-#  define MAX(x, y) (((x)>(y))?(x):(y))
+#define MAX(x, y) (((x)>(y))?(x):(y))
 #endif
 
 /*! @def MIN(x,y) 
 @brief A macro that returns the minimum of \a x and \a y. 
 */
 #ifndef MIN
-#  define MIN(x, y) (((x)<(y))?(x):(y))
+#define MIN(x, y) (((x)<(y))?(x):(y))
 #endif
 
 /*! @def ABS(x) 
 @brief A macro that returns the absolute value of \a x.
 */
 #ifndef ABS
-#  define ABS(x) (((x)<0)?-(x):(x))
+#define ABS(x) (((x)<0)?-(x):(x))
 #endif
 
 /*! @def SIGN(x) 
 @brief Return the sign of \a x.
 */
 #ifndef SIGN
-#  define SIGN(x) (((x)<0)?-1:1)
+#define SIGN(x) (((x)<0)?-1:1)
 #endif
 
 #endif   /* __CCP4_TYPES */

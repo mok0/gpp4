@@ -34,6 +34,7 @@
 #include "library_file.h"
 #include "ccp4_errno.h"
 #include "ccp4_file_err.h"
+/* rcsid[] = "$Id: library_file.c,v 1.21 2008/06/18 17:34:27 mdw Exp $" */
                                                         
 static uint16 nativeIT = NATIVEIT; /* machine integer type */ 
 static uint16 nativeFT = NATIVEFT; /* machine float type */
@@ -349,7 +350,7 @@ int ccp4_file_raw_write(CCP4File *cfile, const char *buffer, size_t n_items)
     result = fwrite (buffer, (size_t) sizeof(char), n_items,
                     cfile->stream);
   else 
-#if defined _MVS
+#if defined _MSC_VER
     result = _write (cfile->fd, buffer, n_items);
 #else
     result = write (cfile->fd, buffer, n_items);
@@ -402,7 +403,7 @@ int ccp4_file_raw_seek(CCP4File *cfile, long offset, int whence)
 #if defined _MSC_VER
      result = _lseek(cfile->fd,offset,whence);
 #else
-     result = (int) lseek(cfile->fd, offset, whence);
+     result = lseek(cfile->fd, offset, whence);
 #endif
   } 
   
@@ -959,9 +960,14 @@ CCP4File *ccp4_file_open (const char *filename, const int flag)
                              "mbc=16",        /* bigger blocksize */
                              "ctx=stm", "mrs=0", "rat=cr", "rfm=stmlf");
 #else
-# ifdef _MVS
-    if (cfile->scratch) 
+# ifdef _MSC_VER
+	if (cfile->scratch) { 
       cfile->stream = tmpfile();
+// if tmpfile fails, try opening temporary file the unix way
+	  if (!cfile->stream) {
+	     cfile->stream = fopen (filename, fmode);
+	  }
+	}
     else 
       cfile->stream = fopen (filename, fmode);
 # else
@@ -981,20 +987,20 @@ CCP4File *ccp4_file_open (const char *filename, const int flag)
 #if defined (__alpha) && defined (vms)
 (void) fflush (cfile->stream);
 #endif
-#if defined _MVS
+#if defined _MSC_VER
   _fstat(_fileno(cfile->stream), &st);
 #else
   fstat(fileno(cfile->stream), &st);
 #endif
   }
-#if defined _MVS
+#if defined _MSC_VER
   cfile->name = _strdup(filename);
 #else
   cfile->name = strdup(filename);
 #endif
   cfile->open = 1;  
   cfile->own = 1;  
-#if defined _MVS
+#if defined _MSC_VER
   if ( !(st.st_mode & S_IFREG) ) {
 #else
   if ( !S_ISREG(st.st_mode) ) {
@@ -2062,7 +2068,7 @@ long ccp4_file_length (CCP4File *cfile)
 #endif
     cfile->length = st.st_size;
 
-  return ((long) st.st_size);
+  return (st.st_size);
 }
 
 /**
@@ -2084,13 +2090,15 @@ long ccp4_file_tell (CCP4File *cfile)
   cfile->last_op = IRRELEVANT_OP;
 
   if (cfile->buffered && cfile->stream) {
-    fflush (cfile->stream); 
+#if !defined (_MSC_VER)
+    fflush (cfile->stream);
+#endif	
     result = (long) ftell(cfile->stream);
   } else
 #if defined _MSC_VER
     result = _lseek(cfile->fd, 0L, SEEK_CUR);
 #else
-    result = (long) lseek(cfile->fd, 0L, SEEK_CUR);
+    result = lseek(cfile->fd, 0L, SEEK_CUR);
 #endif
   
   cfile->loc = result;
@@ -2202,14 +2210,15 @@ char *ccp4_file_print(CCP4File *cfile, char *msg_start, char *msg_end)
       strcpy(msg_curr,cfile->name);
       msg_curr = strrchr(msg_curr,'\0'); }
 
-  if (cfile->open)
+  if (cfile->open) {
     if ((msg_end - msg_curr) > 6 ) {
       strcat(msg_start, " opened");
       msg_curr = strrchr(msg_curr,'\0'); }
-  else
+  } else {
     if ((msg_end - msg_curr) > 7 ) {
       strcat(msg_start, " closed");
       msg_curr = strrchr(msg_curr,'\0'); }
+  }
 
   if (cfile->append) {
     if ((msg_end - msg_curr) > 13 ) {
@@ -2232,8 +2241,3 @@ char *ccp4_file_print(CCP4File *cfile, char *msg_start, char *msg_end)
   return msg_curr;
 }
 
-/*
-  Local variables:
-  mode: font-lock
-  End:
-*/

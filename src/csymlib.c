@@ -34,7 +34,6 @@
 #include "cvecmat.h"
 #include "ccp4_errno.h"
 #include "ccp4_unitcell.h"
-#include "ccp4_sysdep.h"
 
 /* stuff for error reporting */
 #define CSYM_ERRNO(n) (CCP4_ERR_SYM | (n))
@@ -46,77 +45,8 @@
 #define  CSYMERR_NullSpacegroup      3
 #define  CSYMERR_NoAsuDefined        4
 #define  CSYMERR_NoLaueCodeDefined   5
+#define  CSYMERR_SyminfoTokensMissing 6
 
- /*!
-   Find the path of the SYMINFO file. We will try to locate the file
-   in several places (in increasing order of significance):
-      -# $SYMINFO environment variable
-      -# ./syminfo.lib
-      -# $prefix/share/gpp4/syminfo.lib
-      -# $prefix/lib/syminfo.lib
-      -# $CCP4/lib/data/syminfo.lib
-   where $prefix is defined by the --prefix switch to the configure script.
-   The function allocates memory for the pathname that must be free'd
-   by the caller in order to avoid a memory leak.
-   @return path to syminfo.lib file.
- */
-static char *open_syminfo_file()
-{
-  struct stat statbuf;
-  char *str;
-  char *fnam = (char *)ccp4_utils_malloc(512);
-
-  if ((str = getenv("SYMINFO"))) {
-    /* SYMINFO was defined, now check to see if file exists */
-    strncpy (fnam, str, 512);
-    if( stat(fnam,&statbuf) == 0) {
-      printf("\n Spacegroup information obtained from library file: \n");
-      printf(" Logical Name: SYMINFO   Filename: %s\n\n", fnam);
-      return fnam;
-    }
-  }
-
-  printf("Environment variable SYMINFO not set ... guessing location of symmetry file.\n");
-
-  strncpy (fnam, "./syminfo.lib", 14);
-  if( stat(fnam,&statbuf) == 0) {
-    printf("\n Spacegroup information obtained from local file: %s\n", fnam);
-    return fnam;
-  }
-
-  strncpy (fnam, GPP4_PREFIX, 512-24);
-  strncat (fnam, "/share/gpp4/syminfo.lib", 24);
-  if( stat(fnam,&statbuf) == 0) {
-    printf("\n Spacegroup information obtained from system file: %s\n", fnam);
-    return fnam;
-  }
-
-  strncpy (fnam, GPP4_PREFIX, 512-17);
-  strncpy (fnam, "/lib/syminfo.lib", 17);
-  if( stat(fnam,&statbuf) == 0) {
-    printf("\n Spacegroup information obtained from system file: %s\n", fnam);
-    return fnam;
-  }
-
-  /* Hmmm. Try one last time in the CCP4 installation */
-
-  if (!(str = getenv("CCP4"))) {
-    printf("Environment variable CCP4 not set ... big trouble! \n");
-    free(fnam);
-    return NULL;
-  }
-
-  strncpy(fnam, str, 512);
-  strncat(fnam,"/lib/data/syminfo.lib", 22);
-  if( stat(fnam,&statbuf) == 0) {
-    printf("\n Spacegroup information obtained from CCP4 library: %s\n", fnam);
-    return fnam;
-  }
-
-  /* We give up... */
-  free(fnam);
-  return NULL;
-}
 
 CCP4SPG *ccp4spg_load_by_standard_num(const int numspg) 
 { 
@@ -149,10 +79,12 @@ CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
 
 { CCP4SPG *spacegroup;
   int i,j,k,l,debug=0,nsym2,symops_provided=0,ierr,ilaue;
-  float sg_chb[4][4],limits[2],rot1[4][4],rot2[4][4];
+  float sg_chb[4][4],limits[2],rot1[4][4],rot2[4][4],det;
   FILE *filein;
   char *symopfile, *ccp4dir, filerec[80];
   ccp4_symop *op2,*op3,opinv;
+
+  static int reported_syminfo = 0;       /* report location of SYMINFO first time only */
 
   /* spacegroup variables */
   int sg_num, sg_ccp4_num, sg_nsymp, sg_num_cent;
@@ -212,10 +144,13 @@ CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
   filein = fopen(symopfile,"r");
   free(symopfile);
 
+  filein = fopen(symopfile,"r");
   if (!filein) {
     ccp4_signal(CSYM_ERRNO(CSYMERR_NoSyminfoFile),"ccp4spg_load_spacegroup",NULL); 
     return NULL;
   }
+
+  if (!(getenv("SYMINFO"))) free(symopfile);
 
   parser = ccp4_parse_start(20);
   if (parser == NULL) 
@@ -230,12 +165,28 @@ CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
     printf(" parser initialised \n");
 
   while (fgets(filerec,80,filein)) {
+
+    /* If syminfo.lib comes from a DOS platform, and we are on
+       unix, need to strip spurious \r character. Note this is
+       necessary because we have removed \r as parser delimiter. */
+    if (strlen(filerec) > 1){
+      if (filerec[strlen(filerec)-2]=='\r') {
+        filerec[strlen(filerec)-2]='\n';
+        filerec[strlen(filerec)-1]='\0';
+      }
+    }
+
     if (strlen(filerec) > 1) {
 
       ccp4_parser(filerec, 80, parser, iprint);
 
       if (ccp4_keymatch(key, "number")) {
-        sg_num = (int) token[1].value;
+        if (parser->ntokens < 2) {
+           printf("Current SYMINFO line = %s\n",filerec);
+           ccp4_signal(CCP4_ERRLEVEL(2) | CSYM_ERRNO(CSYMERR_SyminfoTokensMissing),"ccp4spg_load_spacegroup",NULL);
+        } else {
+          sg_num = (int) token[1].value;
+        }
       }
 
       if (ccp4_keymatch(key, "basisop")) {
@@ -243,34 +194,49 @@ CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
       }
 
       if (ccp4_keymatch(key, "symbol")) {
-        if (strcmp(token[1].fullstring,"ccp4") == 0)
-          sg_ccp4_num = (int) token[2].value;
-        if (strcmp(token[1].fullstring,"Hall") == 0)
-          strcpy(sg_symbol_Hall,token[2].fullstring);
-        if (strcmp(token[1].fullstring,"xHM") == 0)
-          strcpy(sg_symbol_xHM,token[2].fullstring);
-        if (strcmp(token[1].fullstring,"old") == 0)
-          strcpy(sg_symbol_old,token[2].fullstring);
-        if (strcmp(token[1].fullstring,"patt") == 0)
-          strcpy(sg_patt_group,token[3].fullstring);
-        if (strcmp(token[1].fullstring,"pgrp") == 0)
-          strcpy(sg_point_group,token[3].fullstring);
+        if (parser->ntokens < 3) {
+           printf("Current SYMINFO line = %s\n",filerec);
+           ccp4_signal(CCP4_ERRLEVEL(2) | CSYM_ERRNO(CSYMERR_SyminfoTokensMissing),"ccp4spg_load_spacegroup",NULL);
+        } else {
+          if (strcmp(token[1].fullstring,"ccp4") == 0)
+            sg_ccp4_num = (int) token[2].value;
+          if (strcmp(token[1].fullstring,"Hall") == 0)
+            strcpy(sg_symbol_Hall,token[2].fullstring);
+          if (strcmp(token[1].fullstring,"xHM") == 0)
+            strcpy(sg_symbol_xHM,token[2].fullstring);
+          if (strcmp(token[1].fullstring,"old") == 0)
+            strcpy(sg_symbol_old,token[2].fullstring);
+          if (strcmp(token[1].fullstring,"patt") == 0)
+            strcpy(sg_patt_group,token[3].fullstring);
+          if (strcmp(token[1].fullstring,"pgrp") == 0)
+            strcpy(sg_point_group,token[3].fullstring);
+        }
       }
 
       if (ccp4_keymatch(key, "hklasu")) {
-        if (strcmp(token[1].fullstring,"ccp4") == 0)
-          strcpy(sg_asu_descr,token[2].fullstring);
+        if (parser->ntokens < 3) {
+           printf("Current SYMINFO line = %s\n",filerec);
+           ccp4_signal(CCP4_ERRLEVEL(2) | CSYM_ERRNO(CSYMERR_SyminfoTokensMissing),"ccp4spg_load_spacegroup",NULL);
+        } else {
+          if (strcmp(token[1].fullstring,"ccp4") == 0)
+            strcpy(sg_asu_descr,token[2].fullstring);
+        }
       }
 
       if (ccp4_keymatch(key, "mapasu")) {
-        if (strcmp(token[1].fullstring,"zero") == 0) {
-          strcpy(map_asu_x,token[2].fullstring);
-          strcpy(map_asu_y,token[3].fullstring);
-          strcpy(map_asu_z,token[4].fullstring);
-        } else if (strcmp(token[1].fullstring,"ccp4") == 0) {
-          strcpy(map_asu_ccp4_x,token[2].fullstring);
-          strcpy(map_asu_ccp4_y,token[3].fullstring);
-          strcpy(map_asu_ccp4_z,token[4].fullstring);
+        if (parser->ntokens < 5) {
+           printf("Current SYMINFO line = %s\n",filerec);
+           ccp4_signal(CCP4_ERRLEVEL(2) | CSYM_ERRNO(CSYMERR_SyminfoTokensMissing),"ccp4spg_load_spacegroup",NULL);
+        } else {
+          if (strcmp(token[1].fullstring,"zero") == 0) {
+            strcpy(map_asu_x,token[2].fullstring);
+            strcpy(map_asu_y,token[3].fullstring);
+            strcpy(map_asu_z,token[4].fullstring);
+          } else if (strcmp(token[1].fullstring,"ccp4") == 0) {
+            strcpy(map_asu_ccp4_x,token[2].fullstring);
+            strcpy(map_asu_ccp4_y,token[3].fullstring);
+            strcpy(map_asu_ccp4_z,token[4].fullstring);
+          }
         }
       }
 
@@ -393,7 +359,8 @@ CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
      strncpy(filerec,sg_symop[j],80);   /* symop_to_mat4 overwrites later sg_symop */
      symop_to_mat4(filerec,filerec+strlen(filerec),rot2[0]);
      ccp4_4matmul(rot1,(const float (*)[4])cent_ops,(const float (*)[4])rot2);
-     invert4matrix((const float (*)[4])rot1,rot2);
+     det=invert4matrix((const float (*)[4])rot1,rot2);
+     if (debug) printf("symop determinant: %f\n",det);
      for (k = 0; k < 3; ++k) {
       for (l = 0; l < 3; ++l) {
         spacegroup->symop[i*sg_nsymp+j].rot[k][l]=rot1[k][l];
@@ -891,7 +858,7 @@ void ccp4spg_name_de_colon(char *name) {
     *ch1 = ' ';
     *(ch1+1) = ' ';
     ch1 = strstr(name,"R");
-    if (ch1) *ch1 = 'H';
+    if (ch1 != NULL) *ch1 = 'H';
   }
     
   return;
@@ -967,6 +934,22 @@ int ccp4_spgrp_equal( int nsym1, const ccp4_symop *op1, int nsym2, const ccp4_sy
 
   /* return true if they are equal */
   return ( i == n );
+}
+
+int ccp4_spgrp_equal_order( int nsym1, const ccp4_symop *op1, int nsym2, const ccp4_symop *op2 )
+{
+  int i;
+
+  /* first check that we have equal number of symops */
+  if ( nsym1 != nsym2 ) return 0;
+
+  /* compare the symcodes */
+  for ( i = 0; i < nsym1; i++ ) {
+    if ( ccp4_symop_code( op1[i] ) != ccp4_symop_code( op2[i] ) ) break;
+  }
+
+  /* return true if they are equal */
+  return ( i == nsym1 );
 }
 
 int ccp4_symop_code(ccp4_symop op)
@@ -1603,6 +1586,11 @@ int ccp4spg_generate_origins(const char *namspg, const int nsym, const float rsy
 
 void ccp4spg_print_recip_spgrp(const CCP4SPG* sp)
 {
+  if (!sp) {  
+    ccp4_signal(CSYM_ERRNO(CSYMERR_NullSpacegroup),"ccp4spg_print_recip_spgrp",NULL); 
+    return;
+  }
+
     printf("Reciprocal space symmetry: \n");
     printf("Space group: \"%s\" Point group: \"%s\" Laue group: \"%s\" \n",
        sp->symbol_xHM,sp->point_group,sp->laue_name); 
@@ -1946,6 +1934,8 @@ int ccp4spg_check_symm_cell(int nsym, float rsym[][4][4], float cell[6]) {
   int i,k,l,status=1;
   ccp4_symop *op1;
 
+  if (nsym <= 0) return 0;
+
   /* identify spacegroup from supplied symops */
   op1 = (ccp4_symop *) ccp4_utils_malloc(nsym*sizeof(ccp4_symop));
   for (i = 0; i < nsym; ++i) {
@@ -1962,6 +1952,8 @@ int ccp4spg_check_symm_cell(int nsym, float rsym[][4][4], float cell[6]) {
   if (strstr(spacegroup->symbol_xHM,":R")) {
     status = ccp4uc_is_rhombohedral(cell,0.01F);
   } else if (strstr(spacegroup->symbol_xHM,":H")) {
+    status = ccp4uc_is_hexagonal(cell,0.01F);
+  } else if (spacegroup->spg_num >= 168 && spacegroup->spg_num <= 194) {
     status = ccp4uc_is_hexagonal(cell,0.01F);
   }
 

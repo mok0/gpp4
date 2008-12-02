@@ -39,11 +39,10 @@ namespace CCP4 {
 extern "C" {
 #endif
 
-/*! Version of CCP4 that gpp4 is derived from */
-#define CCP4_VERSION_NO "5.0"
-
+/*! CCP4 library version this version is derived from */
+#define CCP4_VERSION_NO "6.1"
 /*! Patch level of CCP4 that gpp4 is derived from */
-#define CCP4_PATCH_LEVEL "5.0.2" 
+#define CCP4_PATCH_LEVEL "6.1.0"
 
 /*! GPP4 version is defined by autoconf */
 #define GPP4_VERSION_NO VERSION   
@@ -53,16 +52,110 @@ extern "C" {
 #define MAXLEN_PROGVERSION 80  /*!<  Maximum length of program version string */
 #define MAXLEN_RCSDATE     80  /*!<  Maximum length of date string */
 
+/*------------------------------------------------------------------*/
+
+/* Type Definitions */
+
+/*------------------------------------------------------------------*/
+
+/*! Define a type which is a pointer to a function taking an integer
+   and a pointer to character, and returning an integer */
+typedef int (*CCP4INTFUNCPTR)(int, char *);
+
+/*------------------------------------------------------------------*/
 
 /* Function Prototypes */
 
-char *ccp4_prog_vers(char *progvers);
+/*------------------------------------------------------------------*/
+
+/** Register or query program version.
+ * @param progvers Program version string, or NULL to query existing value.
+ * @return Program version string.
+ */
+char *ccp4_prog_vers(const char *progvers);
+
+/** Set or return program name.
+ * @param progname Program name, or NULL to query existing value.
+ * @return Program name
+ */
 char *ccp4ProgramName(const char *progname);
+
+/** Set or return program RCS date
+ * @param rcs_string Date string, or NULL to query existing value.
+ * @return Date string
+ */
 char *ccp4RCSDate(const char *rcs_string);
+
+/** Set or print program time information
+ * @param init
+ */
 void ccp4ProgramTime(int init);
+
+/** Set or return the reference verbosity level
+ * Always return the verbosity level - if verboselevel is
+ * between 0 and 9 then reset the verbosity level to
+ * verboselevel
+ * @param level Verbosity level, or -1 to query existing value.
+ * @return Verbosity level
+ */
 int ccp4VerbosityLevel(int level);
+
+/** Set or invoke a user-defined callback function
+ * The callback must be of the form "function(const int, const char *)"
+ * This is essentially an internal function which operates in one of two
+ * modes - in "set" mode the named function is stored and the remaining
+ * arguments are discarded; in "invoke" mode the stored function is
+ * executed with the supplied values (the supplied name is discarded).
+ * @param mycallback Callback function (discarded in "invoke" mode)
+ * @param mode Either "set" or "invoke"
+ * @param ierr An error level equivalent to that used in ccperror
+ * @param message A message string equivalent to that used in ccperror
+ * @return Result of the executed function (invoke mode)
+ */
+int ccp4Callback(CCP4INTFUNCPTR mycallback, char *mode, int ierr, char *message);
+
+/** Set a user-defined callback function
+ * This is a wrapper to ccp4Callback - it stores a user-defined
+ * callback function which must be of the form 
+ * "function(const int, const char *)"
+ * @param mycallback Callback function
+ * @return 1 (if the function is stored), 0 (if it is not) 
+ */
+int ccp4SetCallback(CCP4INTFUNCPTR mycallback);
+
+/** Invoke the user-defined callback function
+ * This is a wrapper to ccp4Callback - it executes the user-defined
+ * callback function previously stored.
+ * @param ierr An error level equivalent to that used in ccperror
+ * @param message A message string equivalent to that used in ccperror
+ * @return Result of the executed function
+ */
+int ccp4InvokeCallback(int ierr, char *message);
+
+/** A dummy callback function used by default in ccp4CallOnExit
+ * Internal function. This function does nothing.
+ * @param level Severity level supplied from ccperror
+ * @param message Message text supplied from ccperror
+ * @return Always returns 1
+*/      
+int ccp4NullCallback(int level, char *message);
+
+/** Check existence of licence agreement
+ * @param name Name of licence, e.g. "CCP4".
+ * @return 1 for licence exists, else 0.
+ */
 int ccp4_licence_exists(const char *name);
+
+/** Register or query html output level.
+ * @param ihtml_in 0 = turn off html output, 1 = turn on html output, -1 = query existing value
+ * @return 0 = no html output, 1 = html output
+ */
 int html_log_output(int ihtml_in);
+
+/** Register or query summary output level.
+ * @param isumm_in 0 = turn off summary output, 1 = turn on summary output, -1 = query existing value
+ * @return 0 = no summary output, 1 = summary output
+ */
 int summary_output(int isumm_in);
 
 #ifdef __cplusplus
