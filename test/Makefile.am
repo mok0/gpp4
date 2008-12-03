@@ -3,7 +3,7 @@
 ## This code is distributed under the GPL license.
 
 AM_CPPFLAGS = -I$(top_srcdir)/src
-AM_LDFLAGS = $(top_srcdir)/src/libgpp4.la @LIBM@
+AM_LDFLAGS = $(top_builddir)/src/libgpp4.la @LIBM@
 
 noinst_PROGRAMS = load_syminfo
 

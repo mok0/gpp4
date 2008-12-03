@@ -5,8 +5,13 @@ Revision: 1
 Maintainer: Morten Kjeldgaard <mok@bioxray.dk>
 Description: Library providing CCP4 functionality 
 License: LGPL
+Source: ftp://ftp.bioxray.au.dk/pub/mok/src/gpp4-%v.tar.gz
+Source-MD5: 48931781425a5b79a8255ebefaed24b3
+NoSourceDirectory: false
+Depends: %N-shlibs (= %v-%r)
+BuildDependsOnly: true
 HomePage: http://www.bioxray.dk/~mok/gpp4
-
+DocFiles: README AUTHORS NEWS COPYING
 DescDetail: << 
 The CCP4 software suite is based around a library of routines which
 cover common tasks, such as file opening, parsing keyworded input,
@@ -32,31 +37,37 @@ The library contains several subcomponents:
     just like a simple C array, but can be resized at will without 
     incurring excessive overheads.
 <<
-
-# Unpack phase
-
-Source: ftp://ftp.bioxray.au.dk/pub/mok/src/gpp4-%v.tar.gz
-Source-MD5: 48931781425a5b79a8255ebefaed24b3
-NoSourceDirectory: false
-Depends: %N-0-shlibs (= %v-%r)
-# No other package can depend on this one:
-BuildDependsOnly: true
-
-
 CompileScript: <<
   ./configure --prefix=%p
   make
 <<
-
-# Install phase
 InstallScript: <<
   make install DESTDIR=%d
 <<
-
 SplitOff: <<
-  Package: %N-0-shlibs
-  Files: lib/libgpp4.0.dylib lib/libgpp4.0.0.0.dylib share/gpp4
-  Shlibs: %p/lib/libgpp4.0.dylib @VERSION@ %n (>= @VERSION@-1)
+  Package: %N-shlibs
+  Files: <<
+	lib/libgpp4.dylib
+    lib/libgpp4.0.dylib
+	lib/libgpp4.0.0.0.dylib
+  <<
+  Shlibs: <<
+	%p/lib/libgpp4.dylib 1.0.0 %n (>= @VERSION@-1)
+	%p/lib/libgpp4.0.dylib 1.0.0 %n (>= @VERSION@-1)
+	%p/lib/libgpp4.0.0.0.dylib 1.0.0 %n (>= @VERSION@-1)
+  <<
+<<
+SplitOff2: <<
+Package: %N-dev
+BuildDependsOnly: True
+ Files: <<   
+  lib/*.a
+  lib/*.la
+  include/gpp4/ccp4/*.h
+  share/gpp4/default.def
+  share/gpp4/environ.def
+  share/gpp4/syminfo.lib
+ <<
 <<
 
 ####
