@@ -17,7 +17,10 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include "ccp4_utils.h"
 
  /*!
    Find the path of the SYMINFO file. We will try to locate the file
@@ -32,7 +35,7 @@
    by the caller in order to avoid a memory leak.
    @return path to syminfo.lib file.
  */
-char *open_syminfo_file()
+char *gpp4_open_syminfo_file()
 {
   struct stat statbuf;
   char *str;

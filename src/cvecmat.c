@@ -25,6 +25,7 @@
     @author Martyn Winn 
  */
 
+#include <math.h>
 #include "cvecmat.h"
 
 /*! Vector cross product

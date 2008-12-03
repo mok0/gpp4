@@ -73,6 +73,10 @@ CCP4SPG *ccp4_spgrp_reverse_lookup(const int nsym1, const ccp4_symop *op1)
   return ccp4spg_load_spacegroup(0, 0, NULL, NULL, nsym1, op1);
 }
 
+
+char *gpp4_open_syminfo_file();
+
+
 CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
          const char *spgname, const char *ccp4spgname, 
          const int nsym1, const ccp4_symop *op1) 
@@ -138,13 +142,12 @@ CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
 
   /* Open the symop file: */
 
-  if (!(symopfile = open_syminfo_file()))
+  if (!(symopfile = gpp4_open_syminfo_file()))
     return NULL;
 
   filein = fopen(symopfile,"r");
   free(symopfile);
 
-  filein = fopen(symopfile,"r");
   if (!filein) {
     ccp4_signal(CSYM_ERRNO(CSYMERR_NoSyminfoFile),"ccp4spg_load_spacegroup",NULL); 
     return NULL;

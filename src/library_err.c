@@ -230,13 +230,13 @@ void ccp4_error (const char *msg)
                "Last system message: ",strerror(errno)); }
 }
 
-/* Wrapper for ccp4_error which also calls exit(1)
+/* Wrapper for ccp4_error which also calls abort()
    param message (const char *)
 */
 void ccp4_fatal (const char *message)
 {
   ccp4_error(message);
-  exit(1);
+  abort();
 }
 
 int CFile_Perror(const char *msg)
@@ -271,7 +271,7 @@ int ccp4_liberr_verbosity(int iverb) {
     See error codes above for levels and systems.
     A callback with prototype void function(void)
     may also be passed to the routine.
-    Note: FATAL calls exit(1).
+    Note: FATAL calls abort().
     param error code (int)
     param message (const char * const)
     param callback (point to routine)
@@ -319,5 +319,5 @@ void ccp4_signal(const int code, const char * const msg,
   if (callback)
     (*callback)();
 
-  if (fatal_err) exit(1);
+  if (fatal_err) abort();
 }

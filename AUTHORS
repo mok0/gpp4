@@ -22,6 +22,8 @@ Martyn Winn: ccp4_spg.h, ccp4_unitcell.c, ccp4_unitcell.h, ccp4_vars.h,
 Peter Briggs: ccp4_parser.c, ccp4_parser.h, ccp4_program.c, ccp4_program.h,
   ccp4_general.c, ccp4_general.h
 
+Jan Pieter Abrahams: pack_c.c pack_c.h
+
 Other authors: Ralf W. Grosse-Kunstleve, Paul Emsley, Morten Kjeldgaard.
 
 ####

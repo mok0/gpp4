@@ -29,6 +29,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <stdarg.h>
@@ -70,7 +71,7 @@ int ccperror(int ierr, const char *message)
   if (ierr==0) {
     exit(0);
   } else if (ierr==1 || ierr==-1) {
-    exit(1);
+    abort();
   }
   return 0;
 }
@@ -437,7 +438,7 @@ int ccp4fyp(int argc, char **argv)
     if (ccp4_prog_vers(NULL) && strlen(ccp4_prog_vers(NULL))) 
       printf("; version %s",ccp4_prog_vers(NULL));
     printf("\n");
-    exit(0);
+    abort();
   }
 
   /* Initialise debug (verbosity) level

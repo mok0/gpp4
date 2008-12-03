@@ -1,3 +1,11 @@
+2008-12-03  Morten Kjeldgaard  <mok@bioxray.au.dk>
+
+	* Because the library from CCP4 version 6.1.0 is again LGPL'ed
+	  the (limited) changes from that version have been merged 
+	  into gpp4 v. 1.1. The differences between gpp4 and the mother
+	  library is mostly in the documentation and some parts that make
+	  gpp4 standalone.
+
 2007-07-05  Morten Kjeldgaard  <mok@ghost.bioxray.dk>
 
 	* Version 1.0 of gpp4 now builds and installs correctly with the

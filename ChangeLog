@@ -1,3 +1,14 @@
+2008-12-02  Morten Kjeldgaard  <mok@bioxray.au.dk>
+
+	* src/gpp4_open_symop_file.c: New file containing function
+	open_symop_file which is special to gpp4.
+
+	* Many changes in many files to facilitate merging of future
+	  versions.
+
+	* Merged in modifications from CCP4 library 6.1.0, since it is now
+	  LGPL licensed.
+
 2008-12-01  Morten Kjeldgaard  <mok@bioxray.au.dk>
 
 	* src/ccp4_sysdep.h: patch from Ubuntu to allow building on
