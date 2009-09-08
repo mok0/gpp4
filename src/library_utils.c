@@ -62,7 +62,6 @@ are just generally useful (platform independent date).
 
 #define CCP4_ERRNO(y) (CCP4_ERR_UTILS | (y))          
                                        
-/* rcsid[] = "$Id: library_utils.c,v 1.39 2008/09/16 08:40:28 ccb Exp $" */
 
 /* static uint16 nativeIT = NATIVEIT; */ /* machine integer type - currently unused here */
 static uint16 nativeFT = NATIVEFT; /* machine float type */
@@ -446,15 +445,13 @@ void *ccp4_utils_calloc(size_t nelem , size_t elsize)
  * (MVisualStudio version in w32mvs.c)
  * Note that getlogin only works for processes attached to
  * a terminal (and hence won't work from the GUI).
- * In these instances use getpwuid instead.
  * @return pointer to character string containing login name.
  */
 #if ! defined (_MSC_VER)
-static const char userid_unknown[] = "unknown";
-
 char *ccp4_utils_username(void)
 { 
-  struct passwd *passwd_struct=NULL;
+  static char userid_unknown[] = "unknown";
+  /* struct passwd *passwd_struct=NULL; */
   char *userid=NULL;
   if (!(userid = getlogin())) {
     /*

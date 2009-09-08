@@ -42,7 +42,7 @@ extern "C" {
 /*! CCP4 library version this version is derived from */
 #define CCP4_VERSION_NO "6.1"
 /*! Patch level of CCP4 that gpp4 is derived from */
-#define CCP4_PATCH_LEVEL "6.1.0"
+#define CCP4_PATCH_LEVEL "6.1.2"
 
 /*! GPP4 version is defined by autoconf */
 #define GPP4_VERSION_NO VERSION   
