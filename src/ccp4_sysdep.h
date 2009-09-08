@@ -261,7 +261,7 @@
 #  define NATIVEFT DFNTF_LEIEEE
 #endif
 
-#if defined (powerpc) || defined (__ppc__) || defined __PPC
+#if defined (powerpc) || defined (__powerpc__) || defined (__ppc__) || defined __PPC
 #  define NATIVEIT DFNTI_MBO
 #  define NATIVEFT DFNTF_BEIEEE
 #endif
@@ -287,6 +287,17 @@
 #if defined (__hppa__)
 #  define NATIVEIT DFNTI_MBO
 #  define NATIVEFT DFNTF_BEIEEE
+#endif
+
+#if defined(__ARM__) || defined(__arm__)
+#if defined(__ARMEB__)
+#  define NATIVEIT DFNTI_MBO
+#  define NATIVEFT DFNTF_BEIEEE
+#endif
+#if defined(__ARMEL__)
+#  define NATIVEIT DFNTI_IBO
+#  define NATIVEFT DFNTF_LEIEEE
+#endif
 #endif
 
 #ifndef NATIVEFT

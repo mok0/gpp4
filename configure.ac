@@ -19,6 +19,7 @@ AC_PROG_LIBTOOL
 # check for libm
 AC_CHECK_LIBM
 AC_SUBST(LIBM)
+AC_CHECK_LIB(m, sin)
 
 # check for std c headers
 AC_HEADER_STDC([])

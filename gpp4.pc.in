@@ -1,7 +1,7 @@
-prefix=@GPP4_PREFIX@
-exec_prefix=@GPP4_PREFIX@
-libdir=@GPP4_PREFIX@/lib
-includedir=@GPP4_PREFIX@/include
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
 
 Name: gpp4
 Description: alternative to the CCP4 library
