@@ -1,3 +1,10 @@
+2009-09-08  Morten Kjeldgaard  <mok0@ubuntu.com>
+
+	* Patches from Tim Fenn:
+	  - src/ccp4_sysdep.h: Allow for compilation on ARM
+	  - configure.ac: check for existence of sin() in libm
+	  - gpp4.pc: use standard autoconf variables
+
 2008-12-02  Morten Kjeldgaard  <mok@bioxray.au.dk>
 
 	* src/gpp4_open_symop_file.c: New file containing function
