@@ -34,7 +34,6 @@
 #include "library_file.h"
 #include "ccp4_errno.h"
 #include "ccp4_file_err.h"
-/* rcsid[] = "$Id: library_file.c,v 1.21 2008/06/18 17:34:27 mdw Exp $" */
                                                         
 static uint16 nativeIT = NATIVEIT; /* machine integer type */ 
 static uint16 nativeFT = NATIVEFT; /* machine float type */

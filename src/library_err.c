@@ -29,7 +29,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "ccp4_errno.h"
-/* rcsid[] = "$Id: library_err.c,v 1.23 2008/06/18 16:55:57 mdw Exp $" */
 
 /** ccp4_errno: global to store data 
 */

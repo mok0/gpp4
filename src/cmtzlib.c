@@ -34,7 +34,6 @@
 #include "ccp4_vars.h"
 #include "ccp4_errno.h"
 #include "ccp4_unitcell.h"
-/* "$Id: cmtzlib.c,v 1.100 2008/06/18 16:55:56 mdw Exp $" */
 
 /* stuff for error reporting */
 #define CMTZ_ERRNO(n) (CCP4_ERR_MTZ | (n))

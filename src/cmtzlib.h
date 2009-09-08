@@ -99,7 +99,6 @@ See examples on <a href="ftp://ftp.ccp4.ac.uk/pub/mdw/cmtz">ftp area</a>
 #ifndef __CMTZLib__
 #define __CMTZLib__
 
-/* rcsidhm[100] = "$Id: cmtzlib.h,v 1.45 2008/06/18 16:55:56 mdw Exp $" */
 
 /* defines CCP4::CCP4File */
 #include "ccp4_utils.h"
