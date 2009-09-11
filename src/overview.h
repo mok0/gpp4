@@ -1,6 +1,7 @@
 /*
      overview.h: overview of the GGP4 library
-     (C) 2003 CCLRC, Martyn Winn, modified by Morten Kjeldgaard 2007.
+     (C) 2003 CCLRC, Martyn Winn, modified by Morten Kjeldgaard 2007, 
+     2009.
 
      This library is free software; you can redistribute it and/or
      modify it under the terms of the GNU Lesser General Public
@@ -24,65 +25,77 @@
 
 @section introduction Introduction
 
-This distribution is a special version of the CCP4 library, released
-under the Lesser GNU Public License version 2.1.
+This distribution is a special version of the CCP4 library, released under
+the Lesser GNU Public License version 2.1.
 
-The last version of the CCP4 library covered by a free license was
-version 5.0.2. This version was patched by Ralf Grosse-Kunstleve to
-address some of the more serious deficiencies of the older libraries.
+The goal of this project -- named gpp4 to distinguish it from CCP4 -- is to
+provide a drop-in replacement for the CCP4 libraries, that as carefully as
+possible will implement the current CCP4 library interface.
 
-It is the patched version of the CCP4 library that forms the basis for
-this distribution, which includes a GNU autotools build environment
-developed by Paul Emsley and Morten Kjeldgaard.
+The initial motivation to create this public fork the CCP4 library was that
+the licensing was changed in version 6.0 to be "non-free". At the time, the
+last version of the CCP4 library covered by a free license was version
+5.0.2.
 
-The reason for creating this public fork of the CCP4 libraries is that
-several third party software distributions depend on the CCP4
-libraries.
+There are several third-party applications, such as Phenix and Coot, that
+depend on the CCP4 library. However, you could not legally create a derived
+work containing both CCP4 6.* licensed code and GPL'd code, and distribute
+the resulting program, since the GPL demands that the derived work be
+distributed without additional restrictions. The CCP4 6.* license imposed
+additional restrictions on redistribution - in particular (but not limited
+to) an indemnity clause.
 
-However, you cannot create a derived work containing both CCP4 6.*
-licensed code and GPL'd code, and distribute the resulting program,
-since the GPL demands that the derived work be distributed without
-additional restrictions. The CCP4 6.* license imposes additional
-restrictions on redistribution - in particular (but not limited to) an
-indemnity clause.
+Version 5.0.2 of the CCP4 library was patched by Ralf Grosse-Kunstleve to
+address some of the more serious deficiencies of the older libraries and
+included with the Phenix distribution.
 
-The goal of this project -- named gpp4 to distinguish it from CCP4 --
-is to provide a drop-in replacement for the non-free CCP4 libraries,
-that as carefully as possible will implement the current CCP4 library
-interface.
+It is this patched version of the CCP4 library that forms the original
+basis for this distribution, which includes a GNU autotools build
+environment developed by Paul Emsley and Morten Kjeldgaard.
+
+At this time, the CCP4 has revised its licensing policy, and the CCP4
+library is again licensed under the Lesser GNU Public License. However,
+there is still a very good reason to maintain and develop ggp4, because the
+CCP4 library is tightly integrated with the entire CCP4 distribution, of
+currently around 220Mb.
+
+The ggp4 distribution thus serves as a small, standalone version, that can
+be included in third party software distributions. It is also available
+through the Ubuntu and Fedora software repositories for easy installation.
 
 
-@section aims Aims
+@section purpose Purpose
 
-The CCP4 software suite is based around a library of routines which
-cover common tasks, such as file opening, parsing keyworded input,
-reading and writing of standard data formats, applying symmetry
-operations, etc.  Programs in the suite call these routines which, as
-well as saving the programmer some effort, ensure that the varied
-programs in the suite have a similar look-and-feel. 
-<p>
-Since 2002, there has been a major effort to re-write
-much of the CCP4 library into C/C++. The aims are:
+The CCP4 software suite is based around a library of routines which cover
+common tasks, such as file opening, parsing keyworded input, reading and
+writing of standard data formats, applying symmetry operations, etc.
+Programs in the suite call these routines which, as well as saving the
+programmer some effort, ensure that the varied programs in the suite have a
+similar look-and-feel.  <p> Since 2002, there has been a major effort to
+re-write much of the CCP4 library into C/C++. The aims are:
 
 <ul>
-<li>To implement a better representation of the underlying data model.
-For example, Eugene Krissinel's MMDB library acts on a data structure
-which represents the various levels of structure of a protein model.
-The new MTZ library encapsulates the crystal/dataset hierarchy that
-is increasingly being used by programs.
-<li>To maintain support for existing programs. In particular, the 
-existing Fortran APIs will be maintained, although they will now often
-be only wrappers to functions in the new library. It is hoped that many
-existing programs will be migrated to using the new library directly.
-<li>To provide support for scripting. It is possible to generate APIs 
-for Python, Tcl and Perl automatically from the core C code. Thus, much
-of the standard CCP4 functionality wil be available to scripts used
-e.g. in ccp4i or the molecular graphics project.
-</ul> 
 
-This incremental approach, maintaining the existing suite while
-improving the underlying code, puts constraints on what is possible, but
-is considered more appropriate for a collaborative project like CCP4.
+<li>To implement a better representation of the underlying data model.  For
+example, Eugene Krissinel's MMDB library acts on a data structure which
+represents the various levels of structure of a protein model.  The new MTZ
+library encapsulates the crystal/dataset hierarchy that is increasingly
+being used by programs.
+
+<li>To maintain support for existing programs. In particular, the existing
+Fortran APIs will be maintained, although they will now often be only
+wrappers to functions in the new library. It is hoped that many existing
+programs will be migrated to using the new library directly.
+
+<li>To provide support for scripting. It is possible to generate APIs for
+Python, Tcl and Perl automatically from the core C code. Thus, much of the
+standard CCP4 functionality wil be available to scripts used e.g. in ccp4i
+or the molecular graphics project.
+</ul>
+
+This incremental approach, maintaining the existing suite while improving
+the underlying code, puts constraints on what is possible, but is
+considered more appropriate for a collaborative project like CCP4.
 
 @section start This documentation
 
