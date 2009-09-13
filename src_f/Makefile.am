@@ -5,7 +5,8 @@ EXTRA_DIST = ccplib.f fftlib.f modlib.f parser.f rwbrook.f unix.m4
 
 fsplit = ../util/fsplit
 
-lib_LIBRARIES = libgpp4f.a
+#lib_LIBRARIES = libgpp4f.a
+lib_LTLIBRARIES = libgpp4f.la
 
 libgpp4f_c_files = ccp4_diskio_f.c ccp4_parser_f.c cmaplib_f.c		\
 	csymlib_f.c ccp4_general_f.c ccp4_unitcell_f.c cmtzlib_f.c	\
@@ -51,8 +52,8 @@ winmvs.f
 libgpp4f_f_files = $(fftlib_f_files)  $(modlib_f_files) \
   $(parser_f_files)  $(rwbrook_f_files) $(unix_f_files)
 
-libgpp4f_a_SOURCES = $(libgpp4f_c_files) $(libgpp4f_f_files)
-libgpp4f_a_CFLAGS = -I $(top_srcdir)/src
+libgpp4f_la_SOURCES = $(libgpp4f_c_files) $(libgpp4f_f_files)
+libgpp4f_la_CFLAGS = -I $(top_srcdir)/src
 
 CLEANFILES = $(ccplib_f_files) $(fftlib_f_files)  $(modlib_f_files) \
   $(parser_f_files)  $(rwbrook_f_files) $(unix_f_files) unix.f
