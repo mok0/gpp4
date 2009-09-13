@@ -54,12 +54,15 @@ AC_SUBST(GPP4_PREFIX)
 AC_CONFIG_FILES([
 		Makefile
 		gpp4.pc
+		gpp4f.pc
 		gpp4.spec
 		gpp4.info
 		src/Makefile
+		src_f/Makefile
 		src/Doxyfile
 		data/Makefile
 		test/Makefile
+		util/Makefile
 		])
 
 AC_OUTPUT
