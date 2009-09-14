@@ -34,6 +34,10 @@
 
 */
 
+#if defined(G95) || defined (GFORTRAN)
+#include <time.h>
+#endif
+
 #include "ccp4_utils.h"
 #include "ccp4_errno.h"
 #include "ccp4_fortran.h"
@@ -693,10 +697,11 @@ int isatty_(int *iunit)
 #endif
 
 /* neither gfortran or g95 have isatty */
-/* not true, since August 05 this has been added to gfortran"
+/* not true, since August 05 this has been added to gfortran */
+// It's not in gfortran 4.4.3
 
 /* G95 support */
-#if defined(G95)
+#if defined(G95) || defined (GFORTRAN)
 int isatty_(int *iunit)
 {
   return isatty(*iunit);
