@@ -29,13 +29,13 @@ dnl     Be careful about declaring system library routines either external or
 dnl     intrinsic -- it's probably better to leave them undeclared and let the
 dnl     compiler sort it out since this behaviour may (does?) differ.
 dnl
-dnl $Id: unix.m4,v 1.80 2004/02/10 16:47:24 ccb Exp $
+dnl $Id: unix.m4,v 1.92 2008/06/09 14:20:46 nds65 Exp $
 dnl
 changequote([,])dnl * use [] as quotes rather than `'
 dnl
 dnl * units for record lengths:
 ifelse(_sgi,1,
-  [define(_ubytes,'WORDS')],
+  [ifelse(_f90,1,[define(_ubytes,'BYTES')],[define(_ubytes,'WORDS')])],
 dnl Changed in `DEC fortran' as opposed to (old) MIPS compiler on Ultrix:
 _dec_fortran,1,
   [define(_ubytes,'WORDS')],
@@ -95,6 +95,8 @@ _f2c,1,
   [define(_cant_unlink,1)],dnl
 _g77,1,
   [define(_cant_unlink,1)],dnl
+_gfort,1,
+  [define(_cant_unlink,1)],dnl
 _lf95,1,
   [define(_cant_unlink,1)],dnl
 _pgf,1,
@@ -131,6 +133,7 @@ C TTSEND - Write string to terminal with various carriage control
 C     options
 C UGTARG - Get command-line argument
 C hciftime - Time in cif format
+C ccp4_fflush_stdout - Flush buffers to stdout
 C
 C Functions:
 C
@@ -506,6 +509,9 @@ C     .. Local Scalars ..
 C     ..
 C     .. External Subroutines ..
 ifelse(_ifc,8,,
+_gfort,1,
+[      INTEGER IERRNO
+      EXTERNAL GFORTRAN_IERRNO,GFORTRAN_GERROR],
 [      INTEGER IERRNO
       EXTERNAL IERRNO,GERROR])
 C     ..
@@ -631,6 +637,10 @@ _xlf,1,
       IFLUN = FLUN
       ANSWER = 0
       IF (ISATTY(GETFD(IFLUN)) .EQ. 1) ANSWER = 1],
+_gfort,1,
+[      LOGICAL ISATTY
+      ANSWER = 0
+      IF (ISATTY(FLUN)) ANSWER = 1],
 dnl (else)
 [      LOGICAL ISATTY
       EXTERNAL ISATTY
@@ -792,7 +802,9 @@ c     ============================
 ccFrom GERARD@XRAY.BMC.UU.SE Thu Sep 24 00:25:25 1998
 c
 ifelse(_ifc,8,
-[      USE IFPORT])
+[      USE IFPORT],
+_xlf,1,
+[      use xlfutility])
       implicit none
 c
       character ciftime*(*)
@@ -808,7 +820,13 @@ _ifc,8,
 [      integer gmt_hour,gmt_minutes,localdaymonth,
      +        localhours,localminutes,localmonth,localseconds,
      +        localyear,nhours,nminutes,diff
-      integer(kind=8)  :: stime
+      integer(kind=4)  :: stime
+],
+_xlf,1,
+[      integer gmt_hour,gmt_minutes,localdaymonth,
+     +        localhours,localminutes,localmonth,localseconds,
+     +        localyear,nhours,nminutes,diff
+      integer(kind=TIME_SIZE)  :: stime, time
 ],
 [      integer gmt_hour,gmt_minutes,localdaymonth,
      +        localhours,localminutes,localmonth,localseconds,
@@ -823,6 +841,10 @@ ifelse(_AIX,1,
       real*8 timef,stimef
       integer time
       external time,timef],
+_xlf,1,
+,
+_ifc,8,
+,
 [
       integer time])
 c
@@ -842,17 +864,33 @@ dnl * len is quoted since also m4 macro
 c
 ifelse(_ifc,1,
 [      stime = time(timstr)
+      call gmtime(stime,gmtarray)
+      call ltime(stime,tarray)
 ],
 _efc,1,
 [      stime = int(rtc(), kind=8)
+      call gmtime(stime,gmtarray)
+      call ltime(stime,tarray)
 ],
 _ifc,8, 
 [      stime = int(rtc(), kind=8)
-],
-[
-      stime = time()])
       call gmtime(stime,gmtarray)
       call ltime(stime,tarray)
+],
+_xlf,1,
+[      stime = time()
+      call gmtime(stime,gmtarray)
+      call ltime(stime,tarray)
+],
+_AIX,1,
+[      stime = time()
+      call gmtime(stime,gmtarray)
+      call ltime_(stime,tarray)
+],
+[      stime = time()
+      call gmtime(stime,gmtarray)
+      call ltime(stime,tarray)
+])
 c
       nminutes = gmtarray(2)
       nhours = gmtarray(3)
@@ -903,4 +941,16 @@ c
      +       ':',i2.2)
 c
       return
+      end
+
+C
+
+      subroutine ccp4_fflush_stdout()
+dnl   work around a buglet: : gfortran-4.1.2 glibc-2.7-2
+dnl   (2.6.23.1-37.fc8 x86_64 SMP) C. Flensburg 20071029.
+      implicit none
+ifelse(_gfort,1,
+[      call flush(6)
+],dnl (else)
+[      continue])
       end
