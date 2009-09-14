@@ -1,3 +1,33 @@
+2009-09-14  Morten Kjeldgaard  <mok@homunculus>
+
+	* Add code for the FORTRAN API in src_f/. The additions have not
+	been tested very much, but I did succeed in building refmac
+	version 5.6.0031 with it, and it seems to run.
+
+	* CCP4 uses fsplit to split the fortran source files, but I don't
+	think that is necessary anymore, so the library is built from the
+	original, unsplit files. Fsplit is in the bzr repo at the moment
+	but will go when it is firmly established that it's not needed.
+
+	* I removed some subroutines from the file modlib.f (EA06C, EA08C,
+	EA09C, FA01BS, FA01CS, FA01DS, FA01AS and function FM02AD) because
+	they carry a license that I know is completely unacceptable by
+	Ubuntu or Debian, and probably Fedora too. Don't know about Fink.
+	Basically you are required to notify Harwell in writing if you
+	make modifications to the code, and only research institutions are
+	allowed to do it. The license also carries something akin to an
+	advertising clause *).
+
+	The main routine is EA06C, and it is not used by very many
+	programs. I grepped the CCP4 distro and found that only these
+	programs are callers:
+
+	scaleit.f, icoeff.f, makedict.f, geomcalc.f, scala.f
+
+	EA06C is an eigenvalue finding subroutine, so it is easy to find
+	replacements. I don't understand why CCP4 distributes this code at
+	all.
+	
 2009-09-08  Morten Kjeldgaard  <mok0@ubuntu.com>
 
 	* Patches from Tim Fenn:
