@@ -2,27 +2,34 @@
 
 Authors of this software include:
 
-Charles Ballard: ccp4_file_err.h, ccp4_sysdep.h, ccp4_utils.h,
-  cmap_accessor.c, cmap_close.c, cmap_data.c, cmap_data.h, cmap_errno.h,
-  cmap_header.c, cmap_header.h, cmap_labels.c, cmap_labels.h, cmap_open.c,
-  cmap_skew.c, cmap_skew.h, cmap_stats.c, cmap_stats.h, cmap_symop.c,
-  cmaplib.h, cmaplib_f.h, library_err.c, library_f.h, library_file.c,
-  library_file.h, library_utils.c
+Charles Ballard: src/ccp4_file_err.h, src/ccp4_sysdep.h,
+  src/ccp4_utils.h, src/cmap_accessor.c, src/cmap_close.c,
+  src/cmap_data.*, src/cmap_errno.h, src/cmap_header.*,
+  src/cmap_labels.*, src/cmap_open.c, src/cmap_skew.*,
+  src/cmap_stats.*, src/cmap_symop.c, src/cmaplib.h, src/cmaplib_f.h,
+  src/library_err.c, src/library_f.h, src/library_file.*,
+  src/library_utils.c, src_f/cmaplib_f.c, src_f/library_f.c
 
-Charles Ballard and Martyn Winn: ccp4_errno.h
+Charles Ballard and Martyn Winn: src/ccp4_errno.h,
+  src_f/ccp4_diskio_f.c
 
-Eugene Krissinel: ccp4_fortran.h
+Eugene Krissinel: src/ccp4_fortran.h
 
-Kevin Cowtan: ccp4_array.c, ccp4_array.h
+Kevin Cowtan: src/ccp4_array.*, src_f/libhtml.f
 
-Martyn Winn: ccp4_spg.h, ccp4_unitcell.c, ccp4_unitcell.h, ccp4_vars.h,
-  cmtzlib.c, cmtzlib.h, csymlib.c, csymlib.h cvecmat.c, cvecmat.h,
-  mtzdata.h, overview.h
+Kevin Cowtan & Dave Love: src_f/keyparse.f
 
-Peter Briggs: ccp4_parser.c, ccp4_parser.h, ccp4_program.c, ccp4_program.h,
-  ccp4_general.c, ccp4_general.h
+Martyn Winn: src/ccp4_spg.h, src/ccp4_unitcell.*, src/ccp4_vars.h,
+  src/cmtzlib.*, src/csymlib.*, src/cvecmat.*, src/mtzdata.h,
+  src/overview.h, src_f/ccp4_general_f.c, src_f/ccp4_unitcell_f.c,
+  src_f/cmtzlib_f.c, src_f/csymlib_f.c
 
-Jan Pieter Abrahams: pack_c.c pack_c.h
+Peter Briggs: src/ccp4_parser.*, src/ccp4_program.*,
+  src/ccp4_general.*, src_f/ccp4_parser_f.c
+
+Jan Pieter Abrahams: src/pack_c.*
+
+Lynn Ten Eyck: src_f/fftlib.f
 
 Other authors: Ralf W. Grosse-Kunstleve, Paul Emsley, Morten Kjeldgaard.
 
