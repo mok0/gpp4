@@ -32,6 +32,11 @@
  * SUCH DAMAGE.
  */
 
+
+#ifndef HAVE_STRLCPY
+#define strlcpy(s, x, len) strncpy(s, x, len) 
+#endif
+
 #ifndef lint
 static char copyright[] =
 "@(#) Copyright (c) 1983, 1993\n\
