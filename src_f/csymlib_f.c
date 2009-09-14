@@ -89,7 +89,7 @@ ISYM column is present.
 #include "csymlib.h"
 #include "cmtzlib.h"
 #include "cvecmat.h"
-static char rcsid[] = "$Id: csymlib_f.c,v 1.38.2.1 2004/08/03 16:03:05 mdw Exp $";
+/* rcsid[] = "$Id: csymlib_f.c,v 1.48 2008/06/18 16:55:56 mdw Exp $" */
 
 #define MSPAC 4
 #define MAXSYM 192
@@ -552,7 +552,7 @@ FORTRAN_SUBR ( HKLRANGE, hklrange,
   CSYMLIB_DEBUG(puts("CSYMLIB_F: HKLRANGE");)
 
   if (!spacegroup) {
-    printf("HKLRANGE: No spacegroup loaded yet! \n");
+    ccperror(2,"HKLRANGE: No spacegroup loaded yet! \n");
     return;
   }
 
@@ -711,7 +711,7 @@ FORTRAN_SUBR ( ASUSET, asuset,
   *msymp = spacegroup->nsymop_prim;
   *mlaue = spacegroup->nlaue;
 
-  if (*lprint == FORTRAN_LOGICAL_TRUE) ccp4spg_print_recip_spgrp(spacegroup);
+  if (*lprint != FORTRAN_LOGICAL_FALSE) ccp4spg_print_recip_spgrp(spacegroup);
 
   free(op1);
 }
@@ -753,7 +753,7 @@ FORTRAN_SUBR ( ASUSYM, asusym,
       }
     }
   } else {
-    printf("ASUSYM: No spacegroup loaded yet! \n");
+    ccperror(2,"ASUSYM: No spacegroup loaded yet! \n");
   }
 
 }
@@ -907,6 +907,51 @@ FORTRAN_SUBR ( CCP4SPG_F_LOAD_BY_OPS, ccp4spg_f_load_by_ops,
   free(op1);
 }
 
+/** Compare two sets of symmetry operators to see if they are
+ * in the same order. This is important for the consistent use
+ * of ISYM which encodes the operator position in the list.
+ * @param msym1 number of symmetry matrices passed in first list.
+ * @param rrsym1 first list of symmetry matrices.
+ * @param msym2 number of symmetry matrices passed in second list.
+ * @param rrsym2 second list of symmetry matrices.
+ * @return 1 if operator lists are equal and in the same order, 0 otherwise
+ */
+FORTRAN_FUN (int, CCP4SPG_F_EQUAL_OPS_ORDER, ccp4spg_f_equal_ops_order,
+	       (int *msym1, float rrsym1[192][4][4],int *msym2, float rrsym2[192][4][4]),
+	       (int *msym1, float rrsym1[192][4][4],int *msym2, float rrsym2[192][4][4]),
+	       (int *msym1, float rrsym1[192][4][4],int *msym2, float rrsym2[192][4][4]))
+{
+  int i,k,l,ret;
+  ccp4_symop *op1, *op2;
+
+  CSYMLIB_DEBUG(puts("CSYMLIB_F: CCP4SPG_F_EQUAL_OPS_ORDER");)
+
+  op1 = (ccp4_symop *) ccp4_utils_malloc(*msym1*sizeof(ccp4_symop));
+  for (i = 0; i < *msym1; ++i) {
+    for (k = 0; k < 3; ++k) {
+      for (l = 0; l < 3; ++l)
+	op1[i].rot[k][l] = rrsym1[i][l][k];
+      op1[i].trn[k] = rrsym1[i][3][k];
+    }
+  }
+
+  op2 = (ccp4_symop *) ccp4_utils_malloc(*msym2*sizeof(ccp4_symop));
+  for (i = 0; i < *msym2; ++i) {
+    for (k = 0; k < 3; ++k) {
+      for (l = 0; l < 3; ++l)
+	op2[i].rot[k][l] = rrsym2[i][l][k];
+      op2[i].trn[k] = rrsym2[i][3][k];
+    }
+  }
+
+  ret = ccp4_spgrp_equal_order(*msym1, op1, *msym2, op2);
+
+  free(op1);
+  free(op2);
+
+  return ret;
+}
+
 /** Put reflection in asymmetric unit of spacegroup on index sindx.
  * @param sindx index of this spacegroup.
  * @param ihkl input indices.
@@ -956,7 +1001,7 @@ FORTRAN_FUN (int, INASU, inasu,
   CSYMLIB_DEBUG(puts("CSYMLIB_F: INASU");)
 
   if (!spacegroup) {
-    printf("INASU: No spacegroup loaded yet! \n");
+    ccperror(2,"INASU: No spacegroup loaded yet! \n");
     return 999;
   }
 
@@ -1132,8 +1177,14 @@ FORTRAN_SUBR ( MSYMLB3, msymlb3,
       *lspgrp = spacegroup->spg_num;
     }
     /* produce de-coloned version of xHM symbol */
-    no_colon_name = (char *) ccp4_utils_malloc((strlen(spacegroup->symbol_xHM)+1)*sizeof(char));
-    strcpy(no_colon_name,spacegroup->symbol_xHM);
+    if (strlen(spacegroup->symbol_xHM) > 0) {
+      no_colon_name = (char *) ccp4_utils_malloc((strlen(spacegroup->symbol_xHM)+1)*sizeof(char));
+      strcpy(no_colon_name,spacegroup->symbol_xHM);
+    } else {
+      /* If no _xHM try _old. This should only happen in exceptional circumstances! */
+      no_colon_name = (char *) ccp4_utils_malloc((strlen(spacegroup->symbol_old)+1)*sizeof(char));
+      strcpy(no_colon_name,spacegroup->symbol_old);
+    }
     ccp4spg_name_de_colon(no_colon_name);
     ccp4_CtoFString(FTN_STR(namspg_cif),FTN_LEN(namspg_cif),no_colon_name);
     if (spacegroup->symbol_old) {
@@ -1289,7 +1340,7 @@ FORTRAN_SUBR ( EPSLON, epslon,
   CSYMLIB_DEBUG(puts("CSYMLIB_F: EPSLON");)
 
   if (!spacegroup) {
-    printf("EPSLON: No spacegroup loaded yet! \n");
+    ccperror(2,"EPSLON: No spacegroup loaded yet! \n");
     return;
   }
 
@@ -1569,6 +1620,11 @@ FORTRAN_SUBR ( SETGRD, setgrd,
 {
   int nlaue_save = -1;
 
+  if (!spacegroup) {
+    ccperror(2,"SETGRD: No spacegroup loaded yet! \n");
+    return;
+  }
+
   if (spacegroup->nlaue != *nlaue) {
     printf("SETGRD: supplied CCP4 Laue code is different from that currently stored\n");
     printf("NLAUE (supplied) = %d\n",*nlaue);
@@ -1660,10 +1716,10 @@ FORTRAN_SUBR ( SETRSL, setrsl,
 
 }
 
-FORTRAN_FUN (float, STHLSQ, sthlsq,
-	     (const int *ih, const int *ik, const int *il),
-	     (const int *ih, const int *ik, const int *il),
-	     (const int *ih, const int *ik, const int *il))
+FORTRAN_SUBR (STHLSQ1, sthlsq1,
+	     (float *reso, const int *ih, const int *ik, const int *il),
+	     (float *reso, const int *ih, const int *ik, const int *il),
+	     (float *reso, const int *ih, const int *ik, const int *il))
 {
   int in[3];
 
@@ -1673,13 +1729,14 @@ FORTRAN_FUN (float, STHLSQ, sthlsq,
   in[1] = *ik;
   in[2] = *il;
 
-  return (0.25*MtzInd2reso(in, coefhkl));
+  (*reso) = 0.25*MtzInd2reso(in, coefhkl);
+  return;
 }
 
-FORTRAN_FUN (float, STS3R4, sts3r4,
-	     (const int *ih, const int *ik, const int *il),
-	     (const int *ih, const int *ik, const int *il),
-	     (const int *ih, const int *ik, const int *il))
+FORTRAN_SUBR (STS3R41, sts3r41,
+	     (float *reso, const int *ih, const int *ik, const int *il),
+	     (float *reso, const int *ih, const int *ik, const int *il),
+	     (float *reso, const int *ih, const int *ik, const int *il))
 {
   int in[3];
 
@@ -1689,7 +1746,9 @@ FORTRAN_FUN (float, STS3R4, sts3r4,
   in[1] = *ik;
   in[2] = *il;
 
-  return (0.25*MtzInd2reso(in, coefhkl));
+  (*reso) = 0.25*MtzInd2reso(in, coefhkl);
+
+  return;
 }
 
 /* straight translation, needs to be done properly, used in phistats */
@@ -1725,8 +1784,3 @@ FORTRAN_SUBR ( HANDCHANGE, handchange,
   }
 
 }
-/*
-  Local variables:
-  mode: font-lock
-  End:
-*/

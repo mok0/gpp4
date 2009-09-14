@@ -63,7 +63,6 @@ bytes, to stream-mode files.
 #include "ccp4_errno.h"
 #include "ccp4_fortran.h"
 #include "ccp4_file_err.h"
-static char rcsid[] = "$Id: ccp4_diskio_f.c,v 1.8 2004/06/29 11:04:33 mdw Exp $";
 
 
 /**
@@ -128,7 +127,7 @@ FORTRAN_SUBR ( QOPEN, qopen,
   case 'N':
   case 'n':
     istat = 3; 
-#ifndef _MVS
+#ifndef _MSC_VER
     if (strcasecmp(getenv("CCP4_OPEN"),"UNKNOWN"))
 #else
     if (_stricmp(getenv("CCP4_OPEN"),"UNKNOWN"))
@@ -183,7 +182,7 @@ FORTRAN_SUBR ( QQOPEN, qqopen,
   jstat = *istat;
 
   if (jstat == 4) 
-#ifndef _MVS
+#ifndef _MSC_VER
     if (strcasecmp(getenv("CCP4_OPEN"),"UNKNOWN"))
 #else
     if (_stricmp(getenv("CCP4_OPEN"),"UNKNOWN"))
@@ -741,8 +740,3 @@ FORTRAN_SUBR ( QLOCATE, qlocate,
 		  "QLOCATE", NULL);
 }
 
-/*
-  Local variables:
-  mode: font-lock
-  End:
-*/

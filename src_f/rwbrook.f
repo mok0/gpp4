@@ -526,7 +526,7 @@ C---- H name associated with a=b; Gamma = 120
      +                  abs(cell(6)-120.0).LT.0.001) THEN
                       BRKSPGRP(1:1)='H'
                       CALL CCPERR(2,
-     +                     ' Changing "rhombhedral" to "hexagonal"')
+     +                     ' Changing "rhombohedral" to "hexagonal"')
                       CALL MMDB_F_WBSPGRP(IUNIT,BRKSPGRP,IRET)
                    END IF
 C---- R name associated with a=b=c; Alpha=Beta=Gamma 
@@ -536,7 +536,7 @@ C---- R name associated with a=b=c; Alpha=Beta=Gamma
      +                  abs(cell(6)-cell(4)).LT.0.001) THEN
                       BRKSPGRP(1:1)='R'
                       CALL CCPERR(2,
-     +                     ' Changing "hexagonal" to "rhombhedral"')
+     +                     ' Changing "hexagonal" to "rhombohedral"')
                       CALL MMDB_F_WBSPGRP(IUNIT,BRKSPGRP,IRET)
                    END IF
                 END IF
@@ -3067,3 +3067,4 @@ C    Has the spacegroup name been set yet?
       CALL WBCELL(IUNIT,ARGCELL,ARGNCODE)
       RETURN
       END
+C

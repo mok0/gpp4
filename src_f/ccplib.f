@@ -28,7 +28,7 @@ C     fixme: the bit-twiddling should be in library.c, not here.
 C     amalgamate ccppsf and fdir/fext/froot.  also add tests of these
 C     routines to testlib.
 C
-C     $Id: ccplib.f,v 1.103 2006/02/27 15:26:20 ccb Exp $
+C     $Id: ccplib.f,v 1.104 2008/06/09 10:41:02 mdw Exp $
 C
 C      CCFILL    Set specified number of elements of byte array
 C      CCPALC    Call subroutine with allocated memory

@@ -37,6 +37,7 @@
 #include "cmtzlib.h"
 #include "csymlib.h"
 
+
 /** Free all memory malloc'd from static pointers in Fortran interface.
  * To be called before program exit. The function can be
  * registered with atexit.
@@ -47,29 +48,42 @@ void ccp4f_mem_tidy(void) {
 }
 
 /* MVS was defaulting to assigning GETARG to be returning an int and it aint*/
-#ifdef _MVS
+#ifdef _MSC_VER
+#if (CALL_LIKE_MVS==2)
+ void CCP4H_INIT();
+ void CCP4H_SUMMARY_BEG();
+ void CCP4H_SUMMARY_END();
+ void CCP4H_PRE_BEG();
+#else
  int __stdcall IARGC();
  void __stdcall GETARG(int *i,char *arg,int arg_len);
- void __stdcall CCP4H_INIT_LIB(int *ihtml, int *isumm);
+ void __stdcall CCP4H_INIT();
  void __stdcall CCP4H_SUMMARY_BEG();
  void __stdcall CCP4H_SUMMARY_END();
  void __stdcall CCP4H_PRE_BEG();
+#endif
+#endif
+
+#ifdef GFORTRAN
+extern int _gfortran_iargc(void);
+extern void _gfortran_getarg(int *i,char *arg,int arg_len);
 #endif
 
 FORTRAN_SUBR ( CCPFYP, ccpfyp,
                (),
                (),
                ())
-{ int argc, i, ierr, arg_len=500, debug=0, ihtml, isumm;
+{ int argc, i, ierr, arg_len=500, debug=0;
   char **argv=NULL, arg[500];
 
   /* turn on line buffering for stdout from C (don't think this affects
      Fortran side). This ensures we get library messages, but will slow
      things down. Is this what we want? */
-  if(ccp4_utils_outbuf())
-    ccp4_utils_print("OUTBUF:Can't turn off output buffering");
+  /*if(ccp4_utils_outbuf())
+    ccp4_utils_print("OUTBUF:Can't turn off output buffering"); */
   /* Turn off any buffering on input. This allows mized C and Fortran
      reading of stdin */
+  FORTRAN_CALL(OUTBUF,outbuf,(),(),());
   if(ccp4_utils_noinpbuf())
     ccp4_utils_print("NOINPBUF:Can't turn off input buffering");
 
@@ -79,14 +93,25 @@ FORTRAN_SUBR ( CCPFYP, ccpfyp,
 /* couldn't find a C equivalent to this. In any case, since
    these functions are for Fortran programs, this may be
    the only way?? */
-
+/*
+   Note: for GFORTRAN iargc and getarg are intrinsics
+   which do not follow the postpended underscore convention
+   */
   /* IARGC doesn't include argv[0] */
+#ifdef GFORTRAN
+  argc = _gfortran_iargc() +1;
+#else
   argc = FORTRAN_CALL (IARGC, iargc, (), (), ()) + 1;
+#endif
   argv = (char **) ccp4_utils_malloc(argc*sizeof(char *));
   if (debug) 
     printf("Allocating memory for %d command line arguments \n",argc);
   for (i = 0; i < argc; ++i) {
+#ifdef GFORTRAN
+    _gfortran_getarg_i4(&i,arg,arg_len);
+#else
     FORTRAN_CALL (GETARG, getarg, (&i,arg,arg_len), (&i,arg), (&i,arg,arg_len));
+#endif
     argv[i] = ccp4_FtoCString(arg,arg_len);
     if (debug) 
       printf("CCPFYP: command line argument %d %s\n",i,argv[i]);
@@ -114,9 +139,7 @@ FORTRAN_SUBR ( CCPFYP, ccpfyp,
 
   /* initialise html/summary stuff 
      Note, command line switches dealt with in ccp4fyp */
-  ihtml = 0;
-  isumm = 0;
-  FORTRAN_CALL (CCP4H_INIT_LIB, ccp4h_init_lib, (&ihtml,&isumm), (&ihtml,&isumm), (&ihtml,&isumm));
+  FORTRAN_CALL (CCP4H_INIT, ccp4h_init, (), (), ());
 
   if (debug) 
     printf(" Leaving CCPFYP \n");
@@ -186,6 +209,12 @@ FORTRAN_SUBR ( CCPERR, ccperr,
   strncpy(tmp_errstr,errstr,length);
   tmp_errstr[length]='\0';
 
+  /* work around a buglet: gfortran-4.1.2 glibc-2.7-2 (2.6.23.1-37.fc8 x86_64 SMP)
+     Flush stdout using a Fortran call before printing further. C. Flensburg 20071029. */
+#ifdef GFORTRAN
+  FORTRAN_CALL (CCP4_FFLUSH_STDOUT, ccp4_fflush_stdout, (), (), ());
+#endif
+
   if (abs(*istat) <= 2)
     FORTRAN_CALL (CCP4H_SUMMARY_BEG, ccp4h_summary_beg, (), (), ());
 
@@ -226,7 +255,7 @@ FORTRAN_FUN ( int, LENSTR, lenstr,
  * @param iday Day (1-31).
  * @param iyear Year (4 digit).
  */
-#if ! defined (_MVS) 
+#if ! defined (_MSC_VER) 
 FORTRAN_SUBR ( UIDATE, uidate,
                (int *imonth, int *iday, int *iyear),
                (int *imonth, int *iday, int *iyear),
@@ -278,7 +307,7 @@ FORTRAN_SUBR ( CCPTIM, ccptim,
   }
 
 }
-#if ! defined (_MVS)
+#if ! defined (_MSC_VER)
 FORTRAN_SUBR ( UTIME, utime,
                (fpstr ctime, int ctime_len),
                (fpstr ctime),

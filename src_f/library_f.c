@@ -59,8 +59,8 @@ char *ccp4_FtoCString(fpstr str1, int str1_len)
   return str2;
 }
 
-/** Creates a Fortran string from an input C string for passing back to
- * Fortran call. Characters after null-terminator may be junk, so pad
+/** Creates a Fortran string from an input C string for passing back to 
+ * Fortran call. Characters after null-terminator may be junk, so pad 
  * with spaces. If input cstring is NULL, return blank string.
  * @param str1 pointer Fortran to string
  * @param str1_len Fortran length of string
@@ -71,11 +71,11 @@ void ccp4_CtoFString(fpstr str1, int str1_len, const char *cstring)
   int i;
 
   if (!cstring) {
-    for (i = 0; i < str1_len; ++i)
+    for (i = 0; i < str1_len; ++i) 
       str1[i] = ' ';
   } else if (str1_len > strlen(cstring)) {
     strcpy(FTN_STR(str1),cstring);
-    for (i = strlen(cstring); i < str1_len; ++i)
+    for (i = strlen(cstring); i < str1_len; ++i) 
       str1[i] = ' ';
   } else {
     strncpy(FTN_STR(str1),cstring,str1_len);
@@ -107,13 +107,13 @@ FORTRAN_SUBR ( USTENV, ustenv,
 
   temp_name = ccp4_FtoCString(FTN_STR(str), FTN_LEN(str));
 
-  if (*result = ccp4_utils_setenv (temp_name))
+  if (*result = ccp4_utils_setenv (temp_name))  
     ccp4_fatal("USTENV/CCP4_SETENV: Memory allocation failure"); 
   free(temp_name);
 }
 #endif
 
-#if ! defined (_MVS)
+#if ! defined (_MSC_VER)
 FORTRAN_SUBR ( USTIME, ustime,
          (int *isec),
          (int *isec),
@@ -132,6 +132,11 @@ FORTRAN_SUBR ( USTIME, ustime,
 /* <outbuf code>=                                                           */
 FORTRAN_SUBR ( OUTBUF, outbuf, (), (), ())
 {
+#if defined (__APPLE__) && defined (_CALL_SYSV)
+   char *s = "buffering=disable_preconn";
+   int s_len = strlen(s);
+   FORTRAN_CALL (SETRTEOPTS,setrteopts,(s,s_len),(s,s_len),(s,s_len));
+#endif
   if(ccp4_utils_outbuf())
     ccp4_utils_print("OUTBUF:Can't turn off buffering");
 }
@@ -196,7 +201,7 @@ FORTRAN_SUBR ( CUNLINK, cunlink,
 /*                                                                          */
 /* <miscellaneous routines>=                                                */
 #ifndef VMS                     /* we'll use the Fortran version in VMS*/
-#ifndef _MVS
+#ifndef _MSC_VER
 FORTRAN_SUBR ( CCPAL1, ccpal1,
      (void (* routne) (), int *n, int type[], int length[]),
      (void (* routne) (), int *n, int type[], int length[]),
@@ -434,7 +439,7 @@ FORTRAN_SUBR ( CMKDIR, cmkdir,
     (const fpstr path, const fpstr cmode, int *result, int path_len, int cmode_len),
     (const fpstr path, const fpstr cmode, int *result),
     (const fpstr path, int path_len, const fpstr cmode, int cmode_len, int *result))
-{
+{ 
   char *temp_path, *temp_cmode;
 
   temp_path = ccp4_FtoCString(FTN_STR(path), FTN_LEN(path));
@@ -451,7 +456,7 @@ FORTRAN_SUBR ( CCHMOD, cchmod,
     (const fpstr path, const fpstr cmode, int *result, int path_len, int cmode_len),
     (const fpstr path, const fpstr cmode, int *result),
     (const fpstr path, int path_len, const fpstr cmode, int cmode_len, int *result))
-{
+{ 
   char *temp_path, *temp_cmode;
 
   temp_path = ccp4_FtoCString(FTN_STR(path), FTN_LEN(path));
@@ -463,7 +468,8 @@ FORTRAN_SUBR ( CCHMOD, cchmod,
 }
 
 /* isatty doesnt seem to be in Mircrosoft Visual Studdio so this is a fudge */
-#if CALL_LIKE_MVS
+#if defined (CALL_LIKE_MVS)
+# if CALL_LIKE_MVS == 1
 int __stdcall ISATTY (int *lunit)
 {
   lunit = 0 ;
@@ -475,9 +481,24 @@ float __stdcall ERFC(float *value)
 {
   return (float) ccp4_erfc( (double) *value);
 }
+
+#else
+
+int isatty_ (int *lunit)
+{
+  lunit = 0 ;
+  return lunit;
+}
+
+float erfc_ (float *value)
+{
+  return (float) ccp4_erfc( (double) *value);
+}
+
+# endif
 #endif
 
-#if defined(F2C)
+#if defined(F2C) 
 /* <f2c support>=                                                           */
 int exit_ (status)
      int *status;
@@ -589,16 +610,12 @@ int /* logical */ btest_ (a, b)
 /* <AIX and HPUX support>=                                                  */
 
 #ifdef _AIX
-int isatty_ (FILE *fd) {
-  return(isatty(fd));
+int isatty_ (int *fd) {
+  return(isatty(*fd));
 }
 #endif
 
-#if defined (_AIX)
-void gerror_ (str, Lstr)
-#else
 void gerror  (str, Lstr)
-#endif
 char *str;
 int  Lstr;      
 {
@@ -610,17 +627,41 @@ int  Lstr;
   } else {
     (void) strncpy (str, strerror (errno), Lstr);
     for (i = strlen (str); i < Lstr; i++) str[i] = ' ';  /* pad with spaces */
-  }
+  }       
 } /* End of gerror (str, Lstr) */
 
 int ierrno () {
   return errno;
 }
 
-#endif             /*  HPUX and AIX support */
+#endif             /*  HPUX and AIX support */    
 
 #if ( defined (__APPLE__) && !defined (__GNUC__) )
 /* apple xlf support */
+void gerror_ (str, Lstr)
+char *str;
+int  Lstr;
+{
+  int i;
+
+  if (errno == 0) {             /* Avoid `Error 0' or some such message */    
+    for (i=1; Lstr; i++)
+      str[i] = ' ';
+  } else {
+    (void) strncpy (str, strerror (errno), Lstr);
+    for (i = strlen (str); i < Lstr; i++) str[i] = ' ';  /* pad with spaces */
+  }
+} /* End of gerror (str, Lstr) */
+
+int isatty_(int *iunit)
+{
+  return isatty(*iunit);
+}
+
+#endif /* end of apple xlf support */
+
+#if ( defined (__linux__) && defined (_CALL_SYSV) )
+/* linuxppc xlf support */
 void gerror_ (str, Lstr)
 char *str;
 int  Lstr;
@@ -640,7 +681,9 @@ int isatty_(int *iunit)
 {
   return isatty(*iunit);
 }
-#endif /* end of apple xlf support */
+
+#endif /* end of linuxppc xlf support */
+
 
 #if defined (sun)
 int isatty_(int *iunit)
@@ -649,8 +692,120 @@ int isatty_(int *iunit)
 }
 #endif
 
-/*
-  Local variables:
-  mode: font-lock
-  End:
-*/
+/* neither gfortran or g95 have isatty */
+/* not true, since August 05 this has been added to gfortran"
+
+/* G95 support */
+#if defined(G95)
+int isatty_(int *iunit)
+{
+  return isatty(*iunit);
+}
+#endif
+#if defined(G95) || defined (GFORTRAN)
+
+/* FORTRAN gerror intrinsic */
+int gerror_(str, Lstr)
+char *str;
+int  Lstr;
+{
+  int i;
+
+  if (errno == 0) {             /* Avoid `Error 0' or some such message */
+    for (i=1; Lstr; i++)
+      str[i] = ' ';
+  } else {
+    (void) strncpy (str, strerror (errno), Lstr);
+    for (i = strlen (str); i < Lstr; i++) str[i] = ' ';  /* pad with spaces */
+  }
+  return 0;
+}
+
+/* FORTRAN IErrNo intrinsic */
+int ierrno_() {
+  return errno;
+}
+
+void ltime_(int *stime, int tarray[9])
+{
+  int i;
+  struct tm ldatim;
+
+  if (localtime_r((time_t) stime, &ldatim) != NULL) {
+    tarray[0] = ldatim.tm_sec;
+    tarray[1] = ldatim.tm_min;
+    tarray[2] = ldatim.tm_hour;
+    tarray[3] = ldatim.tm_mday;
+    tarray[4] = ldatim.tm_mon;
+    tarray[5] = ldatim.tm_year;
+    tarray[6] = ldatim.tm_wday;
+    tarray[7] = ldatim.tm_yday;
+    tarray[8] = ldatim.tm_isdst;
+  } else {
+    for (i=0; i<9; i++)
+      tarray[i] = 0;
+  }
+
+}
+
+void idate_ (int *day, int *month, int *year)
+{
+     struct tm *lt=NULL;
+     time_t tim;
+     tim = time(NULL);
+     lt = localtime(&tim);
+     *day = lt->tm_mday;
+     *month = lt->tm_mon+1;  /* need range 1-12 */
+     *year = lt->tm_year + 1900;
+}
+
+void gmtime_(int *stime, int gmarray[9])
+{
+  int i;
+  struct tm udatim;
+
+  if (gmtime_r((time_t) stime, &udatim) != NULL) {
+    gmarray[0] = udatim.tm_sec;
+    gmarray[1] = udatim.tm_min;
+    gmarray[2] = udatim.tm_hour;
+    gmarray[3] = udatim.tm_mday;
+    gmarray[4] = udatim.tm_mon;
+    gmarray[5] = udatim.tm_year;
+    gmarray[6] = udatim.tm_wday;
+    gmarray[7] = udatim.tm_yday;
+    gmarray[8] = udatim.tm_isdst;
+  } else {
+    for (i=0; i<9; i++)
+      gmarray[i] = 0;
+  }
+
+}
+
+void system_(int *status, char *cmd, int cmd_len)
+{
+  char *str = calloc( cmd_len+1, sizeof(char));
+  str = strncpy( str, cmd, cmd_len);
+
+  if ( (*status = system( str)) == -1 )
+     printf(" Forked command %s failed\n",cmd);
+
+  free( str);
+  return;
+}
+
+#endif
+
+#if defined (G95)
+int time_()
+{
+  int ltim;
+  time_t t_ltim;
+
+  t_ltim = time(NULL);
+  ltim = (int) t_ltim;
+
+  return ltim;
+}
+
+#endif /* G95 support */
+

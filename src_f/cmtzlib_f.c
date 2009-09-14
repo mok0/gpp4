@@ -75,9 +75,9 @@ this may be re-implemented.
 #include "csymlib.h"
 #include "ccp4_program.h"
 #include "ccp4_general.h"
-static char rcsid[] = "$Id: cmtzlib_f.c,v 1.62.2.3 2005/01/14 11:32:44 mdw Exp $";
+/* rcsid[] = "$Id: cmtzlib_f.c,v 1.80 2008/06/18 16:55:56 mdw Exp $" */
 
-#define MFILES 4
+#define MFILES 9
 #define MAXSYM 192
 
 static int cmtz_in_memory = 0;
@@ -99,8 +99,12 @@ static int nbatw[MFILES] = {0};
 static double coefhkl[MFILES][6] = {0};
 
 /* MVS defaults to int and doesn't like it */
-#ifdef _MVS
+#ifdef _MSC_VER
+#if (CALL_LIKE_MVS==2)
+void CCP4H_INIT_LIB(int *ihtml, int *isumm);
+#else
  void __stdcall CCP4H_INIT_LIB(int *ihtml, int *isumm);
+#endif
 #endif
 
 void MtzMemTidy(void) {
@@ -254,8 +258,10 @@ FORTRAN_SUBR ( LRTITL, lrtitl,
 
 /** Get history lines from MTZ file opened for read.
  * @param mindx (I) MTZ file index
- * @param hstrng (O) History lines.
- * @param nlines (O) Number of history lines returned.
+ * @param hstrng (O) Array of history lines.
+ * @param nlines (I/O) On input, dimension of hstrng, i.e. the maximum
+ *   number of history lines to be returned. On output, actual number of 
+ *   history lines returned.
  */
 FORTRAN_SUBR ( LRHIST, lrhist,
 	       (int *mindx, fpstr hstrng, int *nlines, int hstrng_len),
@@ -276,7 +282,9 @@ FORTRAN_SUBR ( LRHIST, lrhist,
  * and ranges. In fact, it returns current values on MINDX rather than 
  * those of the input file.
  * @param mindx MTZ file index
- * @param versnx MTZ version.
+ * @param versnx (O) MTZ version. This is the version of the current
+    library rather than that of the input file. If these differ, a
+    warning will have been issued by LROPEN/MtzGet.
  * @param ncolx Number of columns.
  * @param nreflx Number of reflections.
  * @param ranges Array of column ranges.
@@ -288,12 +296,14 @@ FORTRAN_SUBR ( LRINFO, lrinfo,
 
 {
   int i,j,k,iarray;
+  char mtzvers[20];
 
   CMTZLIB_DEBUG(puts("CMTZLIB_F: LRINFO");)
 
  if (MtzCheckSubInput(*mindx,"LRINFO",1)) return;
 
-  ccp4_CtoFString(FTN_STR(versnx),FTN_LEN(versnx),MTZVERSN);
+  sprintf(mtzvers,"MTZ:V%d.%d",MTZ_MAJOR_VERSN,MTZ_MINOR_VERSN);
+  ccp4_CtoFString(FTN_STR(versnx),FTN_LEN(versnx),mtzvers);
   *ncolx = MtzNumActiveCol(mtzdata[*mindx-1]);
   *nreflx = MtzNref(mtzdata[*mindx-1]);
 
@@ -793,6 +803,8 @@ FORTRAN_SUBR ( LRASSN, lrassn,
   for (l = 0; l < *nlprgi; ++l) {
     collookup[*mindx-1][l] = colarray[l];
   }
+  /* Set maximum number of columns to read. This is used in LRREFF and LRREFM */
+  ndatmss[*mindx-1] = *nlprgi;
 
   for (l = 0; l < *nlprgi; ++l) {
  /* Loop over all columns */
@@ -1165,20 +1177,9 @@ FORTRAN_SUBR ( LRREFF, lrreff,
 
  if (MtzCheckSubInput(mindex,"LRREFF",1)) return;
 
- /* Get maximum number of columns to read
-    This is done by cycling backwards through the array until
-    we find the first active column
- */
- for (i = (MCOLUMNS-1); i >= 0; --i) 
-   if (collookup[mindex-1][i]) {
-     mcol = i+1;
-     break;
-   }
- ndatmss[mindex-1] = mcol;
-
  ++irref[mindex-1];
  ieof = ccp4_lrreff(mtzdata[mindex-1], resol, adata, logmss[mindex-1], 
-             collookup[mindex-1], mcol, irref[mindex-1]);
+             collookup[mindex-1], ndatmss[mindex-1], irref[mindex-1]);
  if (ieof) {
    *eof = FORTRAN_LOGICAL_TRUE;
  } else {
@@ -1552,13 +1553,12 @@ FORTRAN_SUBR ( LSTRSL, lstrsl,
 }
 
 /* Fortran wrapper for MtzInd2reso */
-FORTRAN_FUN (float, LSTLSQ, lstlsq,
-	       (const int *mindx, const int *ih, const int *ik, const int *il),
-               (const int *mindx, const int *ih, const int *ik, const int *il),
-               (const int *mindx, const int *ih, const int *ik, const int *il))
+FORTRAN_SUBR (LSTLSQ1, lstlsq1,
+	       (float *reso, const int *mindx, const int *ih, const int *ik, const int *il),
+               (float *reso, const int *mindx, const int *ih, const int *ik, const int *il),
+               (float *reso, const int *mindx, const int *ih, const int *ik, const int *il))
 {
   int in[3];
-  float reso;
 
 /*   CMTZLIB_DEBUG(puts("CMTZLIB_F: LSTLSQ");) */
 
@@ -1566,9 +1566,9 @@ FORTRAN_FUN (float, LSTLSQ, lstlsq,
   in[1] = *ik;
   in[2] = *il;
 
-  reso = MtzInd2reso(in, coefhkl[*mindx-1]);
+  (*reso) = 0.25*MtzInd2reso(in, coefhkl[*mindx-1]);
 
-  return reso/4.0;
+  return;
 
 }
 
@@ -1604,7 +1604,7 @@ FORTRAN_SUBR ( LWOPEN_NOEXIT, lwopen_noexit,
 	       (const int *mindx, fpstr filename, int filename_len, int *ifail))
 
 { 
-  char *temp_name, err_str[200];
+  char *temp_name, *fullfilename, err_str[300];
   int nxtal=1, nset[1]={1};
   int i,j,k,icol;
 
@@ -1639,9 +1639,29 @@ FORTRAN_SUBR ( LWOPEN_NOEXIT, lwopen_noexit,
  iwref[*mindx-1] = 0;
 
  if (!cmtz_in_memory) {
+
+   if (mtzdata[*mindx-1]->filein) {
+     if (getenv(temp_name) != NULL) {
+       fullfilename = strdup(getenv(temp_name));
+     } else {
+       fullfilename = strdup(temp_name);
+     }
+     if (!strcmp(mtzdata[*mindx-1]->filein->name,fullfilename)) {
+       strcpy(err_str,"LWOPEN_NOEXIT: output file is same as open input file: ");
+       strncat(err_str,fullfilename,245);
+       ccperror(2,err_str);
+       free(temp_name);
+       free(fullfilename); 
+       *ifail = 1;
+       return;
+     }
+
+     free(fullfilename); 
+   }
+
    if ( !(mtzdata[*mindx-1]->fileout = MtzOpenForWrite(temp_name)) ) {
      strcpy(err_str,"LWOPEN_NOEXIT: failed to open output file ");
-     strncat(err_str,temp_name,160);
+     strncat(err_str,temp_name,260);
      ccperror(2,err_str);
      free(temp_name);
      *ifail = 1;
@@ -1685,7 +1705,12 @@ FORTRAN_SUBR ( LWOPEN, lwopen,
    ccperror(1,"LWOPEN: failed to open output file");
 }
 
-/* Fortran wrapper for ccp4_lwtitl */
+/** Set title for output file.
+ * @param mindx MTZ file index.
+ * @param ftitle Title to be added to output MTZ file.
+ * @param flag =0 replace old title with new one, or
+ *             =1 append new one to old, with one space
+ */
 FORTRAN_SUBR ( LWTITL, lwtitl,
 	       (const int *mindx, const fpstr ftitle, const int *flag, int ftitle_len),
 	       (const int *mindx, const fpstr ftitle, const int *flag),
@@ -2219,7 +2244,7 @@ FORTRAN_SUBR ( LWSYMM, lwsymm,
 		int spgrnx_len, fpstr pgnamx, int pgnamx_len))
 {
  char *temp_ltypex, *temp_spgrnx, *temp_pgnamx;
- int i,j,k,nsym;
+ int i,ii,j,k,nsym;
  float rsym[MAXSYM][4][4];
 
  CMTZLIB_DEBUG(puts("CMTZLIB_F: LWSYMM");)
@@ -2239,17 +2264,24 @@ FORTRAN_SUBR ( LWSYMM, lwsymm,
        rsym[i][j][k] = rsymx[i][k][j];
 
  /* if there is a cell, check specified symmetry is consistent with it */
- if (mtzdata[*mindx-1]->xtal[0]->cell[0] != 0.0 ) 
-   if (!ccp4spg_check_symm_cell(nsym,rsym,mtzdata[*mindx-1]->xtal[0]->cell)) {
-     printf(" LWSYMM: severe warning - specified symmetry not consistent with cell dimensions! \n");
-     printf(" Spacegroup %s \n",temp_spgrnx);
-     printf(" Cell dimensions %f %f %f %f %f %f \n",mtzdata[*mindx-1]->xtal[0]->cell[0],
-       mtzdata[*mindx-1]->xtal[0]->cell[1],mtzdata[*mindx-1]->xtal[0]->cell[2],
-       mtzdata[*mindx-1]->xtal[0]->cell[3],mtzdata[*mindx-1]->xtal[0]->cell[4],
-	    mtzdata[*mindx-1]->xtal[0]->cell[5]);
-     ccperror(1,"Error in spacegroup or cell dimensions.");
-   }
-
+ if (nsym > 0)
+	{
+	for(ii=0;ii<mtzdata[*mindx-1]->nxtal;ii++)
+		{
+		if(mtzdata[*mindx-1]->xtal[ii]->cell[0] != 0.0 && 
+		   strcmp(mtzdata[*mindx-1]->xtal[ii]->xname,"HKL_base"))
+		if (!ccp4spg_check_symm_cell(nsym,rsym,mtzdata[*mindx-1]->xtal[ii]->cell)) 
+			{
+			printf(" LWSYMM: severe warning - specified symmetry not consistent with cell dimensions! \n");
+			printf(" Spacegroup %s \n",temp_spgrnx);
+			printf(" Cell dimensions %f %f %f %f %f %f \n",mtzdata[*mindx-1]->xtal[ii]->cell[0],
+			mtzdata[*mindx-1]->xtal[ii]->cell[1],mtzdata[*mindx-1]->xtal[ii]->cell[2],
+			mtzdata[*mindx-1]->xtal[ii]->cell[3],mtzdata[*mindx-1]->xtal[ii]->cell[4],
+				mtzdata[*mindx-1]->xtal[ii]->cell[5]);
+			ccperror(1,"Error in spacegroup or cell dimensions.");
+			}
+		}
+	}
   ccp4_lwsymm(mtzdata[*mindx-1], nsym, *nsympx, rsym, temp_ltypex, 
             *nspgrx, temp_spgrnx, temp_pgnamx);
 
@@ -2486,7 +2518,8 @@ FORTRAN_SUBR ( LWBAT, lwbat,
  /* add as new batch */
  batch = NULL;
 
- ccp4_lwbat(mtzdata[*mindx-1], batch, *batno, rbatch, cbatch); 
+ if (!ccp4_lwbat(mtzdata[*mindx-1], batch, *batno, rbatch, cbatch) )
+   ccperror(1,"LWBAT: error in ccp4_lwbat, see messages above");
 
  /* record number of batch headers for output */
  ++nbatw[*mindx-1];
@@ -2537,7 +2570,8 @@ FORTRAN_SUBR ( LWBTIT, lwbtit,
  /* add as new batch */
  batch = NULL;
 
- ccp4_lwbat(mtzdata[*mindx-1], batch, *batno, rbatch, cbatch); 
+ if (!ccp4_lwbat(mtzdata[*mindx-1], batch, *batno, rbatch, cbatch) )
+   ccperror(1,"LWBTIT: error in ccp4_lwbat, see messages above"); 
 
  /* record number of batch headers for output */
  ++nbatw[*mindx-1];
@@ -2590,10 +2624,16 @@ FORTRAN_SUBR ( LWBSCL, lwbscl,
  for (i = 0; i < *nbatsc; ++i) 
    rbatch[72+i] = batscl[i];
 
- ccp4_lwbat(mtzdata[*mindx-1], batch, *batno, rbatch, cbatch); 
+ if (!ccp4_lwbat(mtzdata[*mindx-1], batch, *batno, rbatch, cbatch) )
+   ccperror(1,"LWBSCL: error in ccp4_lwbat, see messages above"); 
 }
 
-/* Fortran wrapper for ccp4_lwbat */
+/** Obsolete. Use LWBSETIDX
+ * @param mindx MTZ file index
+ * @param batno Serial number of batch.
+ * @param project_name Project Name
+ * @param dataset_name Dataset Name
+ */
 FORTRAN_SUBR ( LWBSETID, lwbsetid,
 	       (const int *mindx, const int *batno, const fpstr project_name, 
                   const fpstr dataset_name, 
@@ -2645,7 +2685,13 @@ FORTRAN_SUBR ( LWBSETID, lwbsetid,
   free(temp_dname); 
 }
 
-/* Fortran wrapper for ccp4_lwbsetid */
+/** Assign a batch to a particular dataset, identified by crystal name
+ * and dataset name.
+ * @param mindx MTZ file index
+ * @param batno Serial number of batch.
+ * @param crystal_name Crystal Name
+ * @param dataset_name Dataset Name
+ */
 FORTRAN_SUBR ( LWBSETIDX, lwbsetidx,
 	       (const int *mindx, const int *batno, const fpstr crystal_name, 
                   const fpstr dataset_name, 
@@ -2693,7 +2739,12 @@ FORTRAN_SUBR ( LWBSETIDX, lwbsetidx,
   free(temp_dname); 
 }
 
-/* Set whole array to MNF  */
+/** Set whole array to MNF. The value of the MNF is taken from
+ * the MTZ struct on unit mindx.
+ * @param mindx MTZ file index
+ * @param adata Array of reflection data to be initialised.
+ * @param ncol Number of columns in the array to be initialised.
+ */
 FORTRAN_SUBR ( EQUAL_MAGIC, equal_magic,
 	       (const int *mindx, float adata[], const int *ncol),
 	       (const int *mindx, float adata[], const int *ncol),
@@ -2994,8 +3045,3 @@ FORTRAN_SUBR ( IS_MAGIC, is_magic,
    printf("IS_MAGIC: Obsolete internal routine: you should not be calling this!\n");
    return;
 }
-/*
-  Local variables:
-  mode: font-lock
-  End:
-*/

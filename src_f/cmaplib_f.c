@@ -52,7 +52,7 @@ This document covers some peculiarities of the C implementation.
 #include"ccp4_parser.h"
 #include"csymlib.h"
 #include"ccp4_general.h"
-static char rcsid[] = "$Id: cmaplib_f.c,v 1.16.4.1 2004/07/29 09:10:39 mdw Exp $";
+/* rcsid[] = "$Id: cmaplib_f.c,v 1.21 2008/06/18 16:55:56 mdw Exp $" */
 
 static struct _IOConvMap *ioArray[MAXFILES];
 static int last_Read = -1;
@@ -665,7 +665,7 @@ FORTRAN_SUBR( MRDHDS, mrdhds,
 	       float *rhmax, float *rhmean, float * rhrms, int *ifail, 
 	       int *iprint))
 {
-  char temp_title[80], *temp_map, *file;
+  char temp_title[81], *temp_map, *file;
   int ii;
   double drhmean,drhrms;
 
@@ -732,7 +732,7 @@ FORTRAN_SUBR( CCP4_MAP_READ_OPEN_HEADER_CHECK,
 	       int *iprint))
      /* see MRDHDS */
 {
-  char temp_title[80], *temp_map, *file;
+  char temp_title[81], *temp_map, *file;
   int ii;
   double drhmean,drhrms;
 
@@ -818,7 +818,7 @@ FORTRAN_SUBR( MRDHDR, mrdhdr,
 	       float cell[6], int *lspgrp, int *lmode, float *rhmin, 
 	       float *rhmax, float *rhmean, float * rhrms))
 {  
-  char temp_title[80], *temp_map, *file;
+  char temp_title[81], *temp_map, *file;
   int ii;
   double drhmean,drhrms;
 
@@ -875,7 +875,7 @@ FORTRAN_SUBR( CCP4_MAP_READ_OPEN_HEADER,
 	       float *rhmax, float *rhmean, float * rhrms))
      /* see MRDHDR */
 {
-  char temp_title[80], *temp_map, *file;
+  char temp_title[81], *temp_map, *file;
   int ii;
   double drhmean,drhrms;
 

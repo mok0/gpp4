@@ -36,24 +36,21 @@ giving the same API as the original parser.f
 
 /** @file ccp4_parser_f.c
  *
- *  @brief Fortran API to ccp4_parser.c.
+ * @brief Fortran API to ccp4_parser.c.
  *
- *  @author Peter Briggs
+ * @author Peter Briggs
+ * @date August 2001
+ *
+ * This file contains Fortran API functions which provide the following
+ * functionality originally found in the parser.f file:
+ *   <ul>
+ *   <li> PARSER  read and interpret data from the input stream
+ *   <li> PARSE   free format read routine
+ *   <li> PARSEDL change delimiters
+ *   </ul>
+ * plus internal utility functions which should not be accessed
+ * directly from an application.
  */
-
-/*   ccp4_parser_f.c
-     Peter Briggs CCP4 August 2001
-
-     This file contains Fortran API functions which provide the following
-     functionality originally found in the parser.f file:
-
-     PARSER  read and interpret data from the input stream
-     PARSE   free format read routine
-     PARSEDL change delimiters
-
-     plus internal utility functions which should not be accessed
-     directly from an application.
-*/
 
 /*#define FORTRAN_CALL_DEBUG 1*/
 
@@ -368,7 +365,7 @@ FORTRAN_SUBR(PARSER,parser,
 
   /* Silent or verbose output? */
     PARSER_DEBUG(printf("PARSER: print set to %d\n",*print);)
-  if (*print == FORTRAN_LOGICAL_TRUE) cprint = 1;
+  if (*print != FORTRAN_LOGICAL_FALSE) cprint = 1;
 
   PARSER_DEBUG({ 
     if (cprint) {
