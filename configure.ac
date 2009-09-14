@@ -11,6 +11,7 @@ AM_INIT_AUTOMAKE
 # check base installations
 AC_PROG_CC
 AC_PROG_CPP
+AC_PROG_F77
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -42,7 +43,7 @@ AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
 
 # check for various c library functions
-AC_CHECK_FUNCS([memmove memset mkdir pow putenv rint setenv sqrt strchr strdup strerror strrchr strstr])
+AC_CHECK_FUNCS([memmove memset mkdir pow putenv rint setenv sqrt strchr strdup strerror strrchr strstr strlcpy])
 
 # gpp4 wants to know it's prefix
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
