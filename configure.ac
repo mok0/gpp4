@@ -45,6 +45,11 @@ AC_FUNC_VPRINTF
 # check for various c library functions
 AC_CHECK_FUNCS([memmove memset mkdir pow putenv rint setenv sqrt strchr strdup strerror strrchr strstr strlcpy])
 
+# check for mmdb
+PKG_CHECK_MODULES(mmdb, mmdb >= 1.19)
+AC_SUBST(MMDB_CFLAGS)
+AC_SUBST(MMDB_LIBS)
+
 # gpp4 wants to know it's prefix
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
 AC_DEFINE_UNQUOTED([GPP4_PREFIX],["$prefix"],[Base directory of gpp4 installation])
