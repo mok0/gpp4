@@ -1,9 +1,6 @@
 ## -*- mode: Makefile ; mode: font-lock -*-
 ## This file is to be processed by automake.
 
-EXTRA_DIST = Doxyfile.in
-DISTCLEANFILES = Doxyfile
-
 lib_LTLIBRARIES = libgpp4.la
 
 library_includedir=$(pkgincludedir)/ccp4
