@@ -6,7 +6,7 @@ includedir=@includedir@
 Name: gpp4
 Description: alternative to the CCP4 library, FORTRAN API
 Version: @VERSION@
-Requires:
+Requires: mmdb
 Conflicts:
 Libs: -L\${libdir} -lgpp4f
 Cflags: -I\${includedir}/gpp4
