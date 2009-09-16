@@ -57,7 +57,7 @@
 #define  CPARSERR_MatToSymop          9
 #define  CPARSERR_SymopToMat         10
 
-
+static int symop_to_mat4_err(const char *);
 
 /*! Initialise a CCP4PARSERARRAY 
 
@@ -413,14 +413,14 @@ int ccp4_parse_maxmin(CCP4PARSERARRAY *parsePtr, const double max_exponent,
 int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
 {
   int quotedstring,starttoken,endtoken;
-  char this_char,next_char,matchquote;
+  char this_char,next_char,matchquote=0;
 
   int llen,ich,lword,diag=0;
   int token,nulltoken,isquote,iscommt=0,isdelim;
   double value;
   char *delim,*nulldelim,*comm;
   char quot[]="\"\'";
-  int  ibeg,iend,start;
+  int  ibeg=0,iend,start;
 
   double intvalue,frcvalue,expvalue;
   int    intdigits,frcdigits,expdigits;

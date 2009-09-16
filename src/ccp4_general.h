@@ -101,7 +101,7 @@ int ccp4printf(int level, char *format, ...);
 
 int ccp4fyp(int argc, char **argv);
 
-static int ccp4fyp_cleanup(int ienv, char **envname, char **envtype, char **envext,
+int ccp4fyp_cleanup(int ienv, char **envname, char **envtype, char **envext,
 		    char *logical_name, char *file_name, char *file_type,
 		    char *file_ext, char *env_file, char *def_file,
 		    char *dir, CCP4PARSERARRAY *parser);
@@ -109,7 +109,7 @@ static int ccp4fyp_cleanup(int ienv, char **envname, char **envtype, char **enve
 int ccp4setenv(char *logical_name, char* value, char **envname,
 	       char **envtype, char **envext, int *ienv, int no_overwrt);
 
-static int ccp4setenv_cleanup(char *file_ext, char *file_root, char *file_path,
+int ccp4setenv_cleanup(char *file_ext, char *file_root, char *file_path,
 		       char *file_name);
 
 int ccpexists(char *filename);

@@ -85,13 +85,11 @@ CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
   int i,j,k,l,debug=0,nsym2,symops_provided=0,ierr,ilaue;
   float sg_chb[4][4],limits[2],rot1[4][4],rot2[4][4],det;
   FILE *filein;
-  char *symopfile, *ccp4dir, filerec[80];
-  ccp4_symop *op2,*op3,opinv;
-
-  static int reported_syminfo = 0;       /* report location of SYMINFO first time only */
+  char *symopfile, filerec[80];
+  ccp4_symop *op2, *op3=NULL, opinv;
 
   /* spacegroup variables */
-  int sg_num, sg_ccp4_num, sg_nsymp, sg_num_cent;
+  int sg_num=0, sg_ccp4_num=0, sg_nsymp, sg_num_cent;
   float cent_ops[4][4];
   char sg_symbol_old[20],sg_symbol_Hall[40],sg_symbol_xHM[20],
        sg_point_group[20],sg_patt_group[40];
@@ -852,11 +850,11 @@ void ccp4spg_name_de_colon(char *name) {
 
   /* various spacegroup names have settings specified by colon. We'll
      deal with these on a case-by-case basis. */
-  if (ch1 = strstr(name,":R")) {
+  if ((ch1 = strstr(name,":R"))) {
   /* :R spacegroup should be R already so just replace with blanks */
     *ch1 = ' ';
     *(ch1+1) = ' ';
-  } else if (ch1 = strstr(name,":H")) {
+  } else if ((ch1 = strstr(name,":H"))) {
   /* :H spacegroup should be R so change to H */
     *ch1 = ' ';
     *(ch1+1) = ' ';
@@ -1009,7 +1007,7 @@ int ccp4spg_put_in_asu(const CCP4SPG* sp, const int hin, const int kin, const in
                         lin*sp->symop[i].rot[2][1] ); 
     *lout = (int) rint( hin*sp->symop[i].rot[0][2] + kin*sp->symop[i].rot[1][2] + 
                         lin*sp->symop[i].rot[2][2] ); 
-    if (isign = ccp4spg_is_in_pm_asu(sp,*hout,*kout,*lout)) {
+    if ((isign = ccp4spg_is_in_pm_asu(sp,*hout,*kout,*lout))) {
       *hout = *hout * isign;
       *kout = *kout * isign;
       *lout = *lout * isign;
@@ -1695,6 +1693,8 @@ int range_to_limits(const char *range, float limits[2])
   char ch;
   char buf[2];
   buf[1] = 0;
+
+  value1 = value2 = 0.0;
 
   for (i = 0 ; i < strlen(range) ; ++i) {
     ch = range[i];

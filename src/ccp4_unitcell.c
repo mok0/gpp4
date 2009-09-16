@@ -29,6 +29,7 @@
 
 #include "ccp4_unitcell.h"
 #include "cvecmat.h"
+#include "ccp4_errno.h"
 
 /*! From input cell and orthogonalisation code, find orthogonalisation
    and fractionalisation matrices.

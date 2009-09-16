@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "ccp4_program.h"
 #include "ccp4_parser.h"
 #include "ccp4_utils.h"
@@ -110,7 +111,6 @@ char *ccp4RCSDate(const char *rcs_string)
 {
   static char RCSDate[MAXLEN_RCSDATE]="";
   char        tmpstr1[8],tmpstr2[3];
-  int         i;
 
   /* Deconstruct the RCS string passed to this
      function */
