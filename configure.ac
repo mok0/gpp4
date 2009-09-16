@@ -46,7 +46,7 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([memmove memset mkdir pow putenv rint setenv sqrt strchr strdup strerror strrchr strstr strlcpy])
 
 # check for mmdb
-PKG_CHECK_MODULES(mmdb, mmdb >= 1.19)
+PKG_CHECK_MODULES(MMDB, mmdb >= 1.19)
 AC_SUBST(MMDB_CFLAGS)
 AC_SUBST(MMDB_LIBS)
 

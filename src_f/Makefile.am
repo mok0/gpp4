@@ -16,13 +16,14 @@ libgpp4f_la_SOURCES = $(libgpp4f_c_files) $(libgpp4f_f_files)
 
 CLEANFILES = unix.f
 
-libgpp4f_la_LIBADD = $(top_builddir)/src/libgpp4.la
+libgpp4f_la_LIBADD = $(top_builddir)/src/libgpp4.la @MMDB_LIBS@
+libgpp4f_la_CFLAGS = $(AM_CFLAGS) @MMDB_CFLAGS@
 
 # IMPORTANT!
 # Read http://sourceware.org/autobook/autobook/autobook_91.html 
 # before changing the version-info (read: don't change it)
 
-libgpp4f_la_LDFLAGS = @MMDB_LIBS@ -version-info 0:0:0
+libgpp4f_la_LDFLAGS = -version-info 0:0:0
 
 unix.f: unix.m4
 	m4 < unix.m4 > unix.f
