@@ -21,6 +21,8 @@
 */
 
 #include "csymlib.h"
+#include "ccp4_general.h"
+#include "ccp4_program.h"
 
 main ()
 {
@@ -28,7 +30,7 @@ main ()
 
   ccpputenv ("SYMINFO", "../data/syminfo.lib");
   ccp4ProgramName("load_syminfo");
-  ccp4_prog_vers ("0.1");
+  ccp4_prog_vers (VERSION);
 
   ccp4_banner();
   spg = ccp4spg_load_by_standard_num (20);
