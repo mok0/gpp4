@@ -1,0 +1,179 @@
+
+This is a list of copyrightholders of the source code in this 
+distribution. They are given file-wise to make it easier to modify
+when patches/modifications come in.
+
+Latest update: 2009.09.16
+
+
+Files: src/ccp4_array.*
+Copyright: © 2002 Kevin Cowtan
+
+Files: src/ccp4_errno.h
+Copyright: © 2001 CCLRC, Charles Ballard and Martyn Winn
+
+Files: src/ccp4_file_err.h
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/ccp4_fortran.h
+Copyright: © 2001 Eugene Krissinel
+Copyright: © 2007 Morten Kjeldgaard
+
+Files: src/ccp4_general.*
+Copyright: © 2001, 2003 CCLRC, Peter Briggs
+Copyright: © 2007 Morten Kjeldgaard
+
+Files: src/ccp4_parser.*
+Copyright: © 2001 CCLRC, Peter Briggs
+Copyright: © 2007 Morten Kjeldgaard
+
+Files: src/ccp4_program.*
+Copyright: © 2001 CCLRC, Peter Briggs
+Copyright: © 2007 Morten Kjeldgaard
+
+Files: src/ccp4_spg.h
+Copyright: © 2001 CCLRC, Martyn Winn
+
+Files: src/ccp4_sysdep.h
+Copyright: © 2001 CCLRC
+
+Files: src/ccp4_types.h
+Copyright: © 2001 CCLRC
+Copyright: © 2007 Morten Kjeldgaard
+
+Files: src/ccp4_unitcell.*
+Copyright: © 2001 CCLRC, Martyn Winn
+
+Files: src/ccp4_utils.h
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/ccp4_vars.h
+Copyright: © 2002 CCLRC, Martyn Winn
+
+Files: src/cmap_accessor.c
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/cmap_close.c
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/cmap_data.*
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/cmap_errno.h
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/cmap_header.*
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/cmap_labels.*
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/cmap_open.c
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/cmap_skew.*
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/cmap_stats.*
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/cmap_symop.c
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/cmaplib.h, src/cmaplib_f.h
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/cmtzlib.*
+Copyright: © 2001 CCLRC, Martyn Winn
+
+Files: src/csymlib.*
+Copyright: © 2001 CCLRC, Martyn Winn
+
+Files: src/cvecmat.*
+Copyright: © 2001 CCLRC, Martyn Winn
+
+Files: src/gpp4_open_symop_file.c
+Copyright: © 2008 Morten Kjeldgaard
+
+Files: src/library_err.c
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/library_file.*
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/library_utils.c
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src/mtzdata.h
+Copyright: © 2001 CCLRC, Martyn Winn
+
+Files: src/overview.h
+Copyright: © 2003 CCLRC, Martyn Winn
+Copyright: © Morten Kjeldgaard 2007, 2009
+
+Files: src/pack_c.c, src/pack_c.h
+Copyright: © 1995 Jan P Abrahams
+
+Files: src/symlib.h
+Copyright: © 2003 CCLRC, Martyn Winn
+Copyright: © Morten Kjeldgaard 2007
+
+Files: src_f/ccp4_diskio_f.c
+Copyright: © 2002 CCLRC, Charles Ballard and Martyn Winn
+
+Files: src_f/ccp4_general_f.c
+Copyright: © 2001 CCLRC, Martyn Winn
+
+Files: src_f/ccp4_parser_f.c
+Copyright: © 2001 CCLRC, Peter Briggs
+
+Files: src_f/ccp4_unitcell_f.c
+Copyright: © 2001 CCLRC, Martyn Winn
+
+Files: src_f/ccplib.f
+Copyright: © Phil Evans
+Copyright: © Eleanor Dodson
+
+Files: src_f/cmaplib_f.c
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src_f/cmtzlib_f.c
+Copyright: © 2001 CCLRC, Martyn Winn
+
+Files: src_f/csymlib_f.c
+Copyright: © 2001 CCLRC, Martyn Winn
+
+Files: src_f/dna_output.f, src_f/dna_header.fh
+Copyright: © 2004 CCLRC, Graeme Winter
+
+Files: src_f/fftlib.f
+Copyright: © Lynn Ten Eyck
+
+Files: src_f/keyparse.f
+Copyright: © 1995 Dave Love, Kevin Cowtan
+
+Files: src_f/libhtml.f
+Copyright: © 1998 Kevin Cowtan
+
+Files: src_f/library_f.c
+Copyright: © 2001 CCLRC, Charles Ballard
+
+Files: src_f/modlib.f
+Copyright: © 1985 D.J. Thomas
+Copyright: © 2000 pjx
+Copyright: © 2008 C. Flensburg
+Copyright: © 1988 M. James
+Copyright: © 1989 D. Love
+
+Files: src_f/pack_f.f
+Copyright: © 1995 Jan P Abrahams
+
+Files: src_f/parser.f
+Copyright: Mike Levitt
+Copyright: Peter Brick, Phil Evans, Eleanor Dodson, Dave Love
+
+Files: src_f/rwbrook.f
+Copyright: *unknown*
+
+Files: test/*
+Copyright: © 2008 Morten Kjeldgaard

@@ -2,20 +2,19 @@ C
 C     pack_f.f: (de)compress diffraction image files
 C     Copyright (C) 1995  Jan P Abrahams
 C
-C     This library is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU Lesser General Public License
-C     version 3, modified in accordance with the provisions of the 
-C     license to address the requirements of UK law.
-C 
-C     You should have received a copy of the modified GNU Lesser General 
-C     Public License along with this library.  If not, copies may be 
-C     downloaded from http://www.ccp4.ac.uk/ccp4license.php
-C 
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU Lesser General Public License for more details.
-c
+C   This program is free software: you can redistribute it and/or modify it
+C   under the terms of the Lesser GNU General Public License as published by
+C   the Free Software Foundation, either version 3 of the License, or (at
+C   your option) any later version.
+C
+C   This program is distributed in the hope that it will be useful, but
+C   WITHOUT ANY WARRANTY; without even the implied warranty of
+C   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the Lesser
+C   GNU General Public License for more details.
+C
+C   You should have received a copy of the Lesser GNU General Public
+C   License along with this program. If not, see
+C   <http://www.gnu.org/licenses/>.
 c
 c
       subroutine pack_wordimage (data, x, y, filn)
@@ -244,10 +243,3 @@ c
       end
 
 c*******************************************************************************
-
-
-
-
-
-
-

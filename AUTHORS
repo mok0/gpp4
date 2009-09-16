@@ -27,9 +27,11 @@ Martyn Winn: src/ccp4_spg.h, src/ccp4_unitcell.*, src/ccp4_vars.h,
 Peter Briggs: src/ccp4_parser.*, src/ccp4_program.*,
   src/ccp4_general.*, src_f/ccp4_parser_f.c
 
-Jan Pieter Abrahams: src/pack_c.*
+Jan Pieter Abrahams: src/pack_c.*, src_f/pack_f.f
 
 Lynn Ten Eyck: src_f/fftlib.f
+
+Graeme Winter: dna_output.f, dna_header.fh 
 
 Other authors: Ralf W. Grosse-Kunstleve, Paul Emsley, Morten Kjeldgaard.
 
