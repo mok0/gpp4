@@ -68,7 +68,6 @@ AC_CONFIG_FILES([
 		src/Doxyfile
 		data/Makefile
 		test/Makefile
-		util/Makefile
 		])
 
 AC_OUTPUT
