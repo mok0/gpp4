@@ -63,9 +63,9 @@ AC_CONFIG_FILES([
 		gpp4f.pc
 		gpp4.spec
 		gpp4.info
+		Doxyfile
 		src/Makefile
 		src_f/Makefile
-		src/Doxyfile
 		data/Makefile
 		test/Makefile
 		])
