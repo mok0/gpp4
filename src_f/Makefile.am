@@ -16,7 +16,7 @@ libgpp4f_la_SOURCES = $(libgpp4f_c_files) $(libgpp4f_f_files)
 
 CLEANFILES = unix.f
 
-libgpp4f_la_LIBADD = $(top_builddir)/src/libgpp4.la @MMDB_LIBS@
+libgpp4f_la_LIBADD = $(top_builddir)/src/libgpp4.la @MMDB_LIBS@ $(FLIBS)
 libgpp4f_la_CFLAGS = $(AM_CFLAGS) @MMDB_CFLAGS@
 
 # IMPORTANT!

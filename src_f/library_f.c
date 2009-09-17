@@ -471,7 +471,7 @@ FORTRAN_SUBR ( CCHMOD, cchmod,
   free(temp_cmode);
 }
 
-/* isatty doesnt seem to be in Mircrosoft Visual Studdio so this is a fudge */
+/* isatty doesnt seem to be in Mircrosoft Visual Studio so this is a fudge */
 #if defined (CALL_LIKE_MVS)
 # if CALL_LIKE_MVS == 1
 int __stdcall ISATTY (int *lunit)
@@ -501,6 +501,7 @@ float erfc_ (float *value)
 
 # endif
 #endif
+
 
 #if defined(F2C) 
 /* <f2c support>=                                                           */
@@ -610,6 +611,7 @@ int /* logical */ btest_ (a, b)
 }
 #endif              /* F2C support  */
 
+
 #if defined (__hpux) || defined (_AIX)
 /* <AIX and HPUX support>=                                                  */
 
@@ -640,7 +642,10 @@ int ierrno () {
 
 #endif             /*  HPUX and AIX support */    
 
+
+
 #if ( defined (__APPLE__) && !defined (__GNUC__) )
+
 /* apple xlf support */
 void gerror_ (str, Lstr)
 char *str;
@@ -664,8 +669,11 @@ int isatty_(int *iunit)
 
 #endif /* end of apple xlf support */
 
+
+
 #if ( defined (__linux__) && defined (_CALL_SYSV) )
 /* linuxppc xlf support */
+
 void gerror_ (str, Lstr)
 char *str;
 int  Lstr;
@@ -686,28 +694,15 @@ int isatty_(int *iunit)
   return isatty(*iunit);
 }
 
-#endif /* end of linuxppc xlf support */
 
 
-#if defined (sun)
+#elif defined(G95) || defined (GFORTRAN)
+/* G95 and GFORTRAN support */
+
 int isatty_(int *iunit)
 {
   return isatty(*iunit);
 }
-#endif
-
-/* neither gfortran or g95 have isatty */
-/* not true, since August 05 this has been added to gfortran */
-// It's not in gfortran 4.4.3
-
-/* G95 support */
-#if defined(G95) || defined (GFORTRAN)
-int isatty_(int *iunit)
-{
-  return isatty(*iunit);
-}
-#endif
-#if defined(G95) || defined (GFORTRAN)
 
 /* FORTRAN gerror intrinsic */
 int gerror_(str, Lstr)
@@ -726,6 +721,19 @@ int  Lstr;
   return 0;
 }
 
+#endif
+
+
+#if defined (sun)
+
+int isatty_(int *iunit)
+{
+  return isatty(*iunit);
+}
+
+#endif
+
+#if defined(G95) || defined (GFORTRAN)
 /* FORTRAN IErrNo intrinsic */
 int ierrno_() {
   return errno;
