@@ -88,13 +88,13 @@ static int ioArrayPrint(IOConvMap *ioMap)
   if (rw_mode == 1) {
     fprintf(stdout,"\nFile name for input map file on unit %3d : %s\n",
       ioMap->ipc,filename);
-    fprintf(stdout,"file size %d ; logical name %s\n\n",length,ioMap->logname);
+    fprintf(stdout,"file size %ld ; logical name %s\n\n",length,ioMap->logname);
   } else {
     fprintf(stdout,"\nFile name for output map file on unit %3d : %s\n",
       ioMap->ipc,filename);
     fprintf(stdout,"logical name %s\n\n",ioMap->logname);
   }
-  free(filename);      /* we strdup it in ccp4_file_name */
+  free((void *)filename);      /* we strdup it in ccp4_file_name */
   return 1;
 }
 
@@ -1151,7 +1151,7 @@ FORTRAN_SUBR( MSYWRT, msywrt,
     for (j=0; j != 4 ; ++j) 
       for (k=0; k != 4 ; ++k) 
         rsm[j][k] = *(rot+16*i+j+4*k);
-    mat4_to_symop(buffer,&buffer[80],rsm);
+    mat4_to_symop(buffer,&buffer[80], (const float (*)[4])rsm);
     ccp4_cmap_set_symop(ioArray[ii]->mapfile,buffer);
   }
   /* record for FORTRAN API */
@@ -1178,7 +1178,7 @@ FORTRAN_SUBR( CCP4_MAP_WRITE_SYMM_MATRIX, ccp4_map_write_symm_matrix,
     for (j=0; j != 4 ; ++j) 
       for (k=0; k != 4 ; ++k) 
         rsm[j][k] = *(rot+16*i+j+4*k);
-    mat4_to_symop(buffer,&buffer[80],rsm);
+    mat4_to_symop(buffer,&buffer[80],(const float (*)[4])rsm);
     ccp4_cmap_set_symop(ioArray[ii]->mapfile,buffer);
   }
   /* record for FORTRAN API */
