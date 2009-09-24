@@ -1,3 +1,9 @@
+2009-09-23  Morten Kjeldgaard  <mok0@ubuntu.com>
+
+	* library_f.c, cmtzlib_f.c, ccp4_unitcell_f.c, csymslib_f.c,
+	cmaplib_f.c: fixed various compilation warnings; mostly
+	pointer casting.
+
 2009-09-14  Morten Kjeldgaard  <mok@homunculus>
 
 	* Add code for the FORTRAN API in src_f/. The additions have not
