@@ -8,7 +8,7 @@ pkgconfig_DATA = gpp4.pc gpp4f.pc
 
 # Also distribute these files:
 EXTRA_DIST = bootstrap README gpp4.pc.in gpp4f.pc.in gpp4.spec.in	\
-  gpp4.info.in COPYRIGHT Doxyfile.in
+  gpp4.info.in COPYRIGHT Doxyfile.in gpp4.m4
 
 # Build in these directories
 SUBDIRS = src src_f test data

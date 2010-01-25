@@ -1,3 +1,14 @@
+2010-01-25  Morten Kjeldgaard  <mok0@ubuntu.com>
+
+	* Merge patches to the library from ccp4-6.1.3; this concerns only 
+	  two files: src/ccp4_program.h and src/cmtzlib.c.
+	* Add configure macro gpp4.m4 to tarball.
+
+2009-10-02  Morten Kjeldgaard  <mok0@ubuntu.com>
+
+	* Remove utils/* from the distribution; it is no longer
+	required to split the fortran sources.
+
 2009-09-23  Morten Kjeldgaard  <mok0@ubuntu.com>
 
 	* library_f.c, cmtzlib_f.c, ccp4_unitcell_f.c, csymslib_f.c,
