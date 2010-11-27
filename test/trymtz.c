@@ -21,12 +21,41 @@
 */
 
 #include "cmtzlib.h"
+#include <strings.h>
+
+void mtzhdrout (MTZ *mtz)
+{
+  char *s;
+  register int i, j;
+
+  printf ("title: %s\n", mtz->title);
+  printf ("number of history lines: %d (%d)\n", mtz->histlines, strlen(mtz->hist));
+  
+  printf ("history:\n");
+  s = mtz->hist;
+  for (i=0; i< mtz->histlines; i++) {
+    for (j=0; j<80; j++) 
+      putchar(*s++);
+    putchar('\n');
+  }
+  printf ("number of crystals: %d\n", mtz->nxtal);
+  printf ("number of columns from file: %d\n", mtz->ncol_read);
+  printf ("total number of reflections: %d\n", mtz->nref);
+  printf ("number of reflections from file: %d\n", mtz->nref_filein);
+  printf ("are reflections held in memory?: %d\n", mtz->refs_in_memory);
+  printf ("original number of batches: %d\n", mtz->n_orig_bat);
+  printf ("output file max res: %f\n", mtz->resmax_out);
+  printf ("output file min res: %f\n", mtz->resmin_out);
+
+  return;
+}
+
 
 int main(int argc, char **argv) 
 {
 
   if (argc != 2) {
-    puts("Usage: checkarch <mtzfile>");
+    puts("Usage: trymtz <mtzfile>");
     exit(1);
   }
 
@@ -35,6 +64,7 @@ int main(int argc, char **argv)
     printf ("error reading mtz file %s\n", argv[1]);
     exit (1);
   }
+  mtzhdrout(fd);
   exit(0);
 }
 

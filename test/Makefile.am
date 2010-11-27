@@ -5,10 +5,10 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src
 AM_LDFLAGS = $(top_builddir)/src/libgpp4.la @LIBM@
 
-noinst_PROGRAMS = load_syminfo trymtz
+noinst_PROGRAMS = load_syminfo trymtz checkarch
 
 load_syminfo_SOURCES = load_syminfo.c
-
 trymtz_SOURCES = trymtz.c
+checkarch_SOURCES = checkarch.c
 
 ####
