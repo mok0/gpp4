@@ -138,7 +138,7 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
   /* Read architecture */
   istat = ccp4_file_rarch (filein);
   if (!istat) {
-   ccp4_signal(CCP4_ERRLEVEL(2) | CMTZ_ERRNO(CMTZERR_NoArch),
+    ccp4_signal(CCP4_ERRLEVEL(2) | CMTZ_ERRNO(CMTZERR_NoArch),
                         "MtzGet", NULL);
   }
 
@@ -182,8 +182,17 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
 
   /* set reading integers */
   ccp4_file_setmode(filein,6);
+
   istat = ccp4_file_read(filein, (uint8 *) &hdrst, 1);
-  if (debug) printf(" hdrst read as %d \n",hdrst);
+  if (debug) printf(" istat=%d, hdrst read as %d \n",istat,hdrst);
+
+  if (istat == EOF) {
+    ccp4_signal(CCP4_ERRLEVEL(3) | CMTZ_ERRNO(CMTZERR_ReadFail),"MtzGet",NULL);
+    ccp4_parse_end(parser);
+    ccp4_file_close(filein);
+    free(filename);
+    return NULL;
+  }
 
   /* 1st Pass: Read ntotcol, nref, nbat and dataset info.  
      nxtal and nset are used to assign memory for MTZ structure.
