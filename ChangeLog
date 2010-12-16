@@ -1,3 +1,47 @@
+2010-12-16  Morten Kjeldgaard  <mok0@ubuntu.com>
+
+	* src/csymlib.h: fix url in Doxygen markup.
+
+	* src_f/parser.f (RDSYMM): Remove redundant parser output (from 6.1.24)
+
+	* src_F/csymlib_f.c: Patch to improve test reflection set in
+	HKLRANGE (from 6.1.24)
+
+	* src/ccp4_program.c (ccp4_prog_vers): Simplify dealing with 
+	program version string, using system functions (from 6.1.24)
+
+	* src/cmtzlib.c, src/cmtzlib.h: New API for symmetry confidence flag
+
+	* src_f/cmtzlib_f.c: Add Fortran bindings for spacegroup
+	confidence routines, from 6.1.24
+
+	* src/mtzdata.h: Extension to MTZ header info (from 6.1.24)
+
+	* src/ccp4_program.h: Bump patch level to 6.1.24
+
+	* src_f/unix.m4: case issue fixed (from 6.1.24)
+
+	* src_f/ccplib.f: Patch to increase table size to deal with
+	problems in Scala (from 6.1.24).
+
+	* src/library_file.c: Patch to deal with corrupted file stamp
+	problem (from 6.1.24)
+
+	* src_f/ccp4_general_f.c: Initialize string (from 6.1.24).
+
+	* src/cmap_close.c (ccp4_cmap_close): Patch to fix potential
+	division by zero (from 6.1.24)
+
+	* src_f/cmaplib_f.c (HeaderPrint): Patch to improve map header
+	printout (from 6.1.24)
+
+	* src/library_err.c: Patch to introduce Two new error
+	messages (from 6.1.24)
+
+	* src/cmap_header.c, src/cmaplib.h: Introduce patches posted
+	on the ccp4-dev list 20100811 by Martyn Winn to solve
+	problem with MRC chimera maps
+
 2010-01-25  Morten Kjeldgaard  <mok0@ubuntu.com>
 
 	* Merge patches to the library from ccp4-6.1.3; this concerns only 

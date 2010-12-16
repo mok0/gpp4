@@ -17,7 +17,6 @@
      License along with this library; if not, write to the Free
      Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
      Boston, MA 02110-1301 USA
-
 */
 
 /** @file mtzdata.h
@@ -36,6 +35,8 @@
 #define MTZVERSN "MTZ:V1.1"         /**< traditional version number! */
 #define MTZ_MAJOR_VERSN 1      /**< MTZ file major version - keep to single digit */
 #define MTZ_MINOR_VERSN 1      /**< MTZ file minor version - keep to single digit */
+#define CCP4_MTZDATA 20100630   /**< Date stamp for the cmtz data structure 
+                                 (update if there are changes to the structs in this file) */
 
 /** defines for sizes in MTZ structure */
 #define SIZE1 20                    /**< size of pre-reflection block */
@@ -50,9 +51,7 @@
 #define MSETS      1000      /**< maximum number of datasets (for a few arrays - to be removed!) */
 #define MCOLUMNS  10000      /**< maximum number of columns (for a few arrays - to be removed!) */
 
-/** @struct MTZCOL 
-    @brief MTZ column descriptor. 
-*/
+/** MTZ column struct. */
 typedef struct { char label[31];       /**< column name as given by user */
 		 char type[3];         /**< column type */
                  int active;           /**< whether column in active list */
@@ -60,10 +59,13 @@ typedef struct { char label[31];       /**< column name as given by user */
  		 float min;            /**< minimum data element */
 		 float max;            /**< maximum data element */
 		 float *ref;           /**< data array */
-	       } MTZCOL;               
+	         char colsource[37];   /**< column source - originating job */
+	         char grpname[31];     /**< column group name */
+	         char grptype[5];      /**< column group type */
+	         int  grpposn;         /**< column group position in group */
+               } MTZCOL;
 
-/*! @struct MTZSET 
-    @brief Structure describing an MTZ dataset. */
+/** MTZ dataset struct. */
 typedef struct { int setid;            /**< Dataset id */
 		 char dname[65];       /**< Dataset name */
 		 float wavelength;     /**< Dataset wavelength */
@@ -71,8 +73,7 @@ typedef struct { int setid;            /**< Dataset id */
 		 MTZCOL **col;         /**< columns */
 	       } MTZSET;
 
-/*! @struct MTZXTAL 
-    @brief Structure describing an MTZ crystal. */
+/** MTZ crystal struct. */
 typedef struct { int xtalid;           /**< Crystal id */
 		 char xname[65];       /**< Crystal name */
 		 char pname[65];       /**< Project name */
@@ -83,8 +84,7 @@ typedef struct { int xtalid;           /**< Crystal id */
 		 MTZSET **set;         /**< datasets */
 	       } MTZXTAL;
 
-/*! @struct bathead 
-    @brief MTZ batch descriptor. */
+/** MTZ batch struct. */
 typedef struct bathead { int num;              /**< batch number */
 		 char title[71];       /**< batch title */
 		 char gonlab[3][9];    /**< names of the three axes */
@@ -144,10 +144,9 @@ typedef struct bathead { int num;              /**< batch number */
 		 float detlm[2][2][2]; /**< min & max values of detector coords
 					  (pixels) */
 		 struct bathead *next; /**< next batch in list */
-	       } MTZBAT;	       /*!< type name for struct bathead */
+	       } MTZBAT;
 
-/*! @struct SYMGRP 
-    @brief Symmetry structure. */
+/** MTZ symmetry struct. */
 typedef struct { int spcgrp;           /**< spacegroup number */
 		 char spcgrpname[MAXSPGNAMELENGTH+1];  /**< spacegroup name */
 		 int nsym;             /**< number of symmetry operations */
@@ -156,17 +155,18 @@ typedef struct { int spcgrp;           /**< spacegroup number */
 		 int nsymp;            /**< number of primitive symmetry ops. */
 		 char symtyp;          /**< lattice type (P,A,B,C,I,F,R) */
 		 char pgname[11];      /**< pointgroup name */
+                 char spg_confidence;  /**< L => Bravais lattice correct
+                                            P => pointgroup correct
+                                            E => spacegroup or enantiomorph
+                                            S => spacegroup is correct
+                                            X => flag not set */
                } SYMGRP;
 
-/*! @union MNF 
-    @brief Missing number flag for the MTZ data structure. */
-typedef union { char amnf[4];          /*!< byte representation of MNF */ 
-                float fmnf;	       /*!< floating point representation of MNF */
+typedef union { char amnf[4]; 
+                float fmnf;
               } MNF;
 
-/*! @struct MTZ 
-    @brief Top level MTZ structure, including crystal, symmetry and batch information */
-
+/** Top level of MTZ struct. */
 typedef struct { CCP4File *filein;     /**< file for reading */
                  CCP4File *fileout;    /**< file for writing */
 		 char title[71];       /**< title of mtz structure */
@@ -185,12 +185,9 @@ typedef struct { CCP4File *filein;     /**< file for reading */
 		 MTZXTAL **xtal;       /**< crystals */
 		 MTZBAT *batch;        /**< first batch header */
 		 MTZCOL *order[5];     /**< sort order */
+		 char *xml;            /**< xml data block */
+                 char *unknown_headers;/**< unknown header data */
+                 int n_unknown_headers;/**< unknown header data */
 	       } MTZ;
 
 #endif
-
-/*
-  Local variables:
-  mode: font-lock
-  End:
-*/

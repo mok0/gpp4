@@ -29,7 +29,7 @@ dnl     Be careful about declaring system library routines either external or
 dnl     intrinsic -- it's probably better to leave them undeclared and let the
 dnl     compiler sort it out since this behaviour may (does?) differ.
 dnl
-dnl $Id: unix.m4,v 1.92 2008/06/09 14:20:46 nds65 Exp $
+dnl $Id: unix.m4,v 1.94 2010/09/17 12:16:37 rmk65 Exp $
 dnl
 changequote([,])dnl * use [] as quotes rather than `'
 dnl
@@ -244,7 +244,7 @@ C     with status UNKNOWN rather than new if they exist
       IF (ISTAT.EQ.NEW) THEN
         OPNVAR = ' '
         CALL UGTENV('CCP4_OPEN',OPNVAR)
-        IF (OPNVAR.EQ.'UNKNOWN') ISTAT = 1
+        IF (OPNVAR.EQ.'UNKNOWN' .OR. OPNVAR.EQ.'unknown') ISTAT = 1
       END IF
 C
 C     check for `logical name' referencing real file
@@ -663,7 +663,7 @@ C_END_CCPSPW
 C
        CHARACTER STRING*(*)
        EXTERNAL SYSTEM
-       CALL SYSTEM(STRING)
+       CALL SYSTEM(STATUS, STRING)
        END
 C
       SUBROUTINE CEXIT (ICODE)

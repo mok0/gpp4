@@ -75,7 +75,7 @@ this may be re-implemented.
 #include "csymlib.h"
 #include "ccp4_program.h"
 #include "ccp4_general.h"
-/* rcsid[] = "$Id: cmtzlib_f.c,v 1.80 2008/06/18 16:55:56 mdw Exp $" */
+/* rcsid[] = "$Id: cmtzlib_f.c,v 1.81 2010/04/20 16:00:00 mdw Exp $" */
 
 #define MFILES 9
 #define MAXSYM 192
@@ -495,6 +495,34 @@ FORTRAN_SUBR ( LRRSOL, lrrsol,
 
   MtzResLimits(mtzdata[*mindx-1], minres, maxres);
 
+}
+
+/* Fortran wrapper for ccp4_lrsymi_c 
+   As for LRSYMI, but with confidence flag added. */
+FORTRAN_SUBR ( LRSYMI_C, lrsymi_c,
+	       (int *mindx, int *nsympx, fpstr ltypex, int *nspgrx, fpstr spgrnx,
+                  fpstr pgnamx, fpstr spgconf, 
+                  int ltypex_len, int spgrnx_len, int pgnamx_len, int spgconf_len),
+	       (int *mindx, int *nsympx, fpstr ltypex, int *nspgrx, fpstr spgrnx,
+                  fpstr pgnamx, fpstr spgconf),
+	       (int *mindx, int *nsympx, fpstr ltypex, int ltypex_len, int *nspgrx, 
+                  fpstr spgrnx, int spgrnx_len, fpstr pgnamx, int pgnamx_len, 
+                  fpstr spgconf, int spgconf_len))
+
+{ 
+  char ltypex_temp[2],spgrnx_temp[MAXSPGNAMELENGTH+1], pgnamx_temp[11], spgconf_temp[2];
+
+  CMTZLIB_DEBUG(puts("CMTZLIB_F: LRSYMI_C");)
+
+ if (MtzCheckSubInput(*mindx,"LRSYMI_C",1)) return;
+
+  ccp4_lrsymi_c(mtzdata[*mindx-1], nsympx, ltypex_temp, nspgrx, spgrnx_temp, 
+                pgnamx_temp, spgconf_temp);
+
+  ccp4_CtoFString(FTN_STR(ltypex),FTN_LEN(ltypex),ltypex_temp);
+  ccp4_CtoFString(FTN_STR(spgrnx),FTN_LEN(spgrnx),spgrnx_temp);
+  ccp4_CtoFString(FTN_STR(pgnamx),FTN_LEN(pgnamx),pgnamx_temp);
+  ccp4_CtoFString(FTN_STR(spgconf),FTN_LEN(spgconf),spgconf_temp);
 }
 
 /* Fortran wrapper for ccp4_lrsymi */
@@ -1189,8 +1217,9 @@ FORTRAN_SUBR ( LRREFF, lrreff,
 
  ++irref[mindex-1];
  ieof = ccp4_lrreff(mtzdata[mindex-1], resol, adata, logmss[mindex-1], 
-		    collookup[mindex-1], 
+		    (const MTZCOL **)collookup[mindex-1], 
 		    ndatmss[mindex-1], irref[mindex-1]);
+ /* */
 
  if (ieof) {
    *eof = FORTRAN_LOGICAL_TRUE;
@@ -2305,6 +2334,27 @@ FORTRAN_SUBR ( LWSYMM, lwsymm,
   free(temp_spgrnx);
   free(temp_pgnamx);
 
+}
+/** Write or update symmetry information for MTZ header. 
+ * @param mindx (I) MTZ file index.
+ * @param spgconf (I) one-character spacegroup confidence flag
+ */
+FORTRAN_SUBR ( LWSYMCONF, lwsymconf,
+	       (int *mindx, fpstr spgconf, int spgconf_len),
+	       (int *mindx, fpstr spgconf),
+	       (int *mindx, fpstr spgconf, int spgconf_len))
+{
+ char *temp_spgconf;
+
+ CMTZLIB_DEBUG(puts("CMTZLIB_F: LWSYMCONF");)
+
+ if (MtzCheckSubInput(*mindx,"LWSYMCONF",2)) return;
+
+ temp_spgconf = ccp4_FtoCString(FTN_STR(spgconf), FTN_LEN(spgconf));
+
+  ccp4_lwsymconf(mtzdata[*mindx-1], temp_spgconf);
+
+  free(temp_spgconf);
 }
 
 /** Fortran wrapper to assign columns of output MTZ file. 
