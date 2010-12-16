@@ -64,6 +64,9 @@
 #define  CMTZERR_BadBatchHeader    22
 #define  CMTZERR_DifferentVersion  23
 #define  CMTZERR_ColTypeMismatch   24
+#define  CMTZERR_ColGroupError     25
+#define  CMTZERR_ColSourceError    26
+
 
 MTZ *MtzGet(const char *logname, int read_refs)
 
@@ -80,13 +83,14 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
   char crysin[MXTALS][65],projin[MXTALS][65],crystal[65],project[65];
   double cellin[MXTALS][6],cell[6];
   int jxtalin[MSETS];
-  char mkey[4], keyarg[76], hdrrec[MTZRECORDLENGTH+1], label[30], type[3];
+  char mkey[4], keyarg[76], hdrrec[MTZRECORDLENGTH+1], label[31], type[3];
   int i, j, hdrst, ntotcol, nref, ntotset=0, nbat, nhist=0, icolin;
   int ixtal, jxtal, iset, iiset, icset, nxtal=0, nset[MXTALS]={0}, isym=0;
   int indhigh[3],indlow[3],isort[5],ind_xtal,ind_set,ind_col[3],debug=0;
   float min,max,totcell[6],minres,maxres;
   float *refldata;
   double coefhkl[6];
+  int k; long xmllen;
 
   jxtal = 0;
   nbat = 0;
@@ -106,6 +110,13 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
   int *intbuf = (int *) buf;
   float *fltbuf = buf + NBATCHINTEGERS;
   MTZBAT *batch = NULL;
+
+  /* known headers */
+  char known_headers[][5] =
+    { "PROJ","DATA","DCEL","DRES","DWAV","VERS","TITL","CELL",
+      "SORT","SYMI","SYMM","COLU","VALM","RESO","COLS","COLG",
+      "NCOL","NDIF","CRYS","MTZH","MTZB","BH" };
+  int n_known_headers = sizeof(known_headers)/sizeof(known_headers[0]);
 
   if (debug) 
     printf(" Entering MtzGet \n");
@@ -563,7 +574,12 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
       mtz->mtzsymm.spcgrp = (int) token[4].value;
       strcpy(mtz->mtzsymm.spcgrpname,token[5].fullstring);
       strcpy(mtz->mtzsymm.pgname,token[6].fullstring);
-       }
+      if (ntok > 7) {
+        mtz->mtzsymm.spg_confidence = token[7].fullstring[0];
+      } else {
+        mtz->mtzsymm.spg_confidence = 'X';
+      }
+    }
     else if (strncmp (mkey, "SYMM",4) == 0) {
       symop_to_mat4(hdrrec+4,hdrrec+MTZRECORDLENGTH,mtz->mtzsymm.sym[isym++][0]);
        }
@@ -650,6 +666,104 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
       }
     }
 
+    istat = ccp4_file_readchar(filein, (uint8 *) hdrrec, MTZRECORDLENGTH);
+    hdrrec[MTZRECORDLENGTH] = '\0';
+    ntok = ccp4_parser(hdrrec, MTZRECORDLENGTH, parser, iprint);
+  }
+
+  /* 4th Pass: Column group and source extensions and unknown keywords */
+  /* 4th Pass: Position at top of header */
+  ccp4_file_setmode(filein,6);
+  ccp4_file_seek(filein, hdrst-1, SEEK_SET);
+  ccp4_file_setmode(filein,0);
+  istat = ccp4_file_readchar(filein, (uint8 *) hdrrec, MTZRECORDLENGTH);
+  hdrrec[MTZRECORDLENGTH] = '\0';
+  ntok = ccp4_parser(hdrrec, MTZRECORDLENGTH, parser, iprint);
+  while (strncmp((strncpy(mkey,hdrrec,4)),"END",3) != 0) {
+    if (strncmp (mkey, "COLS",4) == 0 ) {
+      strcpy(label,token[1].fullstring);
+      /* Special trap for M/ISYM */
+      if (strncmp (label,"M/ISYM",6) == 0)
+        strcpy(label,"M_ISYM");
+      icset = (int) token[3].value;
+      newcol = NULL;
+      for (i = 0; i < mtz->nxtal; ++i) {
+	for (j = 0; j < mtz->xtal[i]->nset; ++j) {
+	  if (mtz->xtal[i]->set[j]->setid == icset) {
+	    for ( k = 0; k < mtz->xtal[i]->set[j]->ncol; k++ ) {
+	      if (strcmp(mtz->xtal[i]->set[j]->col[k]->label,label) == 0) {
+		newcol = mtz->xtal[i]->set[j]->col[k];
+		break;
+	      }
+	    }
+	  }
+	}
+      }
+      if ( newcol == NULL ) {
+ 	ccp4_signal(CCP4_ERRLEVEL(3) | CMTZ_ERRNO(CMTZERR_ColSourceError),
+		    "MtzGet", NULL);
+	ccp4_parse_end(parser);
+	ccp4_file_close(filein);
+	free(filename);
+	return(NULL);
+      }
+      strncpy( newcol->colsource, token[2].fullstring, 36 );
+      newcol->colsource[36] = '\0';
+    } else if (strncmp (mkey, "COLG",4) == 0 ) {
+      strcpy(label,token[1].fullstring);
+      /* Special trap for M/ISYM */
+      if (strncmp (label,"M/ISYM",6) == 0)
+        strcpy(label,"M_ISYM");
+      icset = (int) token[5].value;
+      newcol = NULL;
+      for (i = 0; i < mtz->nxtal; ++i) {
+	for (j = 0; j < mtz->xtal[i]->nset; ++j) {
+	  if (mtz->xtal[i]->set[j]->setid == icset) {
+	    for ( k = 0; k < mtz->xtal[i]->set[j]->ncol; k++ ) {
+	      if (strcmp(mtz->xtal[i]->set[j]->col[k]->label,label) == 0) {
+		newcol = mtz->xtal[i]->set[j]->col[k];
+		break;
+	      }
+	    }
+	  }
+	}
+      }
+      if ( newcol == NULL ) {
+ 	ccp4_signal(CCP4_ERRLEVEL(3) | CMTZ_ERRNO(CMTZERR_ColGroupError),
+		    "MtzGet", NULL);
+	ccp4_parse_end(parser);
+	ccp4_file_close(filein);
+	free(filename);
+	return(NULL);
+      }
+      strncpy( newcol->grpname, token[2].fullstring, 30 );
+      newcol->grpname[30] = '\0';
+      strncpy( newcol->grptype, token[3].fullstring, 4 );
+      newcol->grptype[4] = '\0';
+      newcol->grpposn = (int) token[4].value;
+    }
+    istat = ccp4_file_readchar(filein, (uint8 *) hdrrec, MTZRECORDLENGTH);
+    hdrrec[MTZRECORDLENGTH] = '\0';
+    ntok = ccp4_parser(hdrrec, MTZRECORDLENGTH, parser, iprint);
+  }
+
+  /* 5th Pass: Deal with unknown headers */
+  /* 5th Pass: Position at top of header */
+  ccp4_file_setmode(filein,6);
+  ccp4_file_seek(filein, hdrst-1, SEEK_SET);
+  ccp4_file_setmode(filein,0);
+  istat = ccp4_file_readchar(filein, (uint8 *) hdrrec, MTZRECORDLENGTH);
+  hdrrec[MTZRECORDLENGTH] = '\0';
+  ntok = ccp4_parser(hdrrec, MTZRECORDLENGTH, parser, iprint);
+  while (strncmp((strncpy(mkey,hdrrec,4)),"END",3) != 0) {
+    for ( i = 0; i < n_known_headers; ++i )
+      if (strncmp (mkey,known_headers[i],4) == 0 )
+	break;
+    if ( i == n_known_headers ) {
+      mtz->unknown_headers = ccp4_utils_realloc( mtz->unknown_headers, mtz->n_unknown_headers*MTZRECORDLENGTH+MTZRECORDLENGTH );  // if null, malloc
+      memcpy( mtz->unknown_headers+mtz->n_unknown_headers*MTZRECORDLENGTH, hdrrec, MTZRECORDLENGTH );
+      mtz->n_unknown_headers++;
+    }
     istat = ccp4_file_readchar(filein, (uint8 *) hdrrec, MTZRECORDLENGTH);
     hdrrec[MTZRECORDLENGTH] = '\0';
     ntok = ccp4_parser(hdrrec, MTZRECORDLENGTH, parser, iprint);
@@ -746,6 +860,16 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
 
   if (debug) 
     printf(" MtzGet: end of batch pass \n");
+
+  /* Read XML datablock */
+  xmllen = ccp4_file_length(filein) - ccp4_file_tell(filein);
+  if ( xmllen > 0 ) {
+    mtz->xml = (char *)ccp4_utils_malloc( xmllen+1 );
+    if ( mtz->xml != NULL ) {
+      istat = ccp4_file_readchar(filein, (uint8 *) mtz->xml, xmllen);
+      mtz->xml[xmllen] = '\0';
+    }
+  }
 
   /* Position at start of reflections */
   ccp4_file_setmode(filein,6);
@@ -1154,6 +1278,13 @@ int MtzResLimits(const MTZ *mtz, float *minres, float *maxres) {
 
 int ccp4_lrsymi(const MTZ *mtz, int *nsympx, char *ltypex, int *nspgrx, 
        char *spgrnx, char *pgnamx) {
+  char spgconf_temp[2];
+
+  return ccp4_lrsymi_c(mtz,nsympx,ltypex,nspgrx,spgrnx,pgnamx,spgconf_temp);
+}
+
+int ccp4_lrsymi_c(const MTZ *mtz, int *nsympx, char *ltypex, int *nspgrx, 
+       char *spgrnx, char *pgnamx, char *spgconf) {
 
   *nsympx = mtz->mtzsymm.nsymp;
   *nspgrx = mtz->mtzsymm.spcgrp;
@@ -1161,6 +1292,8 @@ int ccp4_lrsymi(const MTZ *mtz, int *nsympx, char *ltypex, int *nspgrx,
   ltypex[1] = '\0';
   strcpy(spgrnx,mtz->mtzsymm.spcgrpname);
   strcpy(pgnamx,mtz->mtzsymm.pgname);
+  spgconf[0] = mtz->mtzsymm.spg_confidence;
+  spgconf[1] = '\0';
 
   return *nspgrx;
 }
@@ -1721,10 +1854,21 @@ int ccp4_lhprt(const MTZ *mtz, int iprint) {
            mtz->mtzsymm.sym[i][j][1],mtz->mtzsymm.sym[i][j][2],
 	       mtz->mtzsymm.sym[i][j][3]);
     }
+    printf("\n");
 
   } else {
     printf(" * Space group = \'%s\' (number     %d)\n\n",mtz->mtzsymm.spcgrpname,
        mtz->mtzsymm.spcgrp);
+  }
+
+  if (mtz->mtzsymm.spg_confidence == 'L') {
+    printf("  (only Bravais lattice is fixed so far)\n\n");
+  } else if (mtz->mtzsymm.spg_confidence == 'P') {
+    printf("  (only pointgroup is fixed so far)\n\n");
+  } else if (mtz->mtzsymm.spg_confidence == 'E') {
+    printf("  (one of pair of enantiomorphic spacegroups)\n\n");
+  } else if (mtz->mtzsymm.spg_confidence == 'S') {
+    printf("  (spacegroup is known)\n\n");
   }
 
   return 1;
@@ -1879,7 +2023,7 @@ int MtzPrintBatchHeader(const MTZBAT *batch) {
          batch->phixyz[1][0],batch->phixyz[1][1],batch->phixyz[1][2]);
   }
   printf("   %s%s%s   %s\n",
-         "Reciprocal axis nearest ",batch->gonlab[0],"..",axes);
+         "Reciprocal axis nearest ",batch->gonlab[batch->ngonax-1],"..",axes);
   if (!batch->lcrflg) {
     printf("   %s %6.3f \n",
 	   "Mosaicity ........................",batch->crydat[0]);
@@ -2123,8 +2267,27 @@ int MtzAssignColumn(MTZ *mtz, MTZCOL *col, const char crystal_name[],
   return 1;
 }
 
+int ccp4_lwsymconf(MTZ *mtz, char spgconf[])
+{
+  if (spgconf[0] != ' ' && spgconf[0] != '\0') mtz->mtzsymm.spg_confidence = spgconf[0];
+
+  return 1;
+}
+
 int ccp4_lwsymm(MTZ *mtz, int nsymx, int nsympx, float rsymx[192][4][4], 
    char ltypex[], int nspgrx, char spgrnx[], char pgnamx[])
+{
+  /* Could set this to "X" but beware of legacy programs where lwsymm
+     still used. Don't want to overwrite flag in newer file. */
+  char spgconf_temp[2]="";
+
+  return ccp4_lwsymm_c(mtz, nsymx, nsympx, rsymx, ltypex, nspgrx, spgrnx,
+		     pgnamx, spgconf_temp);
+}
+
+int ccp4_lwsymm_c(MTZ *mtz, int nsymx, int nsympx, float rsymx[192][4][4], 
+		  char ltypex[], int nspgrx, char spgrnx[], char pgnamx[], 
+                  char spgconf[])
 {
   int i,j,k,length;
 
@@ -2141,6 +2304,7 @@ int ccp4_lwsymm(MTZ *mtz, int nsymx, int nsympx, float rsymx[192][4][4],
   }
   if (ltypex[0] != ' ' && ltypex[0] != '\0') mtz->mtzsymm.symtyp = ltypex[0];
   if (nspgrx != 0) mtz->mtzsymm.spcgrp = nspgrx;
+  if (spgconf[0] != ' ' && spgconf[0] != '\0') mtz->mtzsymm.spg_confidence = spgconf[0];
 
   if (strcmp(spgrnx,"")) {
     length = ( strlen(spgrnx) < MAXSPGNAMELENGTH ) ? strlen(spgrnx) : MAXSPGNAMELENGTH;
@@ -2431,9 +2595,30 @@ int MtzPut(MTZ *mtz, const char *logname)
  float *fltbuf = buf + NBATCHINTEGERS;
  MTZBAT *batch, *lastoldbatch = NULL;
  MTZXTAL *xtl;
+ char colsource[37], *taskenv;
+ int date3[3], time3[3];
 
  if (debug) 
    printf(" MtzPut: entering \n");
+
+ /* get data to fill out column source information */
+ taskenv = getenv( "CCP4_TASK_ID" );
+ if ( taskenv != NULL ) {
+   strncpy( colsource, taskenv, 36 );
+   colsource[36] = '\0';
+ } else {
+   ccp4_utils_idate( date3 );
+   ccp4_utils_itime( time3 );
+   sprintf( colsource, "CREATED_%02d/%02d/%04d_%02d:%02d:%02d",
+	    date3[0],date3[1],date3[2],time3[0],time3[1],time3[2] );
+ }
+ for ( i = 0; i < strlen(colsource); i++ )
+   if ( colsource[i] == ' ' ) colsource[i] = '_';
+ for (i = 0; i < mtz->nxtal; ++i)
+   for (j = 0; j < mtz->xtal[i]->nset; ++j)
+     for (k = 0; k < mtz->xtal[i]->set[j]->ncol; ++k)
+       if ( mtz->xtal[i]->set[j]->col[k]->source == 0 )
+	 strncpy(mtz->xtal[i]->set[j]->col[k]->colsource,colsource,36);
 
  if (!mtz->fileout) {
 
@@ -2530,9 +2715,10 @@ int MtzPut(MTZ *mtz, const char *logname)
  strncpy(spgname+1,mtz->mtzsymm.spcgrpname,length+1);
  spgname[length+2] = '\'';
  spgname[length+3] = '\0';
- sprintf(hdrrec,"SYMINF %3d %2d %c %5d %22s %5s",mtz->mtzsymm.nsym,mtz->mtzsymm.nsymp,
-      mtz->mtzsymm.symtyp,mtz->mtzsymm.spcgrp,spgname,mtz->mtzsymm.pgname);
- MtzWhdrLine(fileout,50,hdrrec);
+ sprintf(hdrrec,"SYMINF %3d %2d %c %5d %22s %5s %c",mtz->mtzsymm.nsym,
+         mtz->mtzsymm.nsymp,mtz->mtzsymm.symtyp,mtz->mtzsymm.spcgrp,spgname,
+         mtz->mtzsymm.pgname,mtz->mtzsymm.spg_confidence);
+ MtzWhdrLine(fileout,52,hdrrec);
  if (debug) printf(" MtzPut: SYMINF just written \n");
 
  for (i = 0; i < mtz->mtzsymm.nsym; ++i) {
@@ -2616,6 +2802,28 @@ int MtzPut(MTZ *mtz, const char *logname)
                    mtz->xtal[i]->set[j]->col[k]->max,
                    mtz->xtal[i]->set[j]->setid);
        MtzWhdrLine(fileout,MTZRECORDLENGTH,hdrrec);
+
+       if ( mtz->xtal[i]->set[j]->col[k]->colsource[0] != '\0' ) {
+         if (strcmp(mtz->xtal[i]->set[j]->col[k]->type,"Y") == 0 && 
+           strcmp(mtz->xtal[i]->set[j]->col[k]->label,"M_ISYM") == 0) {
+	   sprintf(hdrrec,"COLSRC %-30s %-36s  %4d","M/ISYM",mtz->xtal[i]->set[j]->col[k]->colsource,mtz->xtal[i]->set[j]->setid);
+         } else {
+	   sprintf(hdrrec,"COLSRC %-30s %-36s  %4d",mtz->xtal[i]->set[j]->col[k]->label,mtz->xtal[i]->set[j]->col[k]->colsource,mtz->xtal[i]->set[j]->setid);
+         }
+	 MtzWhdrLine(fileout,MTZRECORDLENGTH,hdrrec);
+       }
+
+       if ( mtz->xtal[i]->set[j]->col[k]->grpname[0] != '\0' &&
+	    mtz->xtal[i]->set[j]->col[k]->grptype[0] != '\0' &&
+	    mtz->xtal[i]->set[j]->col[k]->grpposn    >=   0  ) {
+         if (strcmp(mtz->xtal[i]->set[j]->col[k]->type,"Y") == 0 && 
+           strcmp(mtz->xtal[i]->set[j]->col[k]->label,"M_ISYM") == 0) {
+	   sprintf(hdrrec,"COLGRP %-30s %-30s %-4s %1X %4d","M/ISYM",mtz->xtal[i]->set[j]->col[k]->grpname,mtz->xtal[i]->set[j]->col[k]->grptype,mtz->xtal[i]->set[j]->col[k]->grpposn,mtz->xtal[i]->set[j]->setid);
+         } else {
+	   sprintf(hdrrec,"COLGRP %-30s %-30s %-4s %1X %4d",mtz->xtal[i]->set[j]->col[k]->label,mtz->xtal[i]->set[j]->col[k]->grpname,mtz->xtal[i]->set[j]->col[k]->grptype,mtz->xtal[i]->set[j]->col[k]->grpposn,mtz->xtal[i]->set[j]->setid);
+         }
+	 MtzWhdrLine(fileout,MTZRECORDLENGTH,hdrrec);
+       }
      }
    }
   }
@@ -2694,6 +2902,11 @@ int MtzPut(MTZ *mtz, const char *logname)
    }
  }
 
+ /* write out unrecognized headers */
+ if ( mtz->unknown_headers )
+   for (i = 0; i < mtz->n_unknown_headers; ++i)
+     MtzWhdrLine(fileout,MTZRECORDLENGTH,mtz->unknown_headers+i*MTZRECORDLENGTH);
+
  sprintf(hdrrec,"END ");
  MtzWhdrLine(fileout,4,hdrrec);
 
@@ -2745,6 +2958,12 @@ int MtzPut(MTZ *mtz, const char *logname)
 
  sprintf(hdrrec,"MTZENDOFHEADERS ");
  MtzWhdrLine(fileout,16,hdrrec);
+
+ /* write XML data block */
+ if ( mtz->xml != NULL ) {
+   ccp4_file_setmode(fileout,0);
+   ccp4_file_writechar(fileout,(const uint8 *)mtz->xml,strlen(mtz->xml));
+ }
 
  /* go back and correct hdrst */
  ccp4_file_setmode(fileout,0);
@@ -3084,10 +3303,14 @@ MTZ *MtzMalloc(int nxtal, int nset[])
   mtz->mtzsymm.nsymp = 0;
   mtz->mtzsymm.symtyp = '\0';
   mtz->mtzsymm.pgname[0] = '\0';
+  mtz->mtzsymm.spg_confidence = '\0';
   mtz->batch = NULL;
   for (i = 0; i < 5; ++i) {
     mtz->order[i] = NULL;
   }
+  mtz->xml = NULL;
+  mtz->unknown_headers = NULL;
+  mtz->n_unknown_headers = 0;
 
   return(mtz);
 }
@@ -3131,6 +3354,12 @@ int MtzFree(MTZ *mtz)
 
   if (mtz->hist != NULL) 
     MtzFreeHist(mtz->hist);
+
+  if (mtz->xml != NULL)
+    free(mtz->xml);
+
+  if (mtz->unknown_headers != NULL)
+    free(mtz->unknown_headers);
 
   free((void *) mtz);
   return 1;
@@ -3332,6 +3561,10 @@ MTZCOL *MtzAddColumn(MTZ *mtz, MTZSET *set, const char *label,
   col->source = 0;
   col->min = 1.e06;
   col->max = -1.e06;
+  col->colsource[0] = '\0';
+  col->grpname[0] = '\0';
+  col->grptype[0] = '\0';
+  col->grpposn = -1;
   /* add pointer to set */
   if ( ++set->ncol > ccp4array_size(set->col))
     ccp4array_resize(set->col, set->ncol + 9);
@@ -3693,3 +3926,4 @@ MTZXTAL *MtzXtalLookup(const MTZ *mtz, const char *label)
   }
   return NULL;
 }
+

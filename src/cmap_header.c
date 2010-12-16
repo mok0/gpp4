@@ -32,7 +32,7 @@
   \return 1 on success, EOF on failure*/
 int parse_mapheader(CMMFile *mfile)
 {
-  const int read_total = 74;
+  const int read_total = 77;
   const size_t header_size = 1024U, n_byt_symop = 80U;
   unsigned char buffer[224];
   int result;
@@ -46,10 +46,15 @@ int parse_mapheader(CMMFile *mfile)
    result += ccp4_file_readint(mfile->stream, &buffer[64], 3);
    result += ccp4_file_readfloat(mfile->stream, &buffer[76], 3);
    result += ccp4_file_readint(mfile->stream, &buffer[88], 3);
+   /* skew matrix and translation */
    result += ccp4_file_readfloat(mfile->stream, &buffer[100], 12);
+   /* reserved */
    result += ccp4_file_readint(mfile->stream, &buffer[148], 8);
-   result += ccp4_file_readchar(mfile->stream, &buffer[180], 24);
-   result += ccp4_file_readint(mfile->stream, &buffer[204], 3);
+   /* user access */
+   result += ccp4_file_readchar(mfile->stream, &buffer[180], 28);
+   /* map and machine stamp */
+   result += ccp4_file_readint(mfile->stream, &buffer[208], 2);
+   /* ARMS */
    result += ccp4_file_readfloat(mfile->stream, &buffer[216], 1);
    result += ccp4_file_readint(mfile->stream, &buffer[220], 1);
    
@@ -72,7 +77,7 @@ int parse_mapheader(CMMFile *mfile)
   memcpy(&mfile->spacegroup,&buffer[88],sizeof(int));
   memcpy(&mfile->symop.size,&buffer[92],sizeof(int));
   memcpy(&mfile->user_access,&buffer[180],sizeof(mfile->user_access));
-  memcpy(&mfile->data.header_size,&buffer[204],sizeof(int));
+  /* memcpy(&mfile->data.header_size,&buffer[204],sizeof(int)); */
   memcpy(&frms,&buffer[216],sizeof(float));
   mfile->stats.rms = (double) frms;
   memcpy(&mfile->labels.number,&buffer[220],sizeof(int));
@@ -80,7 +85,7 @@ int parse_mapheader(CMMFile *mfile)
   memcpy(&result,&buffer[96],sizeof(int));
   if (result !=0) {
     memcpy(&mfile->skew.rotation[0][0],&buffer[100],sizeof(mfile->skew.rotation));
-    memcpy(&mfile->skew.translation[0],&buffer[148],sizeof(mfile->skew.translation));
+    memcpy(&mfile->skew.translation[0],&buffer[136],sizeof(mfile->skew.translation));
   }
   
   ccp4_file_setmode(mfile->stream, mfile->data_mode);
@@ -102,7 +107,7 @@ int parse_mapheader(CMMFile *mfile)
   \return 1 on success, EOF on failure */
 int write_mapheader(CMMFile *mfile)
 {
-  const int write_total = 74;
+  const int write_total = 77;
   unsigned char buffer[224];
   int result;
   float fmean,frms;
@@ -121,7 +126,7 @@ int write_mapheader(CMMFile *mfile)
   memcpy(&buffer[88],&mfile->spacegroup,sizeof(int));
   memcpy(&buffer[92],&mfile->symop.size,sizeof(int));
   memcpy(&buffer[180],&mfile->user_access,sizeof(mfile->user_access));
-  memcpy(&buffer[204],&mfile->data.header_size,sizeof(int));
+  /* memcpy(&buffer[204],&mfile->data.header_size,sizeof(int)); */
   memcpy(&buffer[208],"MAP ",4U);
   frms = (float) mfile->stats.rms;
   memcpy(&buffer[216],&frms,sizeof(float));
@@ -143,8 +148,8 @@ int write_mapheader(CMMFile *mfile)
    result += ccp4_file_writeint(mfile->stream, &buffer[88], 3);
    result += ccp4_file_writefloat(mfile->stream, &buffer[100], 12);
    result += ccp4_file_writeint(mfile->stream, &buffer[148], 8);
-   result += ccp4_file_writechar(mfile->stream, &buffer[180], 24);
-   result += ccp4_file_writeint(mfile->stream, &buffer[204], 3);
+   result += ccp4_file_writechar(mfile->stream, &buffer[180], 28);
+   result += ccp4_file_writeint(mfile->stream, &buffer[208], 2);
    result += ccp4_file_writefloat(mfile->stream, &buffer[216], 1);
    result += ccp4_file_writeint(mfile->stream, &buffer[220], 1);
    

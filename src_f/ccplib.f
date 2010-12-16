@@ -28,7 +28,7 @@ C     fixme: the bit-twiddling should be in library.c, not here.
 C     amalgamate ccppsf and fdir/fext/froot.  also add tests of these
 C     routines to testlib.
 C
-C     $Id: ccplib.f,v 1.104 2008/06/09 10:41:02 mdw Exp $
+C     $Id: ccplib.f,v 1.105 2010/09/21 15:21:24 ccb Exp $
 C
 C      CCFILL    Set specified number of elements of byte array
 C      CCPALC    Call subroutine with allocated memory
@@ -2221,7 +2221,7 @@ C
       IMPLICIT NONE
 C     .. Parameter (table size: MUST BE A PRIME NUMBER)
       INTEGER KPRI
-      PARAMETER (KPRI=5003)
+      PARAMETER (KPRI=8501)
 C
 C     .. Scalar Arguments ..
       INTEGER NSER
@@ -2286,7 +2286,7 @@ C
       IMPLICIT NONE
 C     .. Parameter (table size: MUST BE A PRIME NUMBER)
       INTEGER KPRI
-      PARAMETER (KPRI=5003)
+      PARAMETER (KPRI=8501)
 C
 C     .. Scalar Arguments ..
       INTEGER NFIND,NSER
@@ -2334,7 +2334,7 @@ C
       IMPLICIT NONE
 C     .. Parameter (table size: MUST BE A PRIME NUMBER)
       INTEGER KPRI
-      PARAMETER (KPRI=5003)
+      PARAMETER (KPRI=8501)
 C     
 C     .. Arrays in Common ..
       INTEGER IT
