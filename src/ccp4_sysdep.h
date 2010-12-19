@@ -266,6 +266,11 @@
 #  define NATIVEFT DFNTF_BEIEEE
 #endif
 
+#if defined (__s390__) || defined (__s390x__)
+#  define NATIVEIT DFNTI_MBO
+#  define NATIVEFT DFNTF_BEIEEE
+#endif
+
 #ifdef __alpha
 #  ifdef VMS
 #    if __IEEE_FLOAT == 1
