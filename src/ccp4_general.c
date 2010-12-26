@@ -33,6 +33,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdarg.h>
+#include <time.h>
 
 /* Library header files */
 #include "ccp4_fortran.h"
@@ -1371,7 +1372,11 @@ int ccpputenv(char *logical_name, char *file_name)
 void ccp4_banner(void) {
 
   int diag=0;
-  char date[11],time[9],prog_vers_str[19];
+  char prog_vers_str[19];
+
+  time_t curtime;
+  struct tm *loctime;
+  char timebuf[32];
 
   if (diag) printf("Entering ccp4_banner \n");
 
@@ -1386,13 +1391,23 @@ void ccp4_banner(void) {
 
   printf(" \n");
 
+  /* Get the current time. */
+  curtime = time (NULL);
+     
+  /* Convert it to local time representation. */
+  loctime = localtime (&curtime);
+     
+  /* output date and time in RFC 2822 format.
+     Example: Mon, 07 Aug 2006 12:34:56 -0600 */
+  strftime (timebuf, 32, "%a, %d %b %Y %T %z", loctime);
+
+
   printf(" ###############################################################\n");
   printf(" ### program name: %s, %s\n", ccp4ProgramName(NULL),prog_vers_str);
   printf(" ### gpp4 library version: %-6s, compiled: %s\n", GPP4_VERSION_NO,__DATE__);
-  printf(" ### (derived from CCP4 library patch level: %-6s)\n", CCP4_PATCH_LEVEL);
+  printf(" ### CCP4 library compatibility: patch level %-6s\n", CCP4_PATCH_LEVEL);
   printf(" ###############################################################\n");
-  printf(" User: %s  Run date: %s Run time: %s \n\n\n",
-	 ccp4_utils_username(),ccp4_utils_date(date),ccp4_utils_time(time)); 
+  printf(" User: %s  Run time: %s \n\n\n", ccp4_utils_username(), timebuf);
   if (diag) printf("Leaving ccp4_banner \n");
 }
 
