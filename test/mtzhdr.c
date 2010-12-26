@@ -1,7 +1,7 @@
 /*
      mtzhdr -- a program to print header information from mtz
      file. Inspired by Ralf Grosse-Kunstleves mail to ccp4-dev mailing
-     list 2010xxyy.  
+     list 20100915.  
 
      Copyright (C) 2010 Morten Kjeldgaard
 
