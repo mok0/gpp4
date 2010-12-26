@@ -1,5 +1,7 @@
 .libs/
 .deps/
+*.lo
+*.la
 config/ltmain.sh
 config/lt~obsolete.m4
 config/ltoptions.m4
@@ -25,3 +27,6 @@ config.log
 config.status
 configure
 doc
+test/checkarch
+test/load_syminfo
+test/mtzhdr

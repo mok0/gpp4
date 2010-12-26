@@ -910,10 +910,10 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
 
   free(filename); 
 
-  return(mtz);}
+  return(mtz);
+}
 
 int MtzArrayToBatch(const int *intbuf, const float *fltbuf, MTZBAT *batch)
-
 {  int i;
 
   batch->iortyp = intbuf[3];
