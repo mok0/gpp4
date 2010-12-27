@@ -1,3 +1,11 @@
+2010-12-27  Morten Kjeldgaard  <mok@gremlin>
+
+	* test/checkarch.c: deal with map files too. Expand test on arch format
+	  and print out more info.
+
+	* test/mtzhdr.c: print extensive header information, inspirede by Ralfs post
+	  on ccp4-dev on 20100915
+
 2010-12-16  Morten Kjeldgaard  <mok0@ubuntu.com>
 
 	* src/csymlib.h: fix url in Doxygen markup.
