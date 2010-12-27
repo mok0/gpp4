@@ -6,6 +6,13 @@
 	* test/mtzhdr.c: print extensive header information, inspirede by Ralfs post
 	  on ccp4-dev on 20100915
 
+2010-12-26  Morten Kjeldgaard  <mok0@ubuntu.com>
+
+	* src/ccp4_general.c (ccp4_banner): output date and time in RFC 2822 format.
+
+	* test/mtzhdr.c: Output more complete header information, inspired
+	by Ralf Grosse-Kunstleves mail to ccp4-dev on 20100915.
+
 2010-12-16  Morten Kjeldgaard  <mok0@ubuntu.com>
 
 	* src/csymlib.h: fix url in Doxygen markup.
