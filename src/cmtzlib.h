@@ -45,6 +45,10 @@ ccp4_lwrefl are required to read and write reflections from/to disk.
 
 Information on the data structure is given in mtzdata.h
 
+See extensive documentaion on the MTZ format at 
+<a href="http://www.ccp4.ac.uk/html/mtzformat.html">
+CCP4's website</a>.
+
 @section cmtz_princ_func Principal Functions
 @subsection cmtz_reading Reading MTZ files
 
