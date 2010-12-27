@@ -88,7 +88,7 @@ void mtzhdrout (MTZ *mtz)
       printf ("    Wavelength: %f\n", mtz->xtal[j]->set[i]->wavelength);
       printf ("    Number of columns: %d\n", mtz->xtal[j]->set[i]->ncol);
       printf ("%31s%11s%10s%11s%11s%8s\n", "label", "#valid", "%valid", "min", "max", "type");
-      /*           FTOXD3       3161  97.71% 170.00 20154.00 F: amplitude */
+
       for (k=0; k < mtz->xtal[j]->set[i]->ncol; k++) {
 
 	printf ("%31s", mtz->xtal[j]->set[i]->col[k]->label);
@@ -115,6 +115,15 @@ void mtzhdrout (MTZ *mtz)
 	case 'F':
 	  printf (" amplitude\n");
 	  break;
+	case 'J':
+	  printf (" intensity\n");
+	  break;
+	case 'G':
+	  printf (" amplitude associated with F(+) or F(-)\n");
+	  break;
+	case 'K': 
+	  printf (" intensity associated with I(+) or I(-)\n"); 
+	  break;
 	case 'D':
 	  printf (" anomalous difference\n");
 	  break;
@@ -124,32 +133,40 @@ void mtzhdrout (MTZ *mtz)
 	case 'I':
 	  printf (" integer\n");
 	  break;
+	case 'R': 
+	  printf (" real\n"); 
+	  break;
+	case 'L': 
+	  printf (" standard deviation of a column of type G\n"); 
+	  break;
+	case 'M': 
+	  printf (" standard deviation of a column of type K\n"); 
+	  break;
+	case 'E': 
+	  printf (" normalised structure factor\n"); 
+	  break;
+	case 'P': 
+	  printf (" phase angle (degrees)\n"); 
+	  break;
+	case 'W': 
+	  printf (" weight\n"); 
+	  break;
+	case 'A': 
+	  printf (" phase probability coefficients\n"); 
+	  break;
+	case 'B': 
+	  printf (" batch number\n"); 
+	  break;
+	case 'Y': 
+	  printf (" packed partial/reject flag and symmetry number\n"); 
+	  break;
 	default:
 	  printf ("\n");
 	  break;
 	}
       }
-
-
-      /* 
-   Name: HKL_base
-    Id: 0
-    Wavelength: 0
-    Number of columns: 3
-    label #valid  %valid  min   max type
-    H       3235 100.00% 0.00 31.00 H: index h,k,l
-    K       3235 100.00% 0.00 16.00 H: index h,k,l
-    L       3235 100.00% 0.00 10.00 H: index h,k,l
-      */
-
-
     }
-
-
   }
-
-
-
   return;
 }
 
