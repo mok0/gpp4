@@ -74,7 +74,7 @@ void mtzhdrout (MTZ *mtz)
     printf ("  Name: %s\n", mtz->xtal[j]->xname);
     printf ("  Project: %s\n", mtz->xtal[j]->pname);
     printf ("  Id: %d\n", mtz->xtal[j]->xtalid);
-    printf ("  Unit cell:", mtz->xtal[j]->cell[i]);
+    printf ("  Unit cell:");
     for (i=0; i<6; i++)
       printf (" %.3f", mtz->xtal[j]->cell[i]);
     printf ("\n");

@@ -92,32 +92,32 @@ struct _CMMFile_Data {
 };
 
 struct _CMMFile_Stats {
-  float offset;                /* pseudo zero value */
-  float min;                   /* minimum density value */
-  float max;                   /* maximum density value */
-  double mean;               /* sum of densities (less offset) */
-  double rms;              /* sum of square of densities (less offset) */
-  int total;                    /* number of summed densities */
+  float offset;		        /**< pseudo zero value */
+  float min;			/**< minimum density value */
+  float max;			/**< maximum density value */
+  double mean;			/**< sum of densities (less offset) */
+  double rms;	                /**< sum of square of densities (less offset) */
+  int total;			/**< number of summed densities */
 };
 
 struct _CMMFile {
-CCP4File *stream;
-char *file_name;
-unsigned int data_mode;
-unsigned int close_mode;
-float cell[6];
-int spacegroup;
-int map_dim[3];
-int origin[3];
-int cell_grid[3];
-int axes_order[3];
-CMMFile_Symop symop;
-CMMFile_Data data;
-CMMFile_Stats stats;
-CMMFile_Labels labels;
-CMMFile_Skew skew;
-int reserved[8];
-char user_access[28];
+  CCP4File *stream;		/**< pointer to file structure */
+  char *file_name;		/**< name of file */
+  unsigned int data_mode;	/**< */
+  unsigned int close_mode;	/**< */
+  float cell[6];		/**< unit cell parameters */
+  int spacegroup;		/**< space group number */
+  int map_dim[3];		/**< size of map array along */
+  int origin[3];		/**< map origin */
+  int cell_grid[3];		/**< grid points along cell edges */
+  int axes_order[3];		/**< */
+  CMMFile_Symop symop;		/**< */
+  CMMFile_Data data;		/**< */
+  CMMFile_Stats stats;		/**< */
+  CMMFile_Labels labels;	/**< */
+  CMMFile_Skew skew;		/**< */
+  int reserved[8];
+  char user_access[28];		/**< */
 };
 
 /* open a file for read/write */
