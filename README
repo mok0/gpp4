@@ -1,4 +1,5 @@
--*- mode: text -*-
+Introduction
+------------
 
 This distribution is a special version of the CCP4 library, released
 under the Lesser GNU Public License version 2.1.
@@ -24,4 +25,43 @@ is to provide a drop-in replacement for the non-free CCP4 libraries,
 that as carefully as possible will implement the current CCP4 library
 interface.
 
-2007-07-04  Morten  Kjeldgaard  <mok@bioxray.dk>
+
+Building gpp4
+-------------
+
+The distribution includes two libraries, libgpp4, which is the C
+interface, and optionally libgpp4f, which is the fortran interface. To
+compile the Fortran library, it is required that the MMDB library is
+installed. This library can be fetched from the Launchpad project at
+ 
+ <https://launchpad.net/mmdb>
+
+either as a tar.gz archive or as a bazaar branch. To retrieve this,
+issue this from a suitable directory:
+
+ bzr branch lp:mmdb
+
+
+Using the library
+-----------------
+
+The header files for gpp4 are by default installed in
+$prefix/include/gpp4/ccp4/* which means that gpp4 should be a
+transparent drop-in replacement for the CCP4 libraries, if your C
+source files use includes of the form:
+
+  #include <ccp4/cmaplib.h>
+
+In this case, it is necessary to pass the flag -I/usr/include/gpp4 to
+the compiler. Gpp4 supports the pkg-config interface, which means you
+can compile your program something like this:
+
+  gcc -o foo `pkgconfig gpp4 --cflags --libs` foo.c
+
+In case your program uses the following include form (not recommended):
+
+  #include "cmaplib.h"
+
+you need to pass the complete include path to the compiler
+(-I/usr/include/gpp4/ccp4) and you cannot make use of the pkg-config
+interface.

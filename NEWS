@@ -1,3 +1,9 @@
+2010-12-28  Morten Kjeldgaard  <mok@homunculus>
+
+	* The C library can now be built on its own without having to
+	also compile the Fortran API. This is done by passing the
+	--without-fortran-api switch to configure.
+
 2010-01-25  Morten Kjeldgaard  <mok@bioxray.dk>
 
 	* Incorporate patches to the library from ccp4-6.1.3. This is a
