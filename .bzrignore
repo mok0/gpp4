@@ -37,7 +37,5 @@ test/.deps/
 test/.libs/
 test/load_syminfo
 test/mtzhdr
-util/.deps/
-util/fsplit
-util/.libs/
+test/maphdr
 src_f/unix.f
