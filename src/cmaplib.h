@@ -72,17 +72,27 @@ struct _CMMFile_Labels {
   char *labels[10];
 };
 
+/** @struct _CMMFile_Skew 
+    @brief Data structure describing an optional skew transformation
+    of the map */
 struct _CMMFile_Skew {
-  float rotation[3][3];
-  float translation[3];
+  float rotation[3][3];		/**< 3x3 rotation matrix */
+  float translation[3];		/**< translation component */
 };
 
+/** @struct _CMMFile_Symop 
+    @brief Data structure describing the block of symmetry data within
+    the file */
 struct _CMMFile_Symop {
-unsigned int offset;
-unsigned int size;
-unsigned int number;
+  unsigned int offset;		/**< offset of data block from
+				   beginning of file */
+  unsigned int size;		/**< size of data block */
+  unsigned int number;		/**< number of symmetry operations */
 };
 
+/** @struct _CMMFile_Data 
+    @brief Data structure describing the blocks within the file holding
+    the map array */
 struct _CMMFile_Data {
   size_t offset;
   size_t section_size;
@@ -91,6 +101,9 @@ struct _CMMFile_Data {
   unsigned int number;
 };
 
+/** @struct _CMMFile_Stats
+    @brief Construct to hold various map statistics
+*/
 struct _CMMFile_Stats {
   float offset;		        /**< pseudo zero value */
   float min;			/**< minimum density value */
@@ -100,6 +113,10 @@ struct _CMMFile_Stats {
   int total;			/**< number of summed densities */
 };
 
+/** @struct _CMMFile 
+    @brief Construct to hold the information about
+    a map file
+*/
 struct _CMMFile {
   CCP4File *stream;		/**< pointer to file structure */
   char *file_name;		/**< name of file */
@@ -107,10 +124,12 @@ struct _CMMFile {
   unsigned int close_mode;	/**< */
   float cell[6];		/**< unit cell parameters */
   int spacegroup;		/**< space group number */
-  int map_dim[3];		/**< size of map array along */
-  int origin[3];		/**< map origin */
-  int cell_grid[3];		/**< grid points along cell edges */
-  int axes_order[3];		/**< */
+  int map_dim[3];		/**< size of map array (number of
+				   columns, rows, sections) */
+  int origin[3];		/**< map origin (number of first
+				   column, row, section) */
+  int cell_grid[3];		/**< grid size along cell edges */
+  int axes_order[3];		/**< which axis corresponds to x, y, z */
   CMMFile_Symop symop;		/**< */
   CMMFile_Data data;		/**< */
   CMMFile_Stats stats;		/**< */

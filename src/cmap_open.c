@@ -76,7 +76,7 @@ int is_cmap(CCP4File *file)
   return !strncmp(buffer,"MAP ",4);
 }
 
-/*! The file is opened.
+/*! The file is opened for reading/writing.
  \param filename (char *) the filename
  \param mode (int) the i/o mode , possible values are O_RDONLY, O_WRONLY, 
        O_RDWR, O_APPEND, O_TMP, O_CREAT, O_TRUNC - see ccp4_sysdep.h
@@ -117,7 +117,6 @@ void *ccp4_cmap_open(const char *filename, int mode)
     return (NULL); }
   return (mfile);
 }
-
 
 /*
   Local variables:
