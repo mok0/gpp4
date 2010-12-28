@@ -51,7 +51,7 @@ PKG_CHECK_MODULES(MMDB, mmdb >= 1.19)
 AC_SUBST(MMDB_CFLAGS)
 AC_SUBST(MMDB_LIBS)
 
-# gpp4 wants to know it's prefix
+# gpp4 wants to know its prefix
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
 AC_DEFINE_UNQUOTED([GPP4_PREFIX],["$prefix"],[Base directory of gpp4 installation])
 GPP4_PREFIX=$prefix

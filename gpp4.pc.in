@@ -8,5 +8,5 @@ Description: alternative to the CCP4 library
 Version: @VERSION@
 Requires:
 Conflicts:
-Libs: -L\${libdir} -lgpp4
-Cflags: -I\${includedir}/gpp4
+Libs: -L${libdir} -lgpp4
+Cflags: -I${includedir}/gpp4
