@@ -175,7 +175,7 @@ int main(int argc, char **argv)
 {
 
   if (argc != 2) {
-    puts("Usage: trymtz <mtzfile>");
+    puts("Usage: mtzhdr <mtzfile>");
     exit(1);
   }
 
