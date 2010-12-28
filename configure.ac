@@ -44,7 +44,7 @@ AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
 
 # check for various c library functions
-AC_CHECK_FUNCS([memmove memset mkdir pow putenv rint setenv sqrt strchr strdup strerror strrchr strstr strlcpy])
+AC_CHECK_FUNCS([strnlen memmove memset mkdir pow putenv rint setenv sqrt strchr strdup strerror strrchr strstr strlcpy])
 
 # check for mmdb
 PKG_CHECK_MODULES(MMDB, mmdb >= 1.19)

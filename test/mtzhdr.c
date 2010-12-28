@@ -87,11 +87,26 @@ void mtzhdrout (MTZ *mtz)
       printf ("    Id: %d\n", mtz->xtal[j]->set[i]->setid);
       printf ("    Wavelength: %f\n", mtz->xtal[j]->set[i]->wavelength);
       printf ("    Number of columns: %d\n", mtz->xtal[j]->set[i]->ncol);
-      printf ("%31s%11s%10s%11s%11s%8s\n", "label", "#valid", "%valid", "min", "max", "type");
 
+      /* Determine length of longest label */
+      int n, max = 1;
+      char fmt[8];
+      for (k=0; k < mtz->xtal[j]->set[i]->ncol; k++) {
+#ifdef HAVE_STRNLEN
+	n = strnlen (mtz->xtal[j]->set[i]->col[k]->label, 31);
+#else
+	n = strlen (mtz->xtal[j]->set[i]->col[k]->label);
+#endif
+	max = n > max? n:max;
+      }
+      sprintf (fmt, "%%%ds", max+4);
+      printf (fmt, "label");
+      printf ("%11s%10s%11s%11s%9s\n", "#valid", "%valid", "min", "max", "type");
+
+      /* Now print info about columnts */
       for (k=0; k < mtz->xtal[j]->set[i]->ncol; k++) {
 
-	printf ("%31s", mtz->xtal[j]->set[i]->col[k]->label);
+	printf (fmt, mtz->xtal[j]->set[i]->col[k]->label);
 	{
 	  float *r = mtz->xtal[j]->set[i]->col[k]->ref;
 	  register int h;
@@ -106,7 +121,7 @@ void mtzhdrout (MTZ *mtz)
 
 	printf (" %10.2f", mtz->xtal[j]->set[i]->col[k]->min);
 	printf (" %10.2f", mtz->xtal[j]->set[i]->col[k]->max);
-	printf (" %7s:", mtz->xtal[j]->set[i]->col[k]->type);
+	printf (" %5s:", mtz->xtal[j]->set[i]->col[k]->type);
 
 	switch (mtz->xtal[j]->set[i]->col[k]->type[0]) {
 	case 'H':
