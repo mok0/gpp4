@@ -118,13 +118,6 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
       "NCOL","NDIF","CRYS","MTZH","MTZB","BH" };
   int n_known_headers = sizeof(known_headers)/sizeof(known_headers[0]);
 
-  /* known headers */
-  char known_headers[][5] =
-    { "PROJ","DATA","DCEL","DRES","DWAV","VERS","TITL","CELL",
-      "SORT","SYMI","SYMM","COLU","VALM","RESO","COLS","COLG",
-      "NCOL","NDIF","CRYS","MTZH","MTZB","BH" };
-  int n_known_headers = sizeof(known_headers)/sizeof(known_headers[0]);
-
   if (debug) 
     printf(" Entering MtzGet \n");
 
