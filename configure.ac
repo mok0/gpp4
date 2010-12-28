@@ -57,7 +57,28 @@ AC_DEFINE_UNQUOTED([GPP4_PREFIX],["$prefix"],[Base directory of gpp4 installatio
 GPP4_PREFIX=$prefix
 AC_SUBST(GPP4_PREFIX)
 
-# output the Makefiles
+dnl The next section provides logic to allow user to disable the
+dnl building of the Fortran API.
+
+AC_ARG_WITH([fortran-api],
+          [AS_HELP_STRING([--without-fortran-api],
+          [disable building of the Fortran library gpp4f])],
+          [],
+          [with_fortran_api=yes])
+
+# Define an automake conditional:
+AM_CONDITIONAL([WANT_GPP4F],[test "x$with_fortran_api" = "xyes"])
+
+# Define an autoconf substitution:
+if test "x$with_fortran_api" = "xyes"; then
+  WANT_GPP4F=1
+else
+  WANT_GPP4F=0
+fi
+AC_SUBST(WANT_GPP4F)
+dnl  end of fortran-api selection
+
+dnl  output the Makefiles
 AC_CONFIG_FILES([
 		Makefile
 		gpp4.pc
