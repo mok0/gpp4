@@ -118,6 +118,13 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
       "NCOL","NDIF","CRYS","MTZH","MTZB","BH" };
   int n_known_headers = sizeof(known_headers)/sizeof(known_headers[0]);
 
+  /* known headers */
+  char known_headers[][5] =
+    { "PROJ","DATA","DCEL","DRES","DWAV","VERS","TITL","CELL",
+      "SORT","SYMI","SYMM","COLU","VALM","RESO","COLS","COLG",
+      "NCOL","NDIF","CRYS","MTZH","MTZB","BH" };
+  int n_known_headers = sizeof(known_headers)/sizeof(known_headers[0]);
+
   if (debug) 
     printf(" Entering MtzGet \n");
 
@@ -769,6 +776,104 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
     ntok = ccp4_parser(hdrrec, MTZRECORDLENGTH, parser, iprint);
   }
 
+  /* 4th Pass: Column group and source extensions and unknown keywords */
+  /* 4th Pass: Position at top of header */
+  ccp4_file_setmode(filein,6);
+  ccp4_file_seek(filein, hdrst-1, SEEK_SET);
+  ccp4_file_setmode(filein,0);
+  istat = ccp4_file_readchar(filein, (uint8 *) hdrrec, MTZRECORDLENGTH);
+  hdrrec[MTZRECORDLENGTH] = '\0';
+  ntok = ccp4_parser(hdrrec, MTZRECORDLENGTH, parser, iprint);
+  while (strncmp((strncpy(mkey,hdrrec,4)),"END",3) != 0) {
+    if (strncmp (mkey, "COLS",4) == 0 ) {
+      strcpy(label,token[1].fullstring);
+      /* Special trap for M/ISYM */
+      if (strncmp (label,"M/ISYM",6) == 0)
+        strcpy(label,"M_ISYM");
+      icset = (int) token[3].value;
+      newcol = NULL;
+      for (i = 0; i < mtz->nxtal; ++i) {
+	for (j = 0; j < mtz->xtal[i]->nset; ++j) {
+	  if (mtz->xtal[i]->set[j]->setid == icset) {
+	    for ( k = 0; k < mtz->xtal[i]->set[j]->ncol; k++ ) {
+	      if (strcmp(mtz->xtal[i]->set[j]->col[k]->label,label) == 0) {
+		newcol = mtz->xtal[i]->set[j]->col[k];
+		break;
+	      }
+	    }
+	  }
+	}
+      }
+      if ( newcol == NULL ) {
+ 	ccp4_signal(CCP4_ERRLEVEL(3) | CMTZ_ERRNO(CMTZERR_ColSourceError),
+		    "MtzGet", NULL);
+	ccp4_parse_end(parser);
+	ccp4_file_close(filein);
+	free(filename);
+	return(NULL);
+      }
+      strncpy( newcol->colsource, token[2].fullstring, 36 );
+      newcol->colsource[36] = '\0';
+    } else if (strncmp (mkey, "COLG",4) == 0 ) {
+      strcpy(label,token[1].fullstring);
+      /* Special trap for M/ISYM */
+      if (strncmp (label,"M/ISYM",6) == 0)
+        strcpy(label,"M_ISYM");
+      icset = (int) token[5].value;
+      newcol = NULL;
+      for (i = 0; i < mtz->nxtal; ++i) {
+	for (j = 0; j < mtz->xtal[i]->nset; ++j) {
+	  if (mtz->xtal[i]->set[j]->setid == icset) {
+	    for ( k = 0; k < mtz->xtal[i]->set[j]->ncol; k++ ) {
+	      if (strcmp(mtz->xtal[i]->set[j]->col[k]->label,label) == 0) {
+		newcol = mtz->xtal[i]->set[j]->col[k];
+		break;
+	      }
+	    }
+	  }
+	}
+      }
+      if ( newcol == NULL ) {
+ 	ccp4_signal(CCP4_ERRLEVEL(3) | CMTZ_ERRNO(CMTZERR_ColGroupError),
+		    "MtzGet", NULL);
+	ccp4_parse_end(parser);
+	ccp4_file_close(filein);
+	free(filename);
+	return(NULL);
+      }
+      strncpy( newcol->grpname, token[2].fullstring, 30 );
+      newcol->grpname[30] = '\0';
+      strncpy( newcol->grptype, token[3].fullstring, 4 );
+      newcol->grptype[4] = '\0';
+      newcol->grpposn = (int) token[4].value;
+    }
+    istat = ccp4_file_readchar(filein, (uint8 *) hdrrec, MTZRECORDLENGTH);
+    hdrrec[MTZRECORDLENGTH] = '\0';
+    ntok = ccp4_parser(hdrrec, MTZRECORDLENGTH, parser, iprint);
+  }
+
+  /* 5th Pass: Deal with unknown headers */
+  /* 5th Pass: Position at top of header */
+  ccp4_file_setmode(filein,6);
+  ccp4_file_seek(filein, hdrst-1, SEEK_SET);
+  ccp4_file_setmode(filein,0);
+  istat = ccp4_file_readchar(filein, (uint8 *) hdrrec, MTZRECORDLENGTH);
+  hdrrec[MTZRECORDLENGTH] = '\0';
+  ntok = ccp4_parser(hdrrec, MTZRECORDLENGTH, parser, iprint);
+  while (strncmp((strncpy(mkey,hdrrec,4)),"END",3) != 0) {
+    for ( i = 0; i < n_known_headers; ++i )
+      if (strncmp (mkey,known_headers[i],4) == 0 )
+	break;
+    if ( i == n_known_headers ) {
+      mtz->unknown_headers = ccp4_utils_realloc( mtz->unknown_headers, mtz->n_unknown_headers*MTZRECORDLENGTH+MTZRECORDLENGTH );  // if null, malloc
+      memcpy( mtz->unknown_headers+mtz->n_unknown_headers*MTZRECORDLENGTH, hdrrec, MTZRECORDLENGTH );
+      mtz->n_unknown_headers++;
+    }
+    istat = ccp4_file_readchar(filein, (uint8 *) hdrrec, MTZRECORDLENGTH);
+    hdrrec[MTZRECORDLENGTH] = '\0';
+    ntok = ccp4_parser(hdrrec, MTZRECORDLENGTH, parser, iprint);
+  }
+
   /* copy sort order */
   for (i = 0; i < 5; ++i) {
     if (isort[i] > 0) 
@@ -860,6 +965,16 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
 
   if (debug) 
     printf(" MtzGet: end of batch pass \n");
+
+  /* Read XML datablock */
+  xmllen = ccp4_file_length(filein) - ccp4_file_tell(filein);
+  if ( xmllen > 0 ) {
+    mtz->xml = (char *)ccp4_utils_malloc( xmllen+1 );
+    if ( mtz->xml != NULL ) {
+      istat = ccp4_file_readchar(filein, (uint8 *) mtz->xml, xmllen);
+      mtz->xml[xmllen] = '\0';
+    }
+  }
 
   /* Read XML datablock */
   xmllen = ccp4_file_length(filein) - ccp4_file_tell(filein);
@@ -2907,6 +3022,11 @@ int MtzPut(MTZ *mtz, const char *logname)
    for (i = 0; i < mtz->n_unknown_headers; ++i)
      MtzWhdrLine(fileout,MTZRECORDLENGTH,mtz->unknown_headers+i*MTZRECORDLENGTH);
 
+ /* write out unrecognized headers */
+ if ( mtz->unknown_headers )
+   for (i = 0; i < mtz->n_unknown_headers; ++i)
+     MtzWhdrLine(fileout,MTZRECORDLENGTH,mtz->unknown_headers+i*MTZRECORDLENGTH);
+
  sprintf(hdrrec,"END ");
  MtzWhdrLine(fileout,4,hdrrec);
 
@@ -2958,6 +3078,12 @@ int MtzPut(MTZ *mtz, const char *logname)
 
  sprintf(hdrrec,"MTZENDOFHEADERS ");
  MtzWhdrLine(fileout,16,hdrrec);
+
+ /* write XML data block */
+ if ( mtz->xml != NULL ) {
+   ccp4_file_setmode(fileout,0);
+   ccp4_file_writechar(fileout,(const uint8 *)mtz->xml,strlen(mtz->xml));
+ }
 
  /* write XML data block */
  if ( mtz->xml != NULL ) {
@@ -3354,6 +3480,12 @@ int MtzFree(MTZ *mtz)
 
   if (mtz->hist != NULL) 
     MtzFreeHist(mtz->hist);
+
+  if (mtz->xml != NULL)
+    free(mtz->xml);
+
+  if (mtz->unknown_headers != NULL)
+    free(mtz->unknown_headers);
 
   if (mtz->xml != NULL)
     free(mtz->xml);
