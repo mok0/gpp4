@@ -90,7 +90,7 @@ void mtzhdrout (MTZ *mtz)
 
       /* Determine length of longest label */
       int n, max = 1;
-      char fmt[8];
+      char fmt[16];
       for (k=0; k < mtz->xtal[j]->set[i]->ncol; k++) {
 #ifdef HAVE_STRNLEN
 	n = strnlen (mtz->xtal[j]->set[i]->col[k]->label, 31);
@@ -99,7 +99,7 @@ void mtzhdrout (MTZ *mtz)
 #endif
 	max = n > max? n:max;
       }
-      sprintf (fmt, "%%%ds", max+4);
+      sprintf (fmt, "      %%-%ds", max);
       printf (fmt, "label");
       printf ("%11s%10s%11s%11s%9s\n", "#valid", "%valid", "min", "max", "type");
 
