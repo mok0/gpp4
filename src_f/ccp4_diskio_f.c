@@ -107,7 +107,7 @@ FORTRAN_SUBR ( QOPEN, qopen,
     (int *iunit, fpstr lognam, int lognam_len, fpstr atbuta, int atbuta_len))
 {
   char *atbut2, *temp_lognam, *fname;
-  int istat;
+  int istat = 0;
 
   atbut2 = ccp4_FtoCString(FTN_STR(atbuta), FTN_LEN(atbuta));
   
@@ -380,12 +380,13 @@ FORTRAN_SUBR ( QREAD, qread,
     (int *iunit, uint8 *buffer, int *nitems, int *result))
 {
   *result = 0;
-  if ( ccp4_file_read (_ioChannels[*iunit]->iobj, buffer, *nitems) != *nitems) 
+  if ( ccp4_file_read (_ioChannels[*iunit]->iobj, buffer, *nitems) != *nitems) {
     if ( ccp4_file_feof(_ioChannels[*iunit]->iobj) ) 
       *result = -1;
     else 
       ccp4_signal(CCP4_ERRLEVEL(4) | CCP4_ERRNO(CIO_ReadFail),
 		  "QREAD", NULL);
+  }
 }
 
 /**
@@ -408,12 +409,13 @@ FORTRAN_SUBR ( QREADI, qreadi,
     (int *iunit, uint8* buffer, int *nitems, int *result))
     {
   *result = 0;
-  if ( ccp4_file_readint (_ioChannels[*iunit]->iobj, buffer, *nitems) != *nitems) 
+  if ( ccp4_file_readint (_ioChannels[*iunit]->iobj, buffer, *nitems) != *nitems) {
     if ( ccp4_file_feof(_ioChannels[*iunit]->iobj) ) 
       *result = -1;
     else 
       ccp4_signal(CCP4_ERRLEVEL(4) | CCP4_ERRNO(CIO_ReadFail),
 		  "QREADI", NULL);
+  }
 }
 
 /**
@@ -436,12 +438,13 @@ FORTRAN_SUBR ( QREADI2, qreadi2,
     (int *iunit, uint8* buffer, int *nitems, int *result))
     {
   *result = 0;
-  if ( ccp4_file_readshort (_ioChannels[*iunit]->iobj, buffer, *nitems) != *nitems) 
+  if ( ccp4_file_readshort (_ioChannels[*iunit]->iobj, buffer, *nitems) != *nitems) {
     if ( ccp4_file_feof(_ioChannels[*iunit]->iobj) ) 
       *result = -1;
     else 
       ccp4_signal(CCP4_ERRLEVEL(4) | CCP4_ERRNO(CIO_ReadFail),
 		  "QREADI2", NULL);
+  }
 }
 
 /**
@@ -464,12 +467,13 @@ FORTRAN_SUBR ( QREADR, qreadr,
     (int *iunit, uint8* buffer, int *nitems, int *result))
     {
   *result = 0;
-  if ( ccp4_file_readfloat (_ioChannels[*iunit]->iobj, buffer, *nitems) != *nitems) 
+  if ( ccp4_file_readfloat (_ioChannels[*iunit]->iobj, buffer, *nitems) != *nitems) {
     if ( ccp4_file_feof(_ioChannels[*iunit]->iobj) ) 
       *result = -1;
     else 
       ccp4_signal(CCP4_ERRLEVEL(4) | CCP4_ERRNO(CIO_ReadFail),
 		  "QREADR", NULL);
+  }
 }
 
 /**
@@ -492,12 +496,13 @@ FORTRAN_SUBR ( QREADQ, qreadq,
     (int *iunit, uint8* buffer, int *nitems, int *result))
     {
   *result = 0;
-  if ( ccp4_file_readcomp (_ioChannels[*iunit]->iobj, buffer, *nitems) != *nitems) 
+  if ( ccp4_file_readcomp (_ioChannels[*iunit]->iobj, buffer, *nitems) != *nitems) {
     if ( ccp4_file_feof(_ioChannels[*iunit]->iobj) ) 
       *result = -1;
     else 
       ccp4_signal(CCP4_ERRLEVEL(4) | CCP4_ERRNO(CIO_ReadFail),
 		  "QREADQ", NULL);
+  }
 }
 
 /**
@@ -706,10 +711,12 @@ FORTRAN_SUBR ( QQINQ, qqinq,
       log_name = strdup("diskio.dft"); 
     if (!(file_name = getenv(log_name)))
       file_name = log_name;
-    for ( *istrm = 1; *istrm == MAXFILES; *istrm++)
-      if (!strcmp(file_name,_ioChannels[*istrm]->iobj->name)) break;
+    for ( *istrm = 1; *istrm < MAXFILES; *istrm++) {
+      if (!strcmp(file_name,_ioChannels[*istrm]->iobj->name))
+	break;
+    }
   }
-  if (*istrm != MAXFILES) {
+  if (*istrm < MAXFILES) {
     *length = ccp4_file_length(_ioChannels[*istrm]->iobj);
     strncpy(FTN_STR(filename), _ioChannels[*istrm]->iobj->name,
                     MIN(strlen(_ioChannels[*istrm]->iobj->name), 

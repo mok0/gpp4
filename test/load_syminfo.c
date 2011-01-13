@@ -24,7 +24,7 @@
 #include "ccp4_general.h"
 #include "ccp4_program.h"
 
-main ()
+int main ()
 {
   CCP4SPG *spg;
 
@@ -38,6 +38,8 @@ main ()
   ccp4spg_print_epsilon_zones(spg);
   ccp4spg_print_recip_spgrp(spg);
   ccp4spg_print_recip_ops(spg);
+
+  return 0;
 }
 
 

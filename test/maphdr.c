@@ -22,6 +22,8 @@
 */
 
 #include "cmaplib.h"
+#include "ccp4_program.h"
+#include "ccp4_general.h"
 
 void maphdrout(CMMFile *map)
 {

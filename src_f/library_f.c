@@ -111,7 +111,7 @@ FORTRAN_SUBR ( USTENV, ustenv,
 
   temp_name = ccp4_FtoCString(FTN_STR(str), FTN_LEN(str));
 
-  if (*result = ccp4_utils_setenv (temp_name))  
+  if ( (*result = ccp4_utils_setenv (temp_name)) )
     ccp4_fatal("USTENV/CCP4_SETENV: Memory allocation failure"); 
   free(temp_name);
 }
@@ -222,7 +222,7 @@ FORTRAN_SUBR ( CCPAL1, ccpal1,
     (int) sizeof (int),            /* 5: not used */
     (int) sizeof (int)             /* 6: integers */
   };
-  int i, size, *leng[13];
+  int i, size = 0, *leng[13];
   void *pointer[13];
 
   for (i=0; i<*n; i++) {

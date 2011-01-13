@@ -23,6 +23,8 @@
 */
 
 #include "cmtzlib.h"
+#include "ccp4_program.h"
+#include "ccp4_general.h"
 #include <strings.h>
 #include <math.h>
 

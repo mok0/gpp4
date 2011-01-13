@@ -53,7 +53,7 @@ int whatkind (CCP4File *fd)
 
 int process_file (char *fnam, int verbose)
 {
-  int stamp_loc;
+  int stamp_loc = 0;
   union {
     unsigned int i;
     unsigned char mtstring[4];
