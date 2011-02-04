@@ -1,11 +1,10 @@
 C
 C  rwbrook.f: Fortran interface to MMDB for handling coordinates
 C
-C  This library is free software; you can redistribute it and/or
+C  This library is free software: you can redistribute it and/or
 C  modify it under the terms of the GNU Lesser General Public
-C  License as published by the Free Software Foundation; either
-C  version 2.1 of the License, or (at your option) any later
-C  version.
+C  License as published by the Free Software Foundation, either
+C  version 3 of the License, or (at your option) any later version.
 C
 C  This library is distributed in the hope that it will be useful,
 C  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,9 +12,8 @@ C  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 C  Lesser General Public License for more details.
 C
 C  You should have received a copy of the GNU Lesser General Public
-C  License along with this library; if not, write to the Free
-C  Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-C  Boston, MA 02110-1301 USA
+C  License along with This library.  If not, see
+C  <http://www.gnu.org/licenses/>.
 C
 C
 C Modifications
