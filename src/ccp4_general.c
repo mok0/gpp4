@@ -1369,6 +1369,7 @@ int ccpputenv(char *logical_name, char *file_name)
 */
 void ccp4_banner(void) {
 
+  register int i;
   int diag=0;
   char prog_vers_str[19];
 
@@ -1380,14 +1381,12 @@ void ccp4_banner(void) {
 
   /* Program version number */
   if (ccp4_prog_vers(NULL) && strlen(ccp4_prog_vers(NULL))) {
-    sprintf(prog_vers_str,"version %-10s",ccp4_prog_vers(NULL));
+    sprintf(prog_vers_str,"version %s",ccp4_prog_vers(NULL));
   } else {
     /* If no program version available then use the major library
        version number */
-    sprintf(prog_vers_str,"version %-10s",GPP4_VERSION_NO);
+    sprintf(prog_vers_str,"version %s",GPP4_VERSION_NO);
   }
-
-  printf(" \n");
 
   /* Get the current time. */
   curtime = time (NULL);
@@ -1399,14 +1398,64 @@ void ccp4_banner(void) {
      Example: Mon, 07 Aug 2006 12:34:56 -0600 */
   strftime (timebuf, 32, "%a, %d %b %Y %T %z", loctime);
 
+  char l1[132];
+  char l2[132];
+  char l3[132];
+  int ll1, ll2, ll3, ll = 0;
 
-  printf(" ###############################################################\n");
-  printf(" ### program name: %s, %s\n", ccp4ProgramName(NULL),prog_vers_str);
-  printf(" ### gpp4 library version: %-6s, compiled: %s\n", GPP4_VERSION_NO,__DATE__);
-  printf(" ### CCP4 library compatibility: patch level %-6s\n", CCP4_PATCH_LEVEL);
-  printf(" ###############################################################\n");
-  printf(" User: %s  Run time: %s \n\n\n", ccp4_utils_username(), timebuf);
-  if (diag) printf("Leaving ccp4_banner \n");
+  sprintf(l1, "program name: %s, %s", ccp4ProgramName(NULL),prog_vers_str);
+  sprintf(l2, "gpp4 library version: %s, compiled: %s", GPP4_VERSION_NO,__DATE__);
+  sprintf(l3, "CCP4 library compatibility: patch level %s", CCP4_PATCH_LEVEL);
+
+#ifdef HAVE_STRNLEN
+  ll1 = strnlen (l1, 132);
+  ll2 = strnlen (l2, 132);
+  ll3 = strnlen (l3, 132);
+#else
+  ll1 = strlen (l1);
+  ll2 = strlen (l2);
+  ll3 = strlen (l3);
+#endif
+  // Find longest line
+
+  ll = MAX(ll1, ll2);
+  ll = MAX(ll, ll3);
+
+  putchar ('o');
+  for (i = 0; i < ll+2; i++) {
+    putchar('-');
+  }
+  
+  fputs("o\n| ",stdout); 
+  fputs(l1, stdout);
+  if (ll-ll1 > 0) {
+    for (i=0; i<ll-ll1; i++)
+      putchar(' ');
+  }
+
+  fputs(" |\n| ", stdout);
+  fputs(l2, stdout);
+  if (ll-ll2 > 0) {
+    for (i=0; i<ll-ll2; i++)
+      putchar(' ');
+  }
+
+  fputs(" |\n| ", stdout);
+  fputs(l3, stdout);
+  if (ll-ll3 > 0) {
+    for (i=0; i<ll-ll3; i++)
+      putchar(' ');
+  }
+  fputs(" |\n", stdout);
+
+  putchar ('o');
+  for (i = 0; i < ll+2; i++) {
+    putchar('-');
+  }
+  puts("o"); 
+
+  printf(" User: %s  Run time: %s\n\n\n", ccp4_utils_username(), timebuf);
+  if (diag) printf("Leaving ccp4_banner\n");
 }
 
 /*
