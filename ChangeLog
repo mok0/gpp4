@@ -1,3 +1,7 @@
+2011-02-09  Morten Kjeldgaard  <mok@gremlin>
+
+	* src/ccp4_general.c (ccp4_banner): Have fun with banner.
+
 2010-12-27  Morten Kjeldgaard  <mok@gremlin>
 
 	* test/checkarch.c: deal with map files too. Expand test on arch format
