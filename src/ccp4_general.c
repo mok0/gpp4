@@ -432,7 +432,7 @@ int ccp4fyp(int argc, char **argv)
   /* Program information requested by -i(nfo) option */
   if (info) {
     /* Print program information and stop */
-    printf("gpp4 library version version %s\n",GPP4_VERSION_NO);
+    printf("\\//\\| gpp4 library version version %s\n",GPP4_VERSION_NO);
     printf("Program:             %s",ccp4ProgramName(NULL));
     if (ccp4_prog_vers(NULL) && strlen(ccp4_prog_vers(NULL))) 
       printf("; version %s",ccp4_prog_vers(NULL));
