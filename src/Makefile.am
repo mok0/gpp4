@@ -24,4 +24,5 @@ cmap_errno.h ccp4_parser.h cmap_header.h library_file.h ccp4_program.h	\
 cmap_labels.h mtzdata.h ccp4_spg.h cmaplib_f.h overview.h		\
 ccp4_sysdep.h cmaplib.h ccp4_types.h cmap_skew.h symlib.h pack_c.h
 
+DISTCLEANFILES = ccp4_program.h
 ####

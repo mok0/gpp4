@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(gpp4, 1.3.0, mok@bioxray.dk)
+AC_INIT(gpp4, 1.3.1, mok@bioxray.dk)
 AC_CONFIG_SRCDIR([src/ccp4_vars.h])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([config])
@@ -90,6 +90,7 @@ AC_CONFIG_FILES([
 		src_f/Makefile
 		data/Makefile
 		test/Makefile
+		src/ccp4_program.h
 		])
 
 AC_OUTPUT

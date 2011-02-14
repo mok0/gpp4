@@ -43,7 +43,7 @@ extern "C" {
 #define CCP4_PATCH_LEVEL "6.1.24"
 
 /*! GPP4 version is defined by autoconf */
-#define GPP4_VERSION_NO VERSION   
+#define GPP4_VERSION_NO "@PACKAGE_VERSION@"
 
 /* Maximum lengths of strings holding program names and versions */
 #define MAXLEN_PROGNAME    80  /*!<  Maximum length of program name */

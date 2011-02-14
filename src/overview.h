@@ -1,5 +1,5 @@
 /*
-     overview.h: overview of the GGP4 library
+     overview.h: overview of the gpp4 library
      (C) 2003 CCLRC, Martyn Winn, modified by Morten Kjeldgaard 2007, 
      2009.
 
