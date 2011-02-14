@@ -1404,7 +1404,7 @@ void ccp4_banner(void) {
   int ll1, ll2, ll3, ll = 0;
 
   sprintf(l1, "program name: %s, %s", ccp4ProgramName(NULL),prog_vers_str);
-  sprintf(l2, "gpp4 library version: %s, compiled: %s", GPP4_VERSION_NO,__DATE__);
+  sprintf(l2, "\\//\\| gpp4 library version: %s, compiled: %s", GPP4_VERSION_NO,__DATE__);
   sprintf(l3, "CCP4 library compatibility: patch level %s", CCP4_PATCH_LEVEL);
 
 #ifdef HAVE_STRNLEN
