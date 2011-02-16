@@ -1,3 +1,20 @@
+2011-02-16  Morten Kjeldgaard  <mok@homunculus>
+
+	* src/cmtzlib.* (MtzRewdInput): New function, upstream patch
+	applied.
+
+	* src_f/ccp4_general_f.c:   add wrapper for ccp4VerbosityLevel
+
+2011-02-16  Morten Kjeldgaard  <mok@homunculus>
+
+	* src/ccp4_general.c (ccp4fyp): Print out new gpp4 ASCII logo
+
+2011-02-14  Morten Kjeldgaard  <mok@homunculus>
+
+	* src/ccp4_program.h.in: GPP4_VERSION_NO was not defined unless
+	the preprocessor defined VERSION. It is now hardwired into the
+	derived header file via autoconf.
+
 2011-02-09  Morten Kjeldgaard  <mok@gremlin>
 
 	* src/ccp4_general.c (ccp4_banner): Have fun with banner.
