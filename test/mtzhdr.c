@@ -3,7 +3,8 @@
      file. Inspired by Ralf Grosse-Kunstleves mail to ccp4-dev mailing
      list 20100915.  
 
-     Copyright (C) 2010 Morten Kjeldgaard
+     Copyright: © 2010 Morten Kjeldgaard <mok@bioxray.dk>
+     License: GPL-3+
 
      This library is free software: you can redistribute it and/or
      modify it under the terms of the GNU Lesser General Public

@@ -1,6 +1,6 @@
 /*
-     maphdr -- a program to print header information from a map
-     file.
+     mtzcols -- a program to print the full mtz paths of columns in
+     an MTZ file.
 
      Copyright: © 2010 Morten Kjeldgaard <mok@bioxray.dk>
      License: GPL-3+
@@ -20,53 +20,55 @@
      <http://www.gnu.org/licenses/>.
 */
 
-#include "cmaplib.h"
+
+#include "cmtzlib.h"
 #include "ccp4_program.h"
 #include "ccp4_general.h"
+#include <strings.h>
+#include <math.h>
 
-void maphdrout(CMMFile *map)
+void mtzhdrout (MTZ *mtz)
 {
-  register int i;
+  char *s;
+  register int i, j, k;
 
-  printf ("File name: %s\n", map->file_name);
-  printf ("Data mode: %u\n", map->data_mode);
-  printf ("Close mode: %u\n", map->close_mode);
-  printf ("Unit cell:");
-  for (i=0; i<6; i++)
-    printf (" %.3f", map->cell[i]);
-  printf ("\n");
-  printf ("Map dimensions: %4d %4d %4d\n",
-	  map->map_dim[0],map->map_dim[1],map->map_dim[2]);
-  printf ("Map origin:     %4d %4d %4d\n",
-	  map->origin[0],map->origin[1],map->origin[2]);
-  printf ("Map size:       %4d %4d %4d\n",
-	  map->cell_grid[0],map->cell_grid[1],map->cell_grid[2]);
+  for (j = 0; j < mtz->nxtal; j++) {
 
-  printf ("Axis order:     %4d %4d %4d\n",
-	  map->axes_order[0],map->axes_order[1],map->axes_order[2]);
+    /* 
+       simply print a list of project/crystal/datase lines
+    */
 
+    for (i=0; i < mtz->xtal[j]->nset; i++) {
 
+      for (k=0; k < mtz->xtal[j]->set[i]->ncol; k++) {
+	printf ("%s/", mtz->xtal[j]->pname);
+	printf ("%s/", mtz->xtal[j]->set[i]->dname);
+	printf ("%s\n", mtz->xtal[j]->set[i]->col[k]->label);
+      }
+    }
+  }
+  return;
 }
+
 
 int main(int argc, char **argv) 
 {
 
   if (argc != 2) {
-    puts("Usage: maphdr <mapfile>");
+    puts("Usage: mtzhdr <mtzfile>");
     exit(1);
   }
 
-  ccp4ProgramName("maphdr");
+  ccp4ProgramName("mtzcols");
   ccp4_prog_vers (VERSION);
   ccp4_banner();
 
-  CMMFile *map = ccp4_cmap_open(argv[1], O_RDONLY);
-  if (!map) {
-    printf ("error reading map file %s\n", argv[1]);
+  MTZ *mtz = MtzGet (argv[1], 1);
+  if (!mtz) {
+    printf ("error reading mtz file %s\n", argv[1]);
     exit (1);
   }
-  maphdrout(map);
-
+  mtzhdrout(mtz);
   exit(0);
 }
 

@@ -1,6 +1,8 @@
 /*
      load_syminfo.c: test program that loads syminfo.lib.
-     Copyright (C) 2007 Morten Kjeldgaard
+
+     Copyright: © 2007 Morten Kjeldgaard <mok@bioxray.dk>
+     License: GPL-3+
 
      This library is free software: you can redistribute it and/or
      modify it under the terms of the GNU Lesser General Public

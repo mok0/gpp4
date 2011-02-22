@@ -1,6 +1,8 @@
 /*
-     check_mtz_stamp.c: check the arch stamp in an mtz file.
-     Copyright (C) 2010 Morten Kjeldgaard
+     checkarch.c: check the arch stamp in an mtz file.
+
+     Copyright: © 2010 Morten Kjeldgaard <mok@bioxray.dk>
+     License: GPL-3+
 
      This library is free software: you can redistribute it and/or
      modify it under the terms of the GNU Lesser General Public

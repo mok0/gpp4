@@ -1,3 +1,8 @@
+2011-02-22  Morten Kjeldgaard  <mok0@ubuntu.com>
+
+	* src/ccp4_general.c (ccp4fyp): If info is set, ccp4fyp
+	needs to return a status value of 0 to the shell.
+
 2011-02-09  Morten Kjeldgaard  <mok@gremlin>
 
 	* src/ccp4_general.c (ccp4_banner): Have fun with banner.

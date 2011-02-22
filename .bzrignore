@@ -37,5 +37,7 @@ test/.deps/
 test/.libs/
 test/load_syminfo
 test/mtzhdr
+test/mtzcols
 test/maphdr
 src_f/unix.f
+src/ccp4_program.h
