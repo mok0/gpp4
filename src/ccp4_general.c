@@ -70,7 +70,7 @@ int ccperror(int ierr, const char *message)
   if (ierr==0) {
     exit(0);
   } else if (ierr==1 || ierr==-1) {
-    abort();
+    exit(1);
   }
   return 0;
 }
@@ -437,7 +437,7 @@ int ccp4fyp(int argc, char **argv)
     if (ccp4_prog_vers(NULL) && strlen(ccp4_prog_vers(NULL))) 
       printf("; version %s",ccp4_prog_vers(NULL));
     printf("\n");
-    abort();
+    exit(0);
   }
 
   /* Initialise debug (verbosity) level
