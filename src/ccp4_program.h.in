@@ -1,7 +1,7 @@
 /*
      ccp4_program.h: Headers to utilies to set and fetch program information.
      Copyright (C) 2001  CCLRC, Peter Briggs
-     Copyright (C) 2007 Morten Kjeldgaard
+     Copyright (C) 2007, 2010 Morten Kjeldgaard
 
      This library is free software: you can redistribute it and/or
      modify it under the terms of the GNU Lesser General Public
