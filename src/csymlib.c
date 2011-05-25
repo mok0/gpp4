@@ -32,6 +32,7 @@
 #include "cvecmat.h"
 #include "ccp4_errno.h"
 #include "ccp4_unitcell.h"
+#include "ccp4_general.h"
 
 /* stuff for error reporting */
 #define CSYM_ERRNO(n) (CCP4_ERR_SYM | (n))
@@ -304,7 +305,7 @@ CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
   fclose(filein);
 
   if (!sg_nsymp) {
-    printf(" Failed to find spacegroup in SYMINFO! \n");
+    ccp4printf(0," Failed to find spacegroup in SYMINFO! \n");
     return NULL;
   } 
 

@@ -50,7 +50,7 @@ C     Fixme: the set of routines below might need extending...
 C     Fixme: consider whether more obscure names worthwhile to avoid
 C     possible clashes.
 C
-C     Dave Love $Date: 2008-06-09 10:41:02 $
+C     Dave Love $Date: 2008/06/09 10:41:02 $
 C     Additions by Kevin Cowtan
 C     
       subroutine memoparse (echo)

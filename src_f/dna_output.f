@@ -30,7 +30,7 @@ c
 c     
 c     
 c     
-c     $Id: dna_output.f,v 1.7 2008-06-09 10:41:02 mdw Exp $
+c     $Id: dna_output.f,v 1.7 2008/06/09 10:41:02 mdw Exp $
 c     
 
 c     set no output flag - this is the alternative to starting the output
