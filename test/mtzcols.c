@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 {
 
   if (argc != 2) {
-    puts("Usage: mtzhdr <mtzfile>");
+    puts("Usage: mtzcols <mtzfile>");
     exit(1);
   }
 
