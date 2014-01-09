@@ -15,6 +15,7 @@ AC_PROG_F77
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 AC_F77_LIBRARY_LDFLAGS
 
@@ -78,6 +79,13 @@ fi
 AC_SUBST(WANT_GPP4F)
 dnl  end of fortran-api selection
 
+dnl  deal with building python extension modules
+AM_PATH_PYTHON(2.7)
+AX_PKG_SWIG(2.0.9, [], [ AC_MSG_ERROR([SWIG is required to build..]) ])
+AX_SWIG_MULTI_MODULE_SUPPORT
+AX_SWIG_PYTHON([use-shadow-classes = yes])
+dnl  end of python extension stuff
+
 dnl  output the Makefiles
 AC_CONFIG_FILES([
 		Makefile
@@ -89,6 +97,7 @@ AC_CONFIG_FILES([
 		src/Makefile
 		src_f/Makefile
 		data/Makefile
+		pyext/Makefile
 		test/Makefile
 		src/ccp4_program.h
 		])

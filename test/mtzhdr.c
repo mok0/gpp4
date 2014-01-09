@@ -104,7 +104,7 @@ void mtzhdrout (MTZ *mtz)
       printf (fmt, "label");
       printf ("%11s%10s%11s%11s%9s\n", "#valid", "%valid", "min", "max", "type");
 
-      /* Now print info about columnts */
+      /* Now print info about columns */
       for (k=0; k < mtz->xtal[j]->set[i]->ncol; k++) {
 
 	printf (fmt, mtz->xtal[j]->set[i]->col[k]->label);

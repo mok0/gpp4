@@ -34,10 +34,14 @@ int main ()
 
   ccp4_banner();
   spg = ccp4spg_load_by_standard_num (20);
+  printf ("=== ccp4spg_print_centric_zones() ===\n");
   ccp4spg_print_centric_zones(spg);
+  printf ("=== ccp4spg_print_epsilon_zones() ===\n");
   ccp4spg_print_epsilon_zones(spg);
-  ccp4spg_print_recip_spgrp(spg);
+  printf ("\n=== ccp4spg_print_recip_ops() ===\n");
   ccp4spg_print_recip_ops(spg);
+  printf ("\n=== ccp4spg_print_recip_spgrp() ===\n\n");
+  ccp4spg_print_recip_spgrp(spg);
 
   return 0;
 }
