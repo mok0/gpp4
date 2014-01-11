@@ -31,51 +31,50 @@ void mtzhdrout (MTZ *mtz)
   char *s;
   register int i, j;
 
-  printf ("spcgrp,");
-  printf ("spcgrpname,");
-  printf ("pgname,");
-  printf ("symtyp,");
-
-  printf ("nxtal,");
-  printf ("nref,");
-  printf ("ncol,");
-  printf ("a,b,c,alpha,beta,gamma,");
-  printf ("resmin,resmax,");
-  printf ("nset,");
-  printf ("wavelength\n");
 
   /* --- */
 
-  printf ("%d,", mtz->mtzsymm.spcgrp);
-  printf ("%s,", mtz->mtzsymm.spcgrpname);
-  printf ("%s,", mtz->mtzsymm.pgname);
-  printf ("%c,", mtz->mtzsymm.symtyp);
-  printf ("%d,", mtz->nxtal);
-  printf ("%d,", mtz->nref);
-  printf ("%d,", mtz->ncol_read);
+  printf ("%d;", mtz->mtzsymm.spcgrp);
+  printf ("%s;", mtz->mtzsymm.spcgrpname);
+  printf ("%s;", mtz->mtzsymm.pgname);
+  printf ("%c;", mtz->mtzsymm.symtyp);
+  printf ("%d;", mtz->nxtal);
+  printf ("%d;", mtz->nref);
+  printf ("%d;", mtz->ncol_read);
   j = 0;
   for (i=0; i<5; i++) 
-    printf ("%.3f,", mtz->xtal[j]->cell[i]);
-  printf ("%.2f,%.2f,", 1.0/sqrt(mtz->xtal[j]->resmin), 1.0/sqrt(mtz->xtal[j]->resmax));
-  printf ("%d,", mtz->xtal[j]->nset);
+    printf ("%.3f;", mtz->xtal[j]->cell[i]);
+  printf ("%.2f;%.2f;", 1.0/sqrt(mtz->xtal[j]->resmin), 1.0/sqrt(mtz->xtal[j]->resmax));
+  printf ("%d;", mtz->xtal[j]->nset);
   printf ("%f\n", mtz->xtal[j]->set[0]->wavelength);
 }
 
 
 int main(int argc, char **argv) 
 {
-
-  if (argc != 2) {
+  register i;
+  
+  if (argc < 2) {
     puts("Usage: mtzhdr <mtzfile>");
     exit(1);
   }
 
-  MTZ *mtz = MtzGet (argv[1], 1);
-  if (!mtz) {
-    printf ("error reading mtz file %s\n", argv[1]);
-    exit (1);
+  /* Write CSV header line */
+  printf ("file;spcgrp;spcgrpname;pgname;symtyp;nxtal;nref;ncol;");
+  printf ("a;b;c;alpha;beta;gamma;resmin;resmax;nset;wavelength\n");
+
+  /* Loop over input files */
+
+  for (i = 1; i < argc; i++) {
+    MTZ *mtz = MtzGet (argv[i], 1);
+    if (!mtz) {
+      fprintf (stderr, "error reading mtz file %s\n", argv[i]);
+    }
+    printf ("%s;", argv[i]);
+    mtzhdrout(mtz);
+    MtzFree(mtz);
   }
-  mtzhdrout(mtz);
+
   exit(0);
 }
 
