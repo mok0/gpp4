@@ -42,7 +42,7 @@ void mtzhdrout (MTZ *mtz)
   printf ("%d;", mtz->nref);
   printf ("%d;", mtz->ncol_read);
   j = 0;
-  for (i=0; i<5; i++) 
+  for (i=0; i<6; i++) 
     printf ("%.3f;", mtz->xtal[j]->cell[i]);
   printf ("%.2f;%.2f;", 1.0/sqrt(mtz->xtal[j]->resmin), 1.0/sqrt(mtz->xtal[j]->resmax));
   printf ("%d;", mtz->xtal[j]->nset);
@@ -81,5 +81,6 @@ int main(int argc, char **argv)
 /*
   Local variables:
   mode: font-lock
+  compile-command: "gcc -o mtz2csv mtz2csv.c `pkg-config gpp4 --cflags --libs` -lm"
   End:
 */
