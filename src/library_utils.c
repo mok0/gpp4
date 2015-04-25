@@ -47,15 +47,8 @@ are just generally useful (platform independent date).
 #include "ccp4_utils.h"
 #include "ccp4_errno.h"
 
-#if defined (_MSC_VER)
-#include <tchar.h>
-#include <wchar.h>
-#include <direct.h>
-#include <io.h>
-#endif
-
-#if !defined (_MSC_VER)
-#include <pwd.h>
+#if defined (_WIN32)
+#include <windows.h>
 #endif
 
 #define CCP4_ERRNO(y) (CCP4_ERR_UTILS | (y))          
@@ -118,6 +111,7 @@ int ccp4_utils_translate_mode_float(float *out, const void *buffer, int dim, int
  */
 size_t ccp4_utils_flength (char *s, int len)
 {
+  if (len <= 0 ) return 0;
   while (s[--len] == ' ')
     if (len == 0) return 0;
   return (++len);
@@ -140,7 +134,7 @@ int ccp4_utils_setenv (char *str)
 #if defined (sgi) || defined (sun) || defined (__hpux) || \
     defined(_AIX) || defined (__OSF1__) || \
     defined (__osf__) || defined (__FreeBSD__) || defined (linux) || \
-    defined (_WIN32)
+    defined (_WIN32) || defined __linux__
   /* putenv is the POSIX.1, draft 3 proposed mechanism */
 #if !(defined(__hpux) && defined(__HP_cc))
   int putenv ();
@@ -281,76 +275,8 @@ void ccp4_utils_hgetlimits (int *IValueNotDet, float *ValueNotDet)
   *ValueNotDet  = FLT_MAX;
 }
 
-/** Make a directory in the computer filesystem.
- * 
- * @return 1 if successful.
- */
-int ccp4_utils_mkdir (const char *path, const char *cmode)
-#if !defined (_MVS_VER) && !defined(_WIN32)
-{  
-  mode_t mode = 0;
-  int result; 
-#if defined (__APPLE__)
-  static const unsigned TBM = 0x07;
-
-  switch (strlen(cmode)) {
-  case 4:
-    mode |= (*cmode & TBM) << 9 ;
-    mode |= (*(cmode+1) & TBM) << 6 ;
-    mode |= (*(cmode+2) & TBM) << 3 ;
-    mode |= (*(cmode+3) & TBM) ;
-    break;
-  case 3:
-    mode |= (*cmode & TBM) << 6 ;
-    mode |= (*(cmode+1) & TBM) << 3 ; 
-    mode |= (*(cmode+2) & TBM) ;      
-    break;
-  case 2:
-    mode |= (*cmode & TBM) << 3 ;
-    mode |= (*(cmode+1) & TBM) ;
-    break;
-  case 1:
-    mode |= (*cmode & TBM) ;
-    break;
-  default:
-    mode = 0x0fff ;
-  }
-#else 
-/* Possible modes (see stat.h)
-  Currently pass 3-character string and interpret as octal.
-  Try also S_IRWXU, S_IRWXG, etc. */
-  sscanf(cmode,"%o",&mode);
-#endif   
-  result = mkdir(path, (mode_t) mode); 
-
-  if (result == -1) {
-    if (errno == EEXIST) {
-      result = 1;
-    }
-  }
-  return (result); 
-}
-#else
-   {
-     /*printf("No harvesting on NT.");
-       return (-1);*/
-     int result;
-     result = mkdir(path);
-     
-     if (result == -1) {
-       if (errno == EEXIST) {
-	 result = 1;
-       }
-     }
-     return (result);
-   }
-#endif
-
-/** Change protection mode on a file.
- * @return 1 if successful.
- */
-int ccp4_utils_chmod (const char *path, const char *cmode)
-#if !defined (_MSC_VER) || !defined(_WIN32)
+#ifndef _WIN32
+static unsigned parse_mode(const char *cmode)
 {
   unsigned mode = 0;
 #if defined (__APPLE__)
@@ -378,25 +304,55 @@ int ccp4_utils_chmod (const char *path, const char *cmode)
   default:
     mode = 0x0fff ;
   }
-#else 
+#else
 /* Possible modes (see stat.h)
   Currently pass 3-character string and interpret as octal.
   Try also S_IRWXU, S_IRWXG, etc. */
   sscanf(cmode,"%o",&mode);
 #endif
-  return (chmod(path, (mode_t) mode)); 
+  return mode;
 }
-#else
-   {
-     /*printf("No harvesting on NT.");
-       return (-1);*/
-     return (chmod(path,0x0fff));
-   }
 #endif
+
+/** .
+ * 
+ * @return 1 if successful.
+ */
+int ccp4_utils_mkdir (const char *path, const char *cmode)
+{
+  int result;
+#if defined(_WIN32)
+  result = mkdir(path);
+#else
+  unsigned mode = parse_mode(cmode);
+  result = mkdir(path, (mode_t) mode);
+#endif
+
+  if (result == -1) {
+    if (errno == EEXIST) {
+      result = 1;
+    }
+  }
+  return (result); 
+}
+
+/** Change protection mode on a file.
+ * @return 1 if successful.
+ */
+int ccp4_utils_chmod (const char *path, const char *cmode)
+{
+#if defined(_WIN32)
+  return (chmod(path,0x0fff));
+#else
+  unsigned mode = parse_mode(cmode);
+  return (chmod(path, (mode_t) mode));
+#endif
+}
 
 /** Wrapper for the malloc function, which adds some
  * error trapping.
  * 
+ * @return void
  */
 void *ccp4_utils_malloc(size_t size)
 
@@ -412,6 +368,8 @@ void *ccp4_utils_malloc(size_t size)
 
 /**  Wrapper for the realloc function, which adds some
  * error trapping.
+ * 
+ * @return 
  */
 void *ccp4_utils_realloc(void *ptr, size_t size)
 { void *val; 
@@ -426,6 +384,8 @@ void *ccp4_utils_realloc(void *ptr, size_t size)
 
 /**  Wrapper for the calloc function, which adds some
  * error trapping.
+ * 
+ * @return 
  */
 void *ccp4_utils_calloc(size_t nelem , size_t elsize)
 { void *val; 
@@ -440,29 +400,34 @@ void *ccp4_utils_calloc(size_t nelem , size_t elsize)
 
 
 /** Return the user's login name.
- * (MVisualStudio version in w32mvs.c)
  * Note that getlogin only works for processes attached to
  * a terminal (and hence won't work from the GUI).
  * @return pointer to character string containing login name.
  */
-#if ! defined (_MSC_VER)
 char *ccp4_utils_username(void)
-{ 
+{
   static char userid_unknown[] = "unknown";
-  /* struct passwd *passwd_struct=NULL; */
-  char *userid=NULL;
-  if (!(userid = getlogin())) {
-    /*
-    passwd_struct = getpwuid(getuid());
-    if (passwd_struct) {
-      userid = passwd_struct->pw_name;
-    }
-    */
-    userid = userid_unknown;
-  }
-  return(userid); 
-}
+  char *userid = NULL;
+#if defined(_WIN32)
+  static char windows_username[512];
+  DWORD bufsize = sizeof(windows_username);
+  if (GetUserName(windows_username, &bufsize))
+      userid = windows_username;
+#else
+  userid = getlogin();
 #endif
+  return userid ? userid : userid_unknown;
+}
+
+static int is_sep(char c)
+{
+#ifdef _WIN32
+    /* allow alternative separator for Windows (for MSYS, Cygwin, Wine) */
+    return c == PATH_SEPARATOR || c == '/';
+#else
+    return c == PATH_SEPARATOR;
+#endif
+}
 
 /** Extracts the basename from a full file name.
  * Separators for directories and extensions are OS-specific.
@@ -475,7 +440,7 @@ char *ccp4_utils_basename(const char *filename)
   char *basename;
 
   for ( i = strlen(filename)-1; i >= 0; i-- ) {
-    if (filename[i] == PATH_SEPARATOR) {
+    if (is_sep(filename[i])) {
       indx1 = i; 
       break;
     }
@@ -506,7 +471,7 @@ char *ccp4_utils_pathname(const char *filename)
   char *pathname;
 
   for ( i = strlen(filename)-1; i >= 0; i-- ) {
-    if (filename[i] == PATH_SEPARATOR) {
+    if (is_sep(filename[i])) {
       indx1 = i; 
       break;
     }
@@ -533,7 +498,7 @@ char *ccp4_utils_extension(const char *filename)
       indx1 = i; 
       length = strlen(filename) - indx1;
       break;
-    } else if (filename[i] == PATH_SEPARATOR) {
+    } else if (is_sep(filename[i])) {
       indx1 = i; 
       length = 1;
       break;
@@ -551,7 +516,7 @@ char *ccp4_utils_extension(const char *filename)
  * @param file file name string.
  * @return pointer to joined directory-filename path.
  */
-char *ccp4_utils_joinfilenames(char *dir, char *file)
+char *ccp4_utils_joinfilenames(const char *dir, const char *file)
 {
   char *join=NULL;
   int  lendir,lenfile,lenjoin;
@@ -639,9 +604,11 @@ char *ccp4_utils_time(char *time)
  * @param tarray Array containing User and System times.
  * @return Sum of User and System times.
  */
-#if ! defined (_MSC_VER) 
 float ccp4_utils_etime (float tarray[2])
 {
+#ifdef _WIN32
+  tarray[0] = tarray[1] = 0.;
+#else
   static long clk_tck = 0;
 
   struct tms buffer;
@@ -649,9 +616,9 @@ float ccp4_utils_etime (float tarray[2])
   (void) times(&buffer);
   tarray[0] = (float) buffer.tms_utime / (float)clk_tck;
   tarray[1] = (float) buffer.tms_stime / (float)clk_tck;
+#endif
   return (tarray[0]+tarray[1]);
 }
-#endif
 
 #if defined (_MSC_VER)
 double ccp4_erfc( double x )

@@ -38,7 +38,6 @@
     @param progvers Program version string, or NULL to query existing value.
     @return Program version string.
  */
-
 char *ccp4_prog_vers(const char *progvers) 
 {
   static char programversion[MAXLEN_PROGVERSION]="";
@@ -48,6 +47,23 @@ char *ccp4_prog_vers(const char *progvers)
     programversion[MAXLEN_PROGVERSION-1] = '\0';
   }
   return programversion;
+}
+
+static char ccp4version[MAXLEN_PROGVERSION];
+
+/*! Query program version.
+    @return Program version string.
+*/
+char *ccp4_vers_no(void)
+{
+  static int init=0;
+
+  if (!init) {
+    bzero(ccp4version,MAXLEN_PROGVERSION);
+    strcpy(ccp4version,CCP4_VERSION_NO);
+    init=1;
+  }
+  return ccp4version;
 }
 
 
@@ -61,7 +77,6 @@ char *ccp4_prog_vers(const char *progvers)
   @note Default program name will be returned as "CCP4", until reset
   by the calling subprogram.
  */
-
 char *ccp4ProgramName(const char *progname)
 {
   static char programname[MAXLEN_PROGNAME]="CCP4";
@@ -82,6 +97,20 @@ char *ccp4ProgramName(const char *progname)
   return programname;
 }
 
+
+/*! Print program info for -i option.
+ */
+void ccp4_prog_info(void)
+{
+  printf("\\//\\| gpp4 library version version %s\n", GPP4_VERSION_NO);
+  printf("Compatible with CCP4 library version %s\n", ccp4_vers_no());
+  printf("Program:             %s", ccp4ProgramName(NULL));
+  if (ccp4_prog_vers(NULL) && strlen(ccp4_prog_vers(NULL)))
+    printf("; version %s", ccp4_prog_vers(NULL));
+  printf("\n");
+}
+
+
 /*! Set or return program RCS date
   @param rcs_string Date string, or NULL to query existing value.
   @return Date string
@@ -95,7 +124,6 @@ char *ccp4ProgramName(const char *progname)
   @note This routine does not make sense in gpp4, since RCS idents are
   not expanede in the SCM system we are using.
 */
-
 char *ccp4RCSDate(const char *rcs_string)
 {
   static char RCSDate[MAXLEN_RCSDATE]="";
@@ -145,7 +173,6 @@ char *ccp4RCSDate(const char *rcs_string)
    information is printed to stdout. @note Only one timer can be
    handled.
  */
-
 void ccp4ProgramTime(int init)
 {
   static int elaps0=0;
@@ -172,7 +199,6 @@ void ccp4ProgramTime(int init)
    Always return the verbosity level - if verboselevel is between 0
    and 9 then reset the verbosity level to verboselevel
 */
-
 int ccp4VerbosityLevel(int level)
 {
   /* The default level is 1 */
@@ -188,7 +214,8 @@ int ccp4VerbosityLevel(int level)
    Internal function: applications should use the API functions
    ccp4SetCallback and ccp4InvokeCallback
  */
-int ccp4Callback(CCP4INTFUNCPTR mycallback, char *mode, int ierr, char *message)
+int ccp4Callback(CCP4INTFUNCPTR mycallback, char *mode, int ierr, 
+		 const char *message)
 {
   static CCP4INTFUNCPTR callback=ccp4NullCallback;
 
@@ -222,7 +249,7 @@ int ccp4SetCallback(CCP4INTFUNCPTR mycallback)
    arguments.
    This is a wrapper to ccp4Callback in "invoke" mode.
  */
-int ccp4InvokeCallback(int ierr, char *message)
+int ccp4InvokeCallback(int ierr, const char *message)
 {
   return ccp4Callback(ccp4NullCallback,"invoke",ierr,message);
 }
@@ -233,7 +260,7 @@ int ccp4InvokeCallback(int ierr, char *message)
    used by ccp4Callback if no user-defined function has been
    specified.
  */
-int ccp4NullCallback(int level, char *message)
+int ccp4NullCallback(int level, const char *message)
 {
   /* This is the default callback function which takes no
      action */

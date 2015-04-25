@@ -1,3 +1,7 @@
+2015-04-25  Morten Kjeldgaard  <mok@homunculus.local>
+
+	* Bring patch level to 6.5.0
+
 2011-02-22  Morten Kjeldgaard  <mok0@ubuntu.com>
 
 	* src/ccp4_general.c (ccp4fyp): If info is set, ccp4fyp

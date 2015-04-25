@@ -27,7 +27,6 @@
 
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <stdarg.h>
@@ -66,7 +65,11 @@
 */
 int ccperror(int ierr, const char *message)
 {
+  /* Execute user-defined function callback */
+  ccp4InvokeCallback(ierr,message);
+  /* Do messaging */
   ccperror_noexit(ierr, message);
+  /* Exit if necessary */
   if (ierr==0) {
     exit(0);
   } else if (ierr==1 || ierr==-1) {
@@ -167,17 +170,17 @@ int ccperror_noexit(int ierr, const char *message)
     argument which is checked against the reference verbosity
     level.
 
-    If the supplied message is less than or equal to the reference
-    verbosity level then the format string and remaining arguments
-    are passed to vprintf to be printed on stdout.
-    Otherwise nothing is printed.
+   If the supplied message is less than or equal to the reference
+   verbosity level then the format string and remaining arguments
+   are passed to vprintf to be printed on stdout.
+   Otherwise nothing is printed.
 
-    The format string has the same format as the format strings
-    passed to printf, with the remaining arguments being the values
-    (if any) to be inserted into placeholders in the format string.
-    
-    @return Returns the number of bytes printed, or zero if no printing was
-    performed, or a negative number for an error from vprintf.
+   The format string has the same format as the format strings
+   passed to printf, with the remaining arguments being the values
+   (if any) to be inserted into placeholders in the format string.
+
+   @return Returns the number of bytes printed, or zero if no printing was
+   performed, or a negative number for an error from vprintf.
 */
 int ccp4printf(int level, char *format, ...)
 {
@@ -194,6 +197,30 @@ int ccp4printf(int level, char *format, ...)
   /* Return to calling function */
   return nbytes;
 }
+
+# ifdef NOTNEEDED
+/*! Return parent of directory that contains arg, e.g.
+  - /foo/bin/prog        -> /foo    (actually /foo/bin/..)
+  - C:\CCP4\bin\prog.exe -> C:\CCP4 (actually C:\CCP4\bin\..)
+  - foo/prog             -> .       (actually foo/..)
+  - prog                 -> ..
+  - ../prog              -> ../..
+
+   @param[in] arg directory name
+   @return the parent directory that contains arg
+ */
+
+static const char* get_parent_directory(const char* arg)
+{
+    const char *last_sep = strrchr(arg, PATH_SEPARATOR);
+    const char *basename = last_sep != NULL ? last_sep + 1 : arg;
+    int dir_len = basename - arg;
+    char* parent_dir = (char*) ccp4_utils_malloc(dir_len + 3);
+    strncpy(parent_dir, arg, dir_len);
+    strcpy(parent_dir+dir_len, "..");
+    return parent_dir;
+}
+#endif
 
 
  /*!  Search for a file (i.e. the default.def or environ.def files) in
@@ -770,7 +797,6 @@ int ccp4fyp(int argc, char **argv)
      3. use the filename as is (in current directory).
   */
   if (!def_file) {
-
     /* Use the standard default.def */
     if (diag) printf("--> use standard default.def file\n");
     std_dir = NULL;

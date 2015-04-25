@@ -28,30 +28,19 @@
 #ifndef __CCP4_BITS
 #define __CCP4_BITS
 
-#if defined (_AIX) || defined(___AIX)
-#  define KNOWN_MACHINE
-#  define CALL_LIKE_HPUX 1
-#endif
-
-#if defined (__hpux) 
-#  define KNOWN_MACHINE
-#  define CALL_LIKE_HPUX 1
-#endif
-
 #ifdef __sgi   /* in ANSI mode */
 #  ifndef sgi
 #    define sgi
 #  endif
 #endif
 
-#if defined (sgi)
-#  define KNOWN_MACHINE
-#  define CALL_LIKE_SUN 1
+#ifndef VMS
+#  if defined (vms) || defined (__vms) || defined (__VMS)
+#    define VMS
+#  endif
 #endif
 
 #if defined (sun) || defined (__sun)
-#  define KNOWN_MACHINE
-#  define CALL_LIKE_SUN 1
 #  if !defined(__STDC__) || defined(__GNUC__)
 #    if !defined(G77)
       extern char *sys_errlist [];
@@ -60,77 +49,20 @@
 #  endif
 #endif
 
-#if defined(__OSF1__) || defined(__osf__)
-#  define KNOWN_MACHINE
-#  define CALL_LIKE_SUN 1
-#endif
-
-#ifndef VMS
-#  if defined (vms) || defined (__vms) || defined (__VMS)
-#    define VMS
-#  endif
-#endif
-#if defined (VMS)
-#  define KNOWN_MACHINE
+#if defined (_AIX) || defined(___AIX) || defined (__hpux)
+#  define CALL_LIKE_HPUX 1
+#elif defined (VMS)
 #  define CALL_LIKE_VMS 1
-#endif
-
-#if defined(_MSC_VER) || defined (WIN32)
-# if defined (_MSC_VER) && (_MSC_VER >= 800)
+#elif defined (_MSC_VER) && (_MSC_VER >= 800)
 #  define CALL_LIKE_MVS 2
-# else
+#elif defined(_MSC_VER) || (defined (WIN32) && !defined(__MINGW32__))
 #  define CALL_LIKE_MVS 1
-# endif
-#  define KNOWN_MACHINE
-#endif
-
-#if defined (linux) || defined __linux__ || defined (__CYGWIN__)
-#  undef CALL_LIKE_SUN
-#  define KNOWN_MACHINE
-#  define CALL_LIKE_SUN 1
-#endif
-
-#if defined __linux__ && ( defined __PPC || defined __PPC__ )
-#  undef CALL_LIKE_SUN
-#  define KNOWN_MACHINE
-#  define CALL_LIKE_SUN 1
-#endif
-
-#if defined (__FreeBSD__)
-#  undef CALL_LIKE_SUN
-#  define KNOWN_MACHINE
-#  define CALL_LIKE_SUN 1
-#endif
-
-#if defined(F2C) || defined(G77)
-#  undef CALL_LIKE_SUN
-#  define CALL_LIKE_SUN 1
-#  define KNOWN_MACHINE
-#endif
-
-#if defined(__APPLE__)
-#  undef CALL_LIKE_SUN
-#  define CALL_LIKE_SUN 1
-#  define KNOWN_MACHINE
-#endif
-
-#if defined (_CALL_SYSV) && ! defined (__APPLE__)
-#  undef CALL_LIKE_SUN
-#  define CALL_LIKE_SUN 1
-#  define KNOWN_MACHINE
-#endif
-
-#if ! defined (KNOWN_MACHINE)
-#  error System type is not known -- see the Installation Guide
 #else
+#  define CALL_LIKE_SUN 1
+#endif
 
 #ifndef _POSIX_SOURCE
 #define _POSIX_SOURCE
-#endif
-
-/* include X/Open Unix extensions (e.g. cuserid) */
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE
 #endif
 
 #include <stdio.h>
@@ -187,9 +119,8 @@
 #  endif
 #endif
 
-/* rint() function does not seen to exist for mingw32
-   defined in library_utils.c */
-#  if ((defined _WIN32) || (defined _MSC_VER)) && (!defined rint)
+/* defined in library_utils.c */
+#if defined(_MSC_VER)
   double rint(double x);
 #endif
 
@@ -197,7 +128,7 @@
 #define  M_PI            3.14159265358979323846
 #endif
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #  define PATH_SEPARATOR '\\'
 #  define EXT_SEPARATOR '.'
 #else
@@ -229,9 +160,12 @@
 #endif
 #define O_TMP    0x0010       /**< i/o mode: scratch file */
 
-#define BYTE  0
-#define INT16 1   
-#define INT32 6
+/* Before version 6.3 we defined BYTE, INT16 and INT32 (without the CCP4_
+ * prefix). The prefix has been added to avoid name conflicts.
+ */
+#define CCP4_BYTE  0
+#define CCP4_INT16 1
+#define CCP4_INT32 6
 #define FLOAT32 2
 #define COMP32  3
 #define COMP64  4
@@ -254,17 +188,9 @@
 #  define NATIVEFT DFNTF_LEIEEE
 #endif
 
-#if defined(__ARMEL__)
-#  define NATIVEIT DFNTI_IBO
-#  define NATIVEFT DFNTF_LEIEEE
-#endif
-
-#if defined (powerpc) || defined (__powerpc__) || defined (__ppc__) || defined __PPC
-#  define NATIVEIT DFNTI_MBO
-#  define NATIVEFT DFNTF_BEIEEE
-#endif
-
-#if defined (__s390__) || defined (__s390x__)
+#if defined (powerpc) || defined (__powerpc__) || defined (__ppc__) || \
+      defined __PPC || defined (__s390__) || defined (__s390x__) || \
+      defined (__hppa__)
 #  define NATIVEIT DFNTI_MBO
 #  define NATIVEFT DFNTF_BEIEEE
 #endif
@@ -287,20 +213,32 @@
 #  define NATIVEFT DFNTF_BEIEEE
 #endif
 
-#if defined (__hppa__)
-#  define NATIVEIT DFNTI_MBO
-#  define NATIVEFT DFNTF_BEIEEE
-#endif
-
 #if defined(__ARM__) || defined(__arm__)
-#if defined(__ARMEB__)
+# if defined(__ARMEB__)
 #  define NATIVEIT DFNTI_MBO
 #  define NATIVEFT DFNTF_BEIEEE
-#endif
-#if defined(__ARMEL__)
+# elif defined(__ARMEL__)
 #  define NATIVEIT DFNTI_IBO
 #  define NATIVEFT DFNTF_LEIEEE
+# endif
 #endif
+
+/* From time to time new architectures are added here, often because Linux
+ * packagers want to build it on all platforms supported by their distro. 
+ * Here we try to catch machines not listed explicitely above, under
+ * assumption that endianness is the same for floating point numbers
+ * as for integers. Which is safe assumption on modern standard computers
+ * (not embedded systems), according to
+ * http://en.wikipedia.org/wiki/Endianness#Floating-point_and_endianness
+ */
+#if !defined(NATIVEIT) && !defined(NATIVEFT) && defined(__BYTE_ORDER)
+# if __BYTE_ORDER == __LITTLE_ENDIAN
+#  define NATIVEIT DFNTI_IBO
+#  define NATIVEFT DFNTF_LEIEEE
+# elif __BYTE_ORDER == __BIG_ENDIAN
+#  define NATIVEIT DFNTI_MBO
+#  define NATIVEFT DFNTF_BEIEEE
+# endif
 #endif
 
 #ifndef NATIVEFT
@@ -314,8 +252,6 @@
 #define DFNT_CHAR       4       /**< char */
 #define DFNT_FLOAT      5       /**< float */
 #define DFNT_DOUBLE     6       /**< double */
-
-#endif
 
 #endif /* __CCP4_BITS */
 

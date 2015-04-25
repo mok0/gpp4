@@ -38,9 +38,9 @@ extern "C" {
 #endif
 
 /*! CCP4 library version this version is derived from */
-#define CCP4_VERSION_NO "6.2"
+#define CCP4_VERSION_NO "6.5"
 /*! Patch level of CCP4 that gpp4 is derived from */
-#define CCP4_PATCH_LEVEL "6.2.0"
+#define CCP4_PATCH_LEVEL "6.5.0"
 
 /*! GPP4 version is defined by autoconf */
 #define GPP4_VERSION_NO "@PACKAGE_VERSION@"
@@ -58,7 +58,7 @@ extern "C" {
 
 /*! Define a type which is a pointer to a function taking an integer
    and a pointer to character, and returning an integer */
-typedef int (*CCP4INTFUNCPTR)(int, char *);
+typedef int (*CCP4INTFUNCPTR)(int, const char *);
 
 /*------------------------------------------------------------------*/
 
@@ -72,11 +72,20 @@ typedef int (*CCP4INTFUNCPTR)(int, char *);
  */
 char *ccp4_prog_vers(const char *progvers);
 
+/** Query ccp4 version.
+ * @return CCP4 version string.
+ */
+char *ccp4_vers_no(void);
+
 /** Set or return program name.
  * @param progname Program name, or NULL to query existing value.
  * @return Program name
  */
 char *ccp4ProgramName(const char *progname);
+
+/** Print program info for -i option.
+ */ 
+void ccp4_prog_info(void);
 
 /** Set or return program RCS date
  * @param rcs_string Date string, or NULL to query existing value.
@@ -110,7 +119,8 @@ int ccp4VerbosityLevel(int level);
  * @param message A message string equivalent to that used in ccperror
  * @return Result of the executed function (invoke mode)
  */
-int ccp4Callback(CCP4INTFUNCPTR mycallback, char *mode, int ierr, char *message);
+int ccp4Callback(CCP4INTFUNCPTR mycallback, char *mode, int ierr,
+                 const char *message);
 
 /** Set a user-defined callback function
  * This is a wrapper to ccp4Callback - it stores a user-defined
@@ -128,7 +138,7 @@ int ccp4SetCallback(CCP4INTFUNCPTR mycallback);
  * @param message A message string equivalent to that used in ccperror
  * @return Result of the executed function
  */
-int ccp4InvokeCallback(int ierr, char *message);
+int ccp4InvokeCallback(int ierr, const char *message);
 
 /** A dummy callback function used by default in ccp4CallOnExit
  * Internal function. This function does nothing.
@@ -136,7 +146,7 @@ int ccp4InvokeCallback(int ierr, char *message);
  * @param message Message text supplied from ccperror
  * @return Always returns 1
 */      
-int ccp4NullCallback(int level, char *message);
+int ccp4NullCallback(int level, const char *message);
 
 /** Check existence of licence agreement
  * @param name Name of licence, e.g. "CCP4".

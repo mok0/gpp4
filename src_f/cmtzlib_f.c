@@ -88,12 +88,12 @@ static char user_label_in[MFILES][MCOLUMNS][2][31];
 static char user_label_out[MFILES][MCOLUMNS][2][31];
 static MTZCOL *collookup[MFILES][MCOLUMNS];
 static MTZCOL *collookup_out[MFILES][MCOLUMNS];
-static int sortorder[MFILES][5] = {{0},{0},{0},{0},{0}};
+static int sortorder[MFILES][5] = {{0}};
 static int logmss[MFILES][MCOLUMNS];
 static int ndatmss[MFILES];
 static MTZBAT *rbat[MFILES];
 static int nbatw[MFILES] = {0};
-static double coefhkl[MFILES][6] = {{0},{0},{0},{0},{0},{0}};
+static double coefhkl[MFILES][6] = {{0}};
 
 /* MVS defaults to int and doesn't like it */
 #ifdef _MSC_VER
@@ -205,6 +205,8 @@ FORTRAN_SUBR ( LROPEN, lropen,
  if (mtzdata[*mindx-1] == NULL) {
    printf("Error: failed to open file for read!\n");
    *ifail = -1;
+   free(fullfilename); 
+   free(temp_name);
    return;
  }
  rlun[*mindx-1] = 1;
@@ -1216,8 +1218,6 @@ FORTRAN_SUBR ( LRREFF, lrreff,
  ieof = ccp4_lrreff(mtzdata[mindex-1], resol, adata, logmss[mindex-1], 
 		    (const MTZCOL **)collookup[mindex-1], 
 		    ndatmss[mindex-1], irref[mindex-1]);
- /* */
-
  if (ieof) {
    *eof = FORTRAN_LOGICAL_TRUE;
  } else {
@@ -1712,7 +1712,7 @@ FORTRAN_SUBR ( LWOPEN_NOEXIT, lwopen_noexit,
    for (i = 0; i < mtzdata[*mindx-1]->nxtal; ++i)
     for (j = 0; j < mtzdata[*mindx-1]->xtal[i]->nset; ++j)
      for (k = 0; k < mtzdata[*mindx-1]->xtal[i]->set[j]->ncol; ++k)
-       if ( (icol = mtzdata[*mindx-1]->xtal[i]->set[j]->col[k]->source) )
+       if ((icol = mtzdata[*mindx-1]->xtal[i]->set[j]->col[k]->source) != 0)
          collookup_out[*mindx-1][icol-1] = mtzdata[*mindx-1]->xtal[i]->set[j]->col[k];
  }
 

@@ -40,10 +40,14 @@
 #include "ccp4_errno.h"
 #include "ccp4_fortran.h"
 
+#if defined(GFORTRAN) || defined (G95)
+#include <time.h>
+#endif
+
 /** Creates a null-terminated C string from an input
  * string obtained from a Fortran call. Trailing blanks are
  * removed. If input string is blank then return string "\0".
- * Memory assigned by malloc, so can be freed.
+ * Memory assigned by malloc, so can be freed. 
  * @param str1 pointer to string
  * @param str1_len Fortran length of string
  */
@@ -52,8 +56,6 @@ char *ccp4_FtoCString(fpstr str1, int str1_len)
   char *str2;
 
   size_t length = ccp4_utils_flength(FTN_STR(str1),str1_len);
-  if (length < 0)
-    return NULL;
   str2 = (char *) ccp4_utils_malloc((length+1)*sizeof(char));
   if(length) strncpy(str2, FTN_STR(str1), length); 
   str2[length] = '\0';
@@ -109,7 +111,7 @@ FORTRAN_SUBR ( USTENV, ustenv,
 
   temp_name = ccp4_FtoCString(FTN_STR(str), FTN_LEN(str));
 
-  if ( (*result = ccp4_utils_setenv (temp_name)) )
+  if ((*result = ccp4_utils_setenv (temp_name)) != 0)
     ccp4_fatal("USTENV/CCP4_SETENV: Memory allocation failure"); 
   free(temp_name);
 }
@@ -220,7 +222,7 @@ FORTRAN_SUBR ( CCPAL1, ccpal1,
     (int) sizeof (int),            /* 5: not used */
     (int) sizeof (int)             /* 6: integers */
   };
-  int i, size = 0, *leng[13];
+  int i, size, *leng[13];
   void *pointer[13];
 
   for (i=0; i<*n; i++) {
@@ -474,8 +476,7 @@ FORTRAN_SUBR ( CCHMOD, cchmod,
 # if CALL_LIKE_MVS == 1
 int __stdcall ISATTY (int *lunit)
 {
-  lunit = 0 ;
-  return *lunit;
+  return 0;
 }
 
 /* erfc doesnt seem to be in Mircrosoft Visual Studdio so this is a fudge */
@@ -488,8 +489,7 @@ float __stdcall ERFC(float *value)
 
 int isatty_ (int *lunit)
 {
-  lunit = 0 ;
-  return *lunit;
+  return 0;
 }
 
 float erfc_ (float *value)
@@ -499,7 +499,6 @@ float erfc_ (float *value)
 
 # endif
 #endif
-
 
 #if defined(F2C) 
 /* <f2c support>=                                                           */
@@ -609,7 +608,6 @@ int /* logical */ btest_ (a, b)
 }
 #endif              /* F2C support  */
 
-
 #if defined (__hpux) || defined (_AIX)
 /* <AIX and HPUX support>=                                                  */
 
@@ -640,38 +638,9 @@ int ierrno () {
 
 #endif             /*  HPUX and AIX support */    
 
-
-
-#if ( defined (__APPLE__) && !defined (__GNUC__) )
-
-/* apple xlf support */
-void gerror_ (str, Lstr)
-char *str;
-int  Lstr;
-{
-  int i;
-
-  if (errno == 0) {             /* Avoid `Error 0' or some such message */    
-    for (i=1; Lstr; i++)
-      str[i] = ' ';
-  } else {
-    (void) strncpy (str, strerror (errno), Lstr);
-    for (i = strlen (str); i < Lstr; i++) str[i] = ' ';  /* pad with spaces */
-  }
-} /* End of gerror (str, Lstr) */
-
-int isatty_(int *iunit)
-{
-  return isatty(*iunit);
-}
-
-#endif /* end of apple xlf support */
-
-
-
-#if ( defined (__linux__) && defined (_CALL_SYSV) )
-/* linuxppc xlf support */
-
+#if !( defined(G95) || defined(GFORTRAN) || defined(F2C) ) && \
+    ( ( defined(__linux__) && defined(_CALL_SYSV) ) || defined(__APPLE__) )
+/* linuxppc xlf and apple xlf support */
 void gerror_ (str, Lstr)
 char *str;
 int  Lstr;
@@ -691,16 +660,26 @@ int isatty_(int *iunit)
 {
   return isatty(*iunit);
 }
+#endif /* end of linuxppc/apple xlf support */
 
-
-
-#elif defined(G95) || defined (GFORTRAN)
-/* G95 and GFORTRAN support */
-
+#if defined (sun)
 int isatty_(int *iunit)
 {
   return isatty(*iunit);
 }
+#endif
+
+/* neither gfortran or g95 have isatty */
+/* not true, since August 05 this has been added to gfortran */
+
+/* G95 support */
+#if defined(G95)
+int isatty_(int *iunit)
+{
+  return isatty(*iunit);
+}
+#endif
+#if defined(G95) || defined (GFORTRAN)
 
 /* FORTRAN gerror intrinsic */
 int gerror_(str, Lstr)
@@ -719,19 +698,6 @@ int  Lstr;
   return 0;
 }
 
-#endif
-
-
-#if defined (sun)
-
-int isatty_(int *iunit)
-{
-  return isatty(*iunit);
-}
-
-#endif
-
-#if defined(G95) || defined (GFORTRAN)
 /* FORTRAN IErrNo intrinsic */
 int ierrno_() {
   return errno;
@@ -741,8 +707,15 @@ void ltime_(int *stime, int tarray[9])
 {
   int i;
   struct tm ldatim;
+  time_t t = *stime;
 
-  if (localtime_r((const time_t *) stime, &ldatim) != NULL) {
+#ifdef __MINGW32__ // no localtime_r in MinGW
+  struct tm* lt = localtime(&t);
+  if (lt != NULL) {
+    ldatim = *lt;
+#else
+  if (localtime_r(&t, &ldatim) != NULL) {
+#endif
     tarray[0] = ldatim.tm_sec;
     tarray[1] = ldatim.tm_min;
     tarray[2] = ldatim.tm_hour;
@@ -774,8 +747,15 @@ void gmtime_(int *stime, int gmarray[9])
 {
   int i;
   struct tm udatim;
+  time_t t = *stime;
 
-  if (gmtime_r((const time_t *) stime, &udatim) != NULL) {
+#ifdef __MINGW32__ // no gmtime_r in MinGW
+  struct tm *p = gmtime(&t);
+  if (p != NULL) {
+    udatim = *p;
+#else
+  if (gmtime_r(&t, &udatim) != NULL) {
+#endif
     gmarray[0] = udatim.tm_sec;
     gmarray[1] = udatim.tm_min;
     gmarray[2] = udatim.tm_hour;

@@ -122,6 +122,9 @@ struct _CMMFile {
   unsigned int close_mode;	/**< */
   float cell[6];		/**< unit cell parameters */
   int spacegroup;		/**< space group number */
+  int EM_spacegroup;            /**< EM space group*/
+  char EM_exthead_type[5];	/**< */
+  char EM_contents[5];		/**< */
   int map_dim[3];		/**< size of map array (number of
 				   columns, rows, sections) */
   int origin[3];		/**< map origin (number of first

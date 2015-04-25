@@ -40,14 +40,22 @@
 #define SIZE1 20                    /**< size of pre-reflection block */
 #define MTZRECORDLENGTH 80          /**< length of records */
 #define MAXSPGNAMELENGTH 20         /**< max length of a spacegroup name */
+#define MAXPGNAMELENGTH 10          /**< max length of a pointgroup name */
 
 #define NBATCHWORDS 185       /**< total size of batch header buffer */
 #define NBATCHINTEGERS 29     /**< size of integer section of batch header buffer */
 #define NBATCHREALS 156       /**< size of float section of batch header buffer */
 
+/* cctbx uses smaller values for these three */
+#ifndef MXTALS
 #define MXTALS      100      /**< maximum number of crystals (for a few arrays - to be removed!) */
+#endif
+#ifndef MSETS
 #define MSETS      1000      /**< maximum number of datasets (for a few arrays - to be removed!) */
+#endif
+#ifndef MCOLUMNS
 #define MCOLUMNS  10000      /**< maximum number of columns (for a few arrays - to be removed!) */
+#endif
 
 /** MTZ column struct. */
 typedef struct { char label[31];       /**< column name as given by user */
@@ -152,7 +160,7 @@ typedef struct { int spcgrp;           /**< spacegroup number */
                                           (translations in [*][3]) */
 		 int nsymp;            /**< number of primitive symmetry ops. */
 		 char symtyp;          /**< lattice type (P,A,B,C,I,F,R) */
-		 char pgname[11];      /**< pointgroup name */
+		 char pgname[MAXPGNAMELENGTH+1];      /**< pointgroup name */
                  char spg_confidence;  /**< L => Bravais lattice correct
                                             P => pointgroup correct
                                             E => spacegroup or enantiomorph

@@ -112,10 +112,11 @@ The library divides roughly into the following sections:
 @ref cmap_f_page page for Fortran programmers.
 
 <dt>MMDB library
-<dd>See Eugene's <a href="http://www.ebi.ac.uk/pdbe/docs/cldoc/">documentation</a>.
+<dd>See Eugene's <a href="http://www.ebi.ac.uk/~keb/cldoc">documentation</a>.
 
-<dt>CSYM library <dd>See the @ref csym_page page for C/C++
-programmers, and the @ref csym_f_page page for Fortran programmers.
+<dt>CSYM library
+<dd>See the @ref csym_page page for C/C++ programmers, and the
+@ref csym_f_page page for Fortran programmers.
 
 <dt>CCP4 utility library
 <dd>See the @ref utilities_page page for C/C++ programmers.

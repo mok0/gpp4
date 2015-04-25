@@ -50,6 +50,7 @@ This document covers some peculiarities of the C implementation.
 #include"ccp4_parser.h"
 #include"csymlib.h"
 #include"ccp4_general.h"
+#include"ccp4_program.h"
 
 static struct _IOConvMap *ioArray[MAXFILES];
 static int last_Read = -1;
@@ -75,7 +76,7 @@ static int GetChannel(int iunit)
 
 static int ioArrayPrint(IOConvMap *ioMap)
 {
-  const char *filename = ccp4_file_name((*ioMap->mapfile).stream);
+  char *filename = ccp4_file_name((*ioMap->mapfile).stream);
   long length = ccp4_file_length((*ioMap->mapfile).stream);
   unsigned rw_mode = ccp4_file_is_read((*ioMap->mapfile).stream);
 
@@ -94,7 +95,7 @@ static int ioArrayPrint(IOConvMap *ioMap)
     fprintf(stdout,"logical name %s\n\n",ioMap->logname);
   }
   out:
-  free((void *)filename);      /* we strdup it in ccp4_file_name */
+  free(filename);      /* we strdup it in ccp4_file_name */
   return 1;
 }
 
@@ -169,7 +170,7 @@ static int HeaderPrint(const CMMFile *mfile)
 
   if(!mfile) {
     if (ccp4VerbosityLevel(-1) > 0)
-    fprintf(stderr,"WARNING: no header information to print.\n");
+      fprintf(stderr,"WARNING: no header information to print.\n");
     return (0);}
 
   /* C. Vonrhein: make the output identical to old (pre-5.0) Fortran */
@@ -1154,7 +1155,7 @@ FORTRAN_SUBR( MSYWRT, msywrt,
     for (j=0; j != 4 ; ++j) 
       for (k=0; k != 4 ; ++k) 
         rsm[j][k] = *(rot+16*i+j+4*k);
-    mat4_to_symop(buffer,&buffer[80], (const float (*)[4])rsm);
+    mat4_to_symop(buffer,&buffer[80],(const float (*)[4])rsm);
     ccp4_cmap_set_symop(ioArray[ii]->mapfile,buffer);
   }
   /* record for FORTRAN API */
@@ -1783,10 +1784,8 @@ FORTRAN_SUBR( MSYCPY, msycpy,
   int ii,jj, nsym, i;
   char symop[81];
 
-  ii = GetChannel(*iunit);
-  jj = GetChannel(*ounit);
-
-  if ( ii == MAXFILES || !ioArray[ii]->mapfile || jj  == MAXFILES || !ioArray[jj]->mapfile)
+  if ( (ii = GetChannel(*iunit)) == MAXFILES || !ioArray[ii]->mapfile
+       || (jj = GetChannel(*ounit)) == MAXFILES || !ioArray[jj]->mapfile) 
      ccp4_signal(CCP4_ERRLEVEL(4) | CMAP_ERRNO(CMERR_NoChannel),
 		 "MSYCPY", NULL);
 
@@ -1812,10 +1811,8 @@ FORTRAN_SUBR( CCP4_MAP_COPY_SYMMETRY,
   int ii,jj, nsym, i;
   char symop[81];
 
-  ii = GetChannel(*iunit);
-  jj = GetChannel(*ounit);
-
-  if ( ii == MAXFILES || !ioArray[ii]->mapfile || jj == MAXFILES || !ioArray[jj]->mapfile)
+  if ( (ii = GetChannel(*iunit)) == MAXFILES || !ioArray[ii]->mapfile
+       || (jj = GetChannel(*ounit)) == MAXFILES || !ioArray[jj]->mapfile) 
      ccp4_signal(CCP4_ERRLEVEL(4) | CMAP_ERRNO(CMERR_NoChannel),
 		 "MSYCPY", NULL);
 

@@ -90,12 +90,6 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
   double coefhkl[6];
   int k; long xmllen;
 
-  jxtal = 0;
-  nbat = 0;
-  nref = 0;
-  ntotcol = 0;
-  newproj = 0;
-
   /* For cparser */
   CCP4PARSERARRAY *parser;
   CCP4PARSERTOKEN *token=NULL;
@@ -107,7 +101,7 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
   float buf[NBATCHWORDS];
   int *intbuf = (int *) buf;
   float *fltbuf = buf + NBATCHINTEGERS;
-  MTZBAT *batch = NULL;
+  MTZBAT *batch;
 
   /* known headers */
   char known_headers[][5] =
@@ -192,15 +186,7 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
   /* set reading integers */
   ccp4_file_setmode(filein,6);
   istat = ccp4_file_read(filein, (uint8 *) &hdrst, 1);
-  if (debug) printf(" istat=%d, hdrst read as %d \n",istat,hdrst);
-
-  if (istat == EOF) {
-    ccp4_signal(CCP4_ERRLEVEL(3) | CMTZ_ERRNO(CMTZERR_ReadFail),"MtzGet",NULL);
-    ccp4_parse_end(parser);
-    ccp4_file_close(filein);
-    free(filename);
-    return NULL;
-  }
+  if (debug) printf(" hdrst read as %d \n",hdrst);
 
   /* 1st Pass: Read ntotcol, nref, nbat and dataset info.  
      nxtal and nset are used to assign memory for MTZ structure.
@@ -841,6 +827,10 @@ MTZ *MtzGetUserCellTolerance(const char *logname, int read_refs, const double ce
           strcpy(batch->gonlab[1],token[2].fullstring); 
           strcpy(batch->gonlab[2],token[3].fullstring); 
           batch->gonlab[0][8] = batch->gonlab[1][8] = batch->gonlab[2][8] = '\0';
+        } else if (ntok == 2) {
+          strcpy(batch->gonlab[0],token[1].fullstring);
+          batch->gonlab[0][8] = '\0';
+          batch->gonlab[1][0] = batch->gonlab[2][0] = '\0';
         } else {
           batch->gonlab[0][0] = batch->gonlab[1][0] = batch->gonlab[2][0] = '\0';
 	}
@@ -1231,7 +1221,7 @@ int MtzListInputColumn(const MTZ *mtz, char clabs[][31], char ctyps[][3], int cs
     for (j = 0; j < mtz->xtal[i]->nset; ++j) {
  /* Loop over columns for each dataset */
      for (k = 0; k < mtz->xtal[i]->set[j]->ncol; ++k) {
-       if ( (colin = mtz->xtal[i]->set[j]->col[k]->source) ) {
+      if ((colin = mtz->xtal[i]->set[j]->col[k]->source) != 0) {
        if (strcmp(mtz->xtal[i]->set[j]->col[k]->type,"Y") == 0 && 
            strcmp(mtz->xtal[i]->set[j]->col[k]->label,"M_ISYM") == 0) {
          strcpy(clabs[colin - 1],"M/ISYM");
@@ -1500,7 +1490,7 @@ int ccp4_lrrefl(const MTZ *mtz, float *resol, float adata[], int logmss[], int i
   int i,j,k;
   int ind[3],ixtal;
   unsigned int colin;
-  float *refldata = NULL;
+  float *refldata;
   double coefhkl[6];
 
   /* If we are past the last reflection, indicate this with return value. */
@@ -1521,7 +1511,7 @@ int ccp4_lrrefl(const MTZ *mtz, float *resol, float adata[], int logmss[], int i
   for (i = 0; i < mtz->nxtal; ++i) {
     for (j = 0; j < mtz->xtal[i]->nset; ++j) {
      for (k = 0; k < mtz->xtal[i]->set[j]->ncol; ++k) {
-       if ( (colin = mtz->xtal[i]->set[j]->col[k]->source) ) {
+       if ((colin = mtz->xtal[i]->set[j]->col[k]->source) != 0) {
          if (mtz->refs_in_memory) {
            adata[colin - 1] = mtz->xtal[i]->set[j]->col[k]->ref[iref-1];
          } else {
@@ -1564,7 +1554,7 @@ int ccp4_lrreff(const MTZ *mtz, float *resol, float adata[], int logmss[],
   int icol,l;
   int ind[3],ixtal,ind_xtal,ind_set,ind_col[3];
   unsigned int colin;
-  float *refldata = NULL;
+  float *refldata;
   double coefhkl[6];
   union float_uint_uchar uf;
 
@@ -1595,7 +1585,7 @@ int ccp4_lrreff(const MTZ *mtz, float *resol, float adata[], int logmss[],
         adata[icol] = lookup[icol]->ref[iref-1];
         logmss[icol] = ccp4_ismnf(mtz, adata[icol]);
       } else {
-	if ( (colin = lookup[icol]->source) ) {
+         if ((colin = lookup[icol]->source) != 0) {
            adata[icol] = refldata[colin - 1];
            logmss[icol] = ccp4_ismnf(mtz, adata[icol]);
 	 } else {
@@ -1671,7 +1661,7 @@ int ccp4_lhprt(const MTZ *mtz, int iprint) {
   printf(" * Title:\n\n");
   printf(" %s\n\n",mtz->title);
 
-  if ( (baseset = MtzSetLookup(mtz,"HKL_base/HKL_base")) ) {
+  if ((baseset = MtzSetLookup(mtz,"HKL_base/HKL_base")) != NULL) {
     if ( MtzNumActiveColsInSet(baseset) ||
          MtzNbatchesInSet(mtz,baseset) ) {
       printf(" * Base dataset:\n\n");
@@ -1782,20 +1772,20 @@ int ccp4_lhprt(const MTZ *mtz, int iprint) {
   for (i = 0; i < mtz->nxtal; ++i) {
    for (j = 0; j < mtz->xtal[i]->nset; ++j) {
     for (k = 0; k < mtz->xtal[i]->set[j]->ncol; ++k) {
-      if (mtz->xtal[i]->set[j]->col[k]->active)  {
-	if (strcmp(mtz->xtal[i]->set[j]->col[k]->type,"Y") == 0 &&
-	    strcmp(mtz->xtal[i]->set[j]->col[k]->label,"M_ISYM") == 0) {
-	  printf(" M/ISYM                         %2s %19.4f %19.4f %8d \n",
-		 mtz->xtal[i]->set[j]->col[k]->type,
-		 mtz->xtal[i]->set[j]->col[k]->min,mtz->xtal[i]->set[j]->col[k]->max,
-		 mtz->xtal[i]->set[j]->setid);
-	} else {
-	  printf(" %-30s %2s %19.4f %19.4f %8d \n",
-		 mtz->xtal[i]->set[j]->col[k]->label,mtz->xtal[i]->set[j]->col[k]->type,
-		 mtz->xtal[i]->set[j]->col[k]->min,mtz->xtal[i]->set[j]->col[k]->max,
-		 mtz->xtal[i]->set[j]->setid);
-	}
+     if (mtz->xtal[i]->set[j]->col[k]->active) {
+      if (strcmp(mtz->xtal[i]->set[j]->col[k]->type,"Y") == 0 && 
+         strcmp(mtz->xtal[i]->set[j]->col[k]->label,"M_ISYM") == 0) {
+       printf(" M/ISYM                         %2s %19.4f %19.4f %8d \n",
+         mtz->xtal[i]->set[j]->col[k]->type,
+         mtz->xtal[i]->set[j]->col[k]->min,mtz->xtal[i]->set[j]->col[k]->max,
+         mtz->xtal[i]->set[j]->setid);
+      } else {
+       printf(" %-30s %2s %19.4f %19.4f %8d \n",
+         mtz->xtal[i]->set[j]->col[k]->label,mtz->xtal[i]->set[j]->col[k]->type,
+         mtz->xtal[i]->set[j]->col[k]->min,mtz->xtal[i]->set[j]->col[k]->max,
+         mtz->xtal[i]->set[j]->setid);
       }
+     }
     }
    }
   }
@@ -2250,7 +2240,7 @@ int MtzAssignColumn(MTZ *mtz, MTZCOL *col, const char crystal_name[],
     if ( oldset->col[i] == col ) {
       for (j = i; j < oldset->ncol - 1; ++j) 
 	oldset->col[j] = oldset->col[j+1];
-      oldset->col[oldset->ncol--] = NULL;
+      oldset->col[--oldset->ncol] = NULL;
       break;
     }
   }
@@ -2315,7 +2305,9 @@ int ccp4_lwsymm_c(MTZ *mtz, int nsymx, int nsympx, float rsymx[192][4][4],
     mtz->mtzsymm.spcgrpname[length] = '\0';
   }
   if (strcmp(pgnamx,"")) {
-    strcpy(mtz->mtzsymm.pgname,pgnamx);
+    length = ( strlen(pgnamx) < MAXPGNAMELENGTH ) ? strlen(pgnamx) : MAXPGNAMELENGTH;
+    strncpy(mtz->mtzsymm.pgname,pgnamx,length);
+    mtz->mtzsymm.pgname[length] = '\0';
   }
 
   return 1;
@@ -2596,7 +2588,7 @@ int MtzPut(MTZ *mtz, const char *logname)
  float buf[NBATCHWORDS];
  int *intbuf = (int *) buf;
  float *fltbuf = buf + NBATCHINTEGERS;
- MTZBAT *batch, *lastoldbatch = NULL;
+ MTZBAT *batch, *lastoldbatch;
  MTZXTAL *xtl;
  char colsource[37], *taskenv;
  int date3[3], time3[3];
@@ -2688,7 +2680,7 @@ int MtzPut(MTZ *mtz, const char *logname)
            mtz->xtal[i]->cell[1],mtz->xtal[i]->cell[2],mtz->xtal[i]->cell[3],
            mtz->xtal[i]->cell[4],mtz->xtal[i]->cell[5]);
      MtzWhdrLine(fileout,65,hdrrec);
-     if ( (xtl = MtzXtalLookup(mtz,"HKL_base")) )
+     if ((xtl = MtzXtalLookup(mtz,"HKL_base")) != NULL)
        for (j = 0; j < 6; ++j)
          xtl->cell[j] = mtz->xtal[i]->cell[j];
      glob_cell_written=1;
@@ -2697,7 +2689,7 @@ int MtzPut(MTZ *mtz, const char *logname)
  }
  /* if no suitable cell found, then try HKL_base cell */
  if (!glob_cell_written) {
-   if ( (xtl = MtzXtalLookup(mtz,"HKL_base")) ) {
+   if ((xtl = MtzXtalLookup(mtz,"HKL_base")) != NULL) {
      sprintf(hdrrec,"CELL  %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f",xtl->cell[0],
            xtl->cell[1],xtl->cell[2],xtl->cell[3],xtl->cell[4],xtl->cell[5]);
      MtzWhdrLine(fileout,65,hdrrec);
@@ -2799,7 +2791,7 @@ int MtzPut(MTZ *mtz, const char *logname)
        if ( mtz->xtal[i]->set[j]->col[k]->min == FLT_MAX ) mtz->xtal[i]->set[j]->col[k]->min = 0.0f;
        if ( mtz->xtal[i]->set[j]->col[k]->max == -FLT_MAX ) mtz->xtal[i]->set[j]->col[k]->max = 0.0f;
 
-       sprintf(hdrrec+38,"%c %17.4f %17.4f %4d",
+       sprintf(hdrrec+38,"%c %17.9g %17.9g %4d",
                    mtz->xtal[i]->set[j]->col[k]->type[0],
                    mtz->xtal[i]->set[j]->col[k]->min,
                    mtz->xtal[i]->set[j]->col[k]->max,
@@ -2946,7 +2938,7 @@ int MtzPut(MTZ *mtz, const char *logname)
      ccp4_file_setmode(fileout,2);
      ccp4_file_write(fileout, (uint8 *) buf, nwords);
      ccp4_file_setmode(fileout,0);
-     if (batch->gonlab[0] != '\0') {
+     if (batch->gonlab[0][0] != '\0') {
        sprintf(hdrrec,"BHCH %8s%8s%8s",batch->gonlab[0],batch->gonlab[1],batch->gonlab[2]);
      } else {
        sprintf(hdrrec,"BHCH                         ");

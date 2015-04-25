@@ -441,7 +441,7 @@ void mirror_longimg(LONG *img, LONG *x, LONG *y);
   if (packfile == NULL) {
     fprintf(stderr,"The file %s cannot be created!\n   ...giving up...\n",
           filename);
-    abort();
+    exit(1);
   } else {
     pack_wordimage_copen(img, x, y, packfile);
     fclose(packfile);
@@ -477,7 +477,7 @@ void mirror_longimg(LONG *img, LONG *x, LONG *y);
   if (packfile == NULL)
   { fprintf(stderr,"The file %s cannot be created!\n   ...giving up...\n", 
 	    filename);
-    abort();}
+    exit(1);}
   else
   { fprintf(packfile, V2IDENTIFIER, x, y);
     while (done < (x * y))
@@ -574,7 +574,7 @@ void mirror_longimg(LONG *img, LONG *x, LONG *y);
   if (packfile == NULL)
   { fprintf(stderr,"The file %s cannot be created!\n   ...giving up...\n", 
 	    filename);
-    abort();}
+    exit(1);}
   else
   { pack_longimage_copen(img, x, y, packfile);
     fclose(packfile);
@@ -610,7 +610,7 @@ void mirror_longimg(LONG *img, LONG *x, LONG *y);
   if (packfile == NULL)
   { fprintf(stderr,"The file %s cannot be created!\n   ...giving up...\n", 
 	    filename);
-    abort();}
+    exit(1);}
   else
   { fprintf(packfile, V2IDENTIFIER, x, y);
     while (done < (x * y))
@@ -850,11 +850,7 @@ void mirror_longimg(LONG *img, LONG *x, LONG *y);
     descriptor[0] = j;
     descriptor[1] = bitsize_encode[bitsize];
     if ((buffree - buffer) > (PACKBUFSIZ - (130 * 4)))
-    { 
-      if (! fwrite(buffer, sizeof(BYTE), buffree - buffer, packfile)) {
-	fprintf (stderr, "write error 1, aborting\n");
-	abort();
-      }
+    { fwrite(buffer, sizeof(BYTE), buffree - buffer, packfile);
       buffer[0] = buffree[0];
       buffree = buffer;}
     pack_longs(descriptor, 2, &buffree, &bitmark, 3);
@@ -862,10 +858,7 @@ void mirror_longimg(LONG *img, LONG *x, LONG *y);
   else
   { int len=buffree-buffer;
     if (bitmark!=0) len++;
-    if (!fwrite(buffer, sizeof(BYTE), len, packfile)) {
-      fprintf (stderr, "write error 2, aborting\n");
-      abort();
-    }
+    fwrite(buffer, sizeof(BYTE), len, packfile);
     free((void *) buffer);
     buffer = NULL;}}
 
@@ -906,11 +899,7 @@ void mirror_longimg(LONG *img, LONG *x, LONG *y);
     descriptor[0] = j;
     descriptor[1] = bitsize_encode[bitsize];
     if ((buffree - buffer) > (PACKBUFSIZ - (130 * 4)))
-    { 
-      if (fwrite(buffer, sizeof(BYTE), buffree - buffer, packfile)) {
-	fprintf (stderr, "write error 3, aborting\n");
-	abort();
-      }
+    { fwrite(buffer, sizeof(BYTE), buffree - buffer, packfile);
       buffer[0] = buffree[0];
       buffree = buffer;}
     pack_longs(descriptor, 1, &buffree, &bitmark, 3);
@@ -919,10 +908,7 @@ void mirror_longimg(LONG *img, LONG *x, LONG *y);
   else
   { int len=buffree-buffer;
     if (bitmark!=0) len++;
-    if (!fwrite(buffer, sizeof(BYTE), len, packfile)) {
-      fprintf (stderr, "write error 4, aborting\n");
-      abort();
-    }
+    fwrite(buffer, sizeof(BYTE), len, packfile);
     free((void *) buffer);
     buffer = NULL;}}
 
@@ -1445,12 +1431,12 @@ void mirror_longimg(LONG *img, LONG *x, LONG *y);
     { c = i = *x = *y = 0;
       while ((++i < BUFSIZ) && (c != EOF) && (c != '\n') && (*x==0) && (*y==0)) 
       { if ((header[i] = c = getc(packfile)) == '\n')
-        { if (sscanf(header, PACKIDENTIFIER, x, y) == 2)
-            ;
+        { if (sscanf(header, PACKIDENTIFIER, x, y) == 2) {
 /*          version = 1; */  
-          else if (sscanf(header, V2IDENTIFIER, x, y) == 2)
-            ;
+          }
+          else if (sscanf(header, V2IDENTIFIER, x, y) == 2) {
 /*          version = 2; */
+          }
         }
       }
     }

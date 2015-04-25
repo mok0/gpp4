@@ -52,7 +52,7 @@ void mtzhdrout (MTZ *mtz)
 
 int main(int argc, char **argv) 
 {
-  register i;
+  register int i;
   
   if (argc < 2) {
     puts("Usage: mtzhdr <mtzfile>");

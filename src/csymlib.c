@@ -46,6 +46,9 @@
 #define  CSYMERR_NoLaueCodeDefined   5
 #define  CSYMERR_SyminfoTokensMissing 6
 
+/* copy of constants from fortran/csymlib_f.c */
+#define MAXSYMOPS 20
+#define MAXLENSYMOPSTR 80
 
 CCP4SPG *ccp4spg_load_by_standard_num(const int numspg) 
 { 
@@ -72,10 +75,6 @@ CCP4SPG *ccp4_spgrp_reverse_lookup(const int nsym1, const ccp4_symop *op1)
   return ccp4spg_load_spacegroup(0, 0, NULL, NULL, nsym1, op1);
 }
 
-
-char *gpp4_open_syminfo_file();
-
-
 CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
          const char *spgname, const char *ccp4spgname, 
          const int nsym1, const ccp4_symop *op1) 
@@ -84,11 +83,11 @@ CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
   int i,j,k,l,debug=0,nsym2,symops_provided=0,ierr,ilaue;
   float sg_chb[4][4],limits[2],rot1[4][4],rot2[4][4],det;
   FILE *filein;
-  char *symopfile, filerec[80];
-  ccp4_symop *op2, *op3=NULL, opinv;
+  char *symopfile, *ccp4dir, filerec[80];
+  ccp4_symop *op2,*op3,opinv;
 
   /* spacegroup variables */
-  int sg_num=0, sg_ccp4_num=0, sg_nsymp, sg_num_cent;
+  int sg_num, sg_ccp4_num, sg_nsymp, sg_num_cent;
   float cent_ops[4][4];
   char sg_symbol_old[20],sg_symbol_Hall[40],sg_symbol_xHM[20],
        sg_point_group[20],sg_patt_group[40];
@@ -138,13 +137,26 @@ CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
   }
 
   /* Open the symop file: */
+  if (!(symopfile = getenv("SYMINFO"))) {
+    if (debug)
+      printf("Environment variable SYMINFO not set ... guessing location of symmetry file. \n");
+    if (!(ccp4dir = getenv("CLIBD"))) {
+      printf("Environment variable CLIBD not set ... big trouble! \n");
+      return NULL;
+    }
 
-  if (!(symopfile = gpp4_open_syminfo_file()))
-    return NULL;
+    symopfile = ccp4_utils_malloc((strlen(ccp4dir)+22)*sizeof(char));
+    strcpy(symopfile,ccp4_utils_joinfilenames(ccp4dir,"syminfo.lib"));
+    symopfile[strlen(ccp4dir)+21] = '\0';
+    ccp4printf(1," SYMINFO file set to %s \n",symopfile);
+  } else {
+    if (debug) {
+      ccp4printf(1,"\n Spacegroup information obtained from library file: \n");
+      ccp4printf(1," Logical Name: SYMINFO   Filename: %s\n\n",symopfile);
+    }
+  }
 
   filein = fopen(symopfile,"r");
-  free(symopfile);
-
   if (!filein) {
     ccp4_signal(CSYM_ERRNO(CSYMERR_NoSyminfoFile),"ccp4spg_load_spacegroup",NULL); 
     return NULL;
@@ -632,6 +644,100 @@ CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
   return spacegroup;
 }
 
+
+/* symfr_driver
+
+   Convert one or more symop description strings into 4x4 matrix
+   representations via multiple calls to symop_to_mat4.
+
+   "line" is a string containing one or more symop description
+   strings to be translated into matrix representations.
+   Multiple symmetry operations can be specified in a single
+   input line, and must be separated by * (with spaces either
+   side).
+   "rot" is an array of 4x4 matrices in which the symops are
+   returned.
+
+   On success, symfr returns the number of symops translated and
+   stored; on failure -1 is returned.
+
+   See comments for SYMFR2 for description of the symop formats.
+*/
+int symfr_driver (const char *line, float rot[MAXSYMOPS][4][4])
+{
+  CCP4PARSERARRAY *symops=NULL;
+  int i,j,k,got_symop=0;
+  int ns=0,nsym=0,maxsymops=MAXSYMOPS;
+  char *symop=NULL,symopbuf[MAXLENSYMOPSTR];
+  float tmp_rot[4][4];
+
+  //CSYMLIB_DEBUG(puts("CSYMLIB: symfr_driver");)
+
+  /* Set up a parser structure to break the line up into
+     individual symop strings */
+  if ((symops = ccp4_parse_start(maxsymops)) == NULL) {
+    /* Couldn't set up a parser structure - abort */
+    printf(" symfr_driver: failed to set up parser structure for reading symops.\n");
+    return -1;
+  }
+
+  /* Tokenise the line, splitting on spaces */
+  ccp4_parse_delimiters(symops," ","");
+  if ((ns = ccp4_parse(line,symops)) > 0) {
+
+    /* Initialise */
+    got_symop = 0;
+    symopbuf[0] = '\0';
+
+    /* Loop over tokens and reconstruct symop strings */
+    for (i=0; i<ns; ++i) {
+      symop = symops->token[i].fullstring;
+
+      /* If there are multiple symop strings then these
+	 will be delimited by asterisks */
+      if (strlen(symop) == 1 && symop[0] == '*') {
+	/* End of symop */
+	got_symop = 1;
+      } else {
+	/* Append token to symop */
+	if (strlen(symopbuf)+strlen(symop)+1 <= MAXLENSYMOPSTR) {
+	  strcat(symopbuf,symop);
+	} else {
+	  /* Error - symop string is too long */
+	  printf("SYMFR: symmetry operator string is too long!\n");
+	  if (symops) ccp4_parse_end(symops);
+	  return -1;
+	}
+	/* Check if this is the last token, in which case
+	   flag it to be processed */
+	if ((i+1)==ns) got_symop = 1;
+      }
+
+      /* Process a complete symop */
+      if (got_symop && strlen(symopbuf) > 0) {
+	/* Translate */
+	if (!symop_to_mat4(&(symopbuf[0]),&(symopbuf[0])+strlen(symopbuf),tmp_rot[0])) {
+	  /* Error */
+	  if (symops) ccp4_parse_end(symops);
+	  return -1;
+	}
+	/* Load result into the appropriate array location */
+	for (j = 0; j < 4; ++j) 
+	  for (k = 0; k < 4; ++k) 
+	    rot[nsym][j][k] = tmp_rot[j][k];
+	nsym++;
+	/* Reset for next symop */
+	got_symop = 0;
+	symopbuf[0] = '\0';
+      }
+    }
+  }
+
+  /* Tidy up and return the number of symops */
+  if (symops) ccp4_parse_end(symops);
+  return nsym;
+}
+
 void ccp4spg_free(CCP4SPG **sp) {
   free ((*sp)->symop);
   free ((*sp)->invsymop);
@@ -866,11 +972,11 @@ void ccp4spg_name_de_colon(char *name) {
 
   /* various spacegroup names have settings specified by colon. We'll
      deal with these on a case-by-case basis. */
-  if ((ch1 = strstr(name,":R"))) {
+  if ((ch1 = strstr(name,":R")) != NULL) {
   /* :R spacegroup should be R already so just replace with blanks */
     *ch1 = ' ';
     *(ch1+1) = ' ';
-  } else if ((ch1 = strstr(name,":H"))) {
+  } else if ((ch1 = strstr(name,":H")) != NULL) {
   /* :H spacegroup should be R so change to H */
     *ch1 = ' ';
     *(ch1+1) = ' ';
@@ -1023,7 +1129,7 @@ int ccp4spg_put_in_asu(const CCP4SPG* sp, const int hin, const int kin, const in
                         lin*sp->symop[i].rot[2][1] ); 
     *lout = (int) rint( hin*sp->symop[i].rot[0][2] + kin*sp->symop[i].rot[1][2] + 
                         lin*sp->symop[i].rot[2][2] ); 
-    if ((isign = ccp4spg_is_in_pm_asu(sp,*hout,*kout,*lout))) {
+    if ((isign = ccp4spg_is_in_pm_asu(sp,*hout,*kout,*lout)) != 0) {
       *hout = *hout * isign;
       *kout = *kout * isign;
       *lout = *lout * isign;
@@ -1709,8 +1815,6 @@ int range_to_limits(const char *range, float limits[2])
   char ch;
   char buf[2];
   buf[1] = 0;
-
-  value1 = value2 = 0.0;
 
   for (i = 0 ; i < strlen(range) ; ++i) {
     ch = range[i];

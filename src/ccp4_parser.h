@@ -186,6 +186,7 @@ int ccp4_parse_init_token(const CCP4PARSERARRAY *parsePtr, const int itok);
 
 int ccp4_parse_delimiters(CCP4PARSERARRAY *parsePtr, const char *delim,
 				  const char *nulldelim);
+
 int ccp4_parse_comments(CCP4PARSERARRAY *parsePtr, const char *comment_chars);
 
 int ccp4_parse_maxmin(CCP4PARSERARRAY *parsePtr, const double max_exponent,
@@ -232,6 +233,11 @@ int ccp4_keymatch(const char *keyin1, const char *keyin2);
  */
 char *strtoupper (char *str1, const char *str2);
 
+/** Convert string to lowercase.
+ * @param str1 On exit str1 will contain lowercased copy of str2
+ * @param str2 Input string
+ * @return str1
+ */
 char *strtolower (char *str1, const char *str2);
 
 int strmatch (const char *str1, const char *str2);
@@ -261,11 +267,7 @@ ccp4_symop symop_to_rotandtrn(const char *symchs_begin, const char *symchs_end);
  * @return  NULL on error, final position pointer on success
  */
 const char * symop_to_mat4(const char *symchs_begin, const char *symchs_end, float *rot);
-
-  /*
 int symop_to_mat4_err(const char *symop);
-  */
-
 ccp4_symop mat4_to_rotandtrn(const float rsm[4][4]);
 
 /* This is Charles' version of symtr */

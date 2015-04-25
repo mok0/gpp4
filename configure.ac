@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(gpp4, 1.3.2, mok@bioxray.dk)
+AC_INIT(gpp4, 1.4.1, mok@bioxray.dk)
 AC_CONFIG_SRCDIR([src/ccp4_vars.h])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([config])
@@ -80,10 +80,10 @@ AC_SUBST(WANT_GPP4F)
 dnl  end of fortran-api selection
 
 dnl  deal with building python extension modules
-dnl AM_PATH_PYTHON(2.7)
-dnl AX_PKG_SWIG(2.0.9, [], [ AC_MSG_ERROR([SWIG is required to build..]) ])
-dnl AX_SWIG_MULTI_MODULE_SUPPORT
-dnl AX_SWIG_PYTHON([use-shadow-classes = yes])
+##AM_PATH_PYTHON(2.7)
+##AX_PKG_SWIG(2.0.9, [], [ AC_MSG_ERROR([SWIG is required to build..]) ])
+##AX_SWIG_MULTI_MODULE_SUPPORT
+##AX_SWIG_PYTHON([use-shadow-classes = yes])
 dnl  end of python extension stuff
 
 dnl  output the Makefiles

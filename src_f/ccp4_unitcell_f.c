@@ -82,7 +82,7 @@ FORTRAN_SUBR ( CCP4UC_F_ORTH_TO_FRAC, ccp4uc_f_orth_to_frac,
     for (j = 0; j < 3; ++j) 
       rf_cmat[i][j] = (double) rf[j][i];
   }
-  ccp4uc_orth_to_frac((const double (*)[3]) rf_cmat, dxo, dxf);
+  ccp4uc_orth_to_frac((const double (*)[3])rf_cmat, dxo, dxf);
   for (i = 0; i < 3; ++i) 
     xf[i] = (float) dxf[i];
 }
@@ -100,7 +100,7 @@ FORTRAN_SUBR ( CCP4UC_F_FRAC_TO_ORTH, ccp4uc_f_frac_to_orth,
     for (j = 0; j < 3; ++j) 
       ro_cmat[i][j] = (double) ro[j][i];
   }
-  ccp4uc_orth_to_frac((const double (*)[3]) ro_cmat, dxf, dxo);
+  ccp4uc_orth_to_frac((const double (*)[3])ro_cmat, dxf, dxo);
   for (i = 0; i < 3; ++i) 
     xo[i] = (float) dxo[i];
 

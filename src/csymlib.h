@@ -26,9 +26,9 @@
  - ccp4_spg.h - contains details of the spacegroup data structure
 
 @section csym_overview Overview
- 
+
 The CSYM library is centred around a data file \c syminfo.lib which is
-auto-generated from sgtbx (the Space Group Toolbox of 
+auto-generated from sgtbx (the Space Group Toolbox of
 <a href="http://cctbx.sourceforge.net/">cctbx</a>). A description of
 the contents of this file is given in the <a href="../symlib.html">
 documentation</a> of the Fortran API.
@@ -82,6 +82,7 @@ encodes the symmetry operation used.
 @section csym_examples Examples
 
 See examples on <a href="ftp://ftp.ccp4.ac.uk/mdw/csym">ftp area</a>
+
 */
 
 /** @file csymlib.h
@@ -91,7 +92,7 @@ See examples on <a href="ftp://ftp.ccp4.ac.uk/mdw/csym">ftp area</a>
  *  Functions defining the C-level API for accessing spacegroup properties.
  *  The primary spacegroup information comes from the data file syminfo.lib
  *
- *  @author Martyn Winn 
+ *  @author Martyn Winn
  */
 
 #ifndef __CSymLib__
@@ -106,19 +107,25 @@ namespace CSym {
 extern "C" {
 #endif
 
-/** Look up spacegroup in standard setting by number and load properties.
+/** Look up spacegroup in standard setting by number, and load properties.
+ * Allocates memory for the spacegroup structure. This can be freed
+ * later by ccp4spg_free().
  * @param numspg spacegroup number
  * @return pointer to spacegroup
  */
-CCP4SPG *ccp4spg_load_by_standard_num(const int numspg); 
+CCP4SPG *ccp4spg_load_by_standard_num(const int numspg);
 
-/** Look up spacegroup by CCP4 number and load properties.
+/** Look up spacegroup by CCP4 number, and load properties.
+ * Allocates memory for the spacegroup structure. This can be freed
+ * later by ccp4spg_free().
  * @param ccp4numspg CCP4 spacegroup number
  * @return pointer to spacegroup
  */
-CCP4SPG *ccp4spg_load_by_ccp4_num(const int ccp4numspg); 
+CCP4SPG *ccp4spg_load_by_ccp4_num(const int ccp4numspg);
 
 /** Look up spacegroup by the extended Hermann Mauguin symbol.
+ * Allocates memory for the spacegroup structure. This can be freed
+ * later by ccp4spg_free().
  * @param spgname Spacegroup name in form of extended Hermann Mauguin symbol.
  * @return pointer to spacegroup
  */
@@ -128,12 +135,16 @@ CCP4SPG *ccp4spg_load_by_spgname(const char *spgname);
  * and is more complicated than ccp4spg_load_by_spgname. For each
  * spacegroup in syminfo.lib it checks the CCP4 spacegroup name
  * first, and then the extended Hermann Mauguin symbol.
+ * Allocates memory for the spacegroup structure. This can be freed
+ * later by ccp4spg_free().
  * @param ccp4spgname Spacegroup name.
  * @return pointer to spacegroup
  */
 CCP4SPG *ccp4spg_load_by_ccp4_spgname(const char *ccp4spgname);
 
 /** Look up spacegroup by symmetry operators and load properties.
+ * Allocates memory for the spacegroup structure. This can be freed
+ * later by ccp4spg_free().
  * @param nsym1 number of operators (including non-primitive)
  * @param op1 pointer to array of operators
  * @return pointer to spacegroup
@@ -142,7 +153,9 @@ CCP4SPG * ccp4_spgrp_reverse_lookup(const int nsym1, const ccp4_symop *op1);
 
 /** Look up spacegroup from SYMOP.
  *  This would not normally be called directly, but via one of
- *  the wrapping functions. 
+ *  the wrapping functions.
+ *  Allocates memory for the spacegroup structure. This can be freed
+ *  later by ccp4spg_free().
  * @param numspg spacegroup number
  * @param ccp4numspg CCP4 spacegroup number
  * @param spgname Spacegroup name.
@@ -152,8 +165,8 @@ CCP4SPG * ccp4_spgrp_reverse_lookup(const int nsym1, const ccp4_symop *op1);
  * @return pointer to spacegroup
  */
 CCP4SPG *ccp4spg_load_spacegroup(const int numspg, const int ccp4numspg,
-        const char *spgname, const char *ccp4spgname, 
-        const int nsym1, const ccp4_symop *op1); 
+        const char *spgname, const char *ccp4spgname,
+        const int nsym1, const ccp4_symop *op1);
 
 /** Free all memory malloc'd from static pointers.
  * To be called before program exit. The function can be
@@ -273,7 +286,7 @@ char *ccp4spg_symbol_Hall(CCP4SPG* sp);
 
 /** inverts a symmetry operator. The input operator is
  * converted to a 4 x 4 matrix, inverted, and converted back.
- * @param op1 input symmetry operator
+ * @param ccp4_symop input symmetry operator
  * @return inverted symmetry operator
  */
 ccp4_symop ccp4_symop_invert( const ccp4_symop op1 );
@@ -287,13 +300,13 @@ ccp4_symop ccp4_symop_invert( const ccp4_symop op1 );
 */
 int ccp4spg_name_equal(const char *spgname1, const char *spgname2);
 
-/** Try to match a spacegroup name to one from SYMINFO. Blanks are 
+/** Try to match a spacegroup name to one from SYMINFO. Blanks are
  * removed when making the comparison. Strings are converted to upper
- * case before making the comparison. If spgname_lib has " 1 " and 
+ * case before making the comparison. If spgname_lib has " 1 " and
  * spgname_match doesn't, then strip out " 1" to do "short" comparison.
- * @param spgname_lib First spacegroup name, assumed to be a standard one
+ * @param spgname1 First spacegroup name, assumed to be a standard one
  *  obtained at some point from SYMINFO
- * @param spgname_match Second spacegroup name that you are trying to match
+ * @param spgname2 Second spacegroup name that you are trying to match
  *  to a standard SYMINFO one. E.g. it might have been provided by the
  *  user.
  * @return 1 if they are equal else 0.
@@ -333,19 +346,32 @@ int ccp4spg_pgname_equal(const char *pgname1, const char *pgname2);
 */
 ccp4_symop *ccp4spg_norm_trans(ccp4_symop *op);
 
-/** Compare two symmetry operator lists.
- * Kevin's code. The lists are coded as ints, which are then sorted and compared.
+/** Sort and compare two symmetry operator lists.
+ * The lists are coded as ints, which are then sorted and compared.
  * Note that no changes are made to the input operators, so that operators
  * differing by an integral number of unit cell translations are considered
- * unequal. If this is not what you want, normalise the operators with 
+ * unequal. If this is not what you want, normalise the operators with
  * ccp4spg_norm_trans first.
  * @param nsym1 number of symmetry operators in first list
  * @param op1 first list of symmetry operators
  * @param nsym2 number of symmetry operators in second list
  * @param op2 second list of symmetry operators
  * @return 1 if they are equal else 0.
+ * @author Kevin Cowtan.
 */
 int ccp4_spgrp_equal( int nsym1, const ccp4_symop *op1, int nsym2, const ccp4_symop *op2);
+
+/** Compare two symmetry operator lists.
+ * Kevin's code. The lists are coded as ints, which are compared.
+ * Unlike ccp4_spgrp_equal, the lists are not sorted, so the same operators
+ * in a different order will be considered unequal.
+ * @param nsym1 number of symmetry operators in first list
+ * @param op1 first list of symmetry operators
+ * @param nsym2 number of symmetry operators in second list
+ * @param op2 second list of symmetry operators
+ * @return 1 if they are equal else 0.
+*/
+int ccp4_spgrp_equal_order( int nsym1, const ccp4_symop *op1, int nsym2, const ccp4_symop *op2);
 
 /** Make an integer coding of a symmetry operator.
  * The coding takes 30 bits: 18 for the rotation and 12 for the translation.
@@ -380,6 +406,7 @@ int ccp4spg_is_in_pm_asu(const CCP4SPG* sp, const int h, const int k, const int 
  */
 int ccp4spg_is_in_asu(const CCP4SPG* sp, const int h, const int k, const int l);
 
+
 /** Place reflection (hin,kin,lin) in the asymmetric unit of spacegroup "sp".
  * Resultant indices are placed in (hout,kout,lout).
  * @param sp pointer to spacegroup
@@ -389,13 +416,14 @@ int ccp4spg_is_in_asu(const CCP4SPG* sp, const int h, const int k, const int l);
  * @param hout output reflection index
  * @param kout output reflection index
  * @param lout output reflection index
- * @return "isym" if successful, 0 otherwise. "isym" = 2*isymop - 1 for 
+ * @return "isym" if successful, 0 otherwise. "isym" = 2*isymop - 1 for
  * reflections placed in the positive asu, i.e. I+ of a Friedel pair, and
- * "isym" = 2*isymop for reflections placed in the negative asu, i.e. I- of 
+ * "isym" = 2*isymop for reflections placed in the negative asu, i.e. I- of
  * a Friedel pair. Here "isymop" is the number of the symmetry operator used.
  */
-int ccp4spg_put_in_asu(const CCP4SPG* sp, const int hin, const int kin, const int lin,
-		       int *hout, int *kout, int *lout );
+int ccp4spg_put_in_asu(const CCP4SPG* sp, const int hin, const int kin,
+		       const int lin, int *hout, int *kout, int *lout );
+
 
 /** Transform reflection (hin,kin,lin) according to spacegroup "sp" and
  * operation "isym". Resultant indices are placed in (hout,kout,lout).
@@ -413,7 +441,8 @@ void ccp4spg_generate_indices(const CCP4SPG* sp, const int isym,
                   const int hin, const int kin, const int lin,
 			      int *hout, int *kout, int *lout );
 
-/** Shift phase value associated with hin,kin,lin according to translation 
+
+/** Shift phase value associated with hin,kin,lin according to translation
 and optional sign change. Return in range 0,360.
  * @param hin reflection index
  * @param kin reflection index
@@ -578,7 +607,7 @@ int range_to_limits(const char *range, float limits[2]);
  * @param nz returns sampling intervals along z
  * @return void
  */
-void set_fft_grid(CCP4SPG* sp, const int nxmin, const int nymin, const int nzmin, 
+void set_fft_grid(CCP4SPG* sp, const int nxmin, const int nymin, const int nzmin,
 		  const float sample, int *nx, int *ny, int *nz);
 
 /** Checks whether all factors of a number n are less than or
@@ -602,15 +631,14 @@ int get_grid_sample(const int minsmp, const int nmul, const float sample);
  * @param nsym No. of symmetry operators.
  * @param rsym Symmetry operators.
  * @param cell Cell dimensions.
- * @return 1 if they are consistent, 0 if there is a problem. 
+ * @return 1 if they are consistent, 0 if there is a problem.
  */
 int ccp4spg_check_symm_cell(int nsym, float rsym[][4][4], float cell[6]);
 
 #ifdef __cplusplus
 } }
 #endif
-#endif
-
+#endif /*  __CSymLib__ */
 /*
   Local variables:
   mode: font-lock

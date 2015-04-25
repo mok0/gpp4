@@ -333,10 +333,10 @@ int ccp4_file_raw_read(CCP4File *cfile, char *buffer, size_t n_items)
  * @param buffer (char *) output array
  * @param n_items (size_t) number of items
  *
- * writes block of @c n_items bytes from buffer to cfile via FILE struct
- * cfile->stream(fwrite) or file desc cfile->fd(write/_write).  Increments
- * cfile->loc on success, or resets on failure, which is then used to
- * determine the file length.  On failure cfile->iostat is set.
+ * writes block of @n_items bytes from @buffer to @cfile via FILE struct
+ * @cfile->stream(fwrite) or file desc @cfile->fd(write/_write).  Increments
+ * @cfile->loc on success, or resets on failure, which is then used to
+ * determine the file length.  On failure @cfile->iostat is set.
  * @return number of bytes written.
  */
 int ccp4_file_raw_write(CCP4File *cfile, const char *buffer, size_t n_items)
@@ -375,8 +375,8 @@ int ccp4_file_raw_write(CCP4File *cfile, const char *buffer, size_t n_items)
  * @param whence (int) SEEK_SET, SEEK_CUR, or SEEK_END
  *
  * if the file is "seekable" (not stdin) the function
- * seeks on cfile by offset bytes using fseek/ftell (cfile->stream)
- * or lseek (cfile->fd).  %SEEK_SET is relative
+ * seeks on @cfile by offset bytes using fseek/ftell (@cfile->stream)
+ * or lseek (@cfile->fd).  %SEEK_SET is relative
  * to start of file, %SEEK_CUR to current, %SEEK_END to
  * end.
  * @return offset in bytes on success, -1 on failure.
@@ -421,7 +421,7 @@ int ccp4_file_raw_seek(CCP4File *cfile, long offset, int whence)
  * _file_free:
  * @param cfile  (CCP4File *)
  *
- * free up cfile
+ * free up @cfile
  */
 static void _file_free(CCP4File *cfile)
 {
@@ -477,7 +477,7 @@ static CCP4File *_file_init()
  * @param cfile (CCP4File *)
  * @param flag (const int) mode flag
  *
- * set file open mode elements of cfile (see ccp4_sysdep.h)
+ * set file open mode elements of @cfile (see ccp4_sysdep.h)
  *  O_TMP    = 0x0010
  *  O_RDONLY = 0x0000
  *  O_WRONLY = 0x0001
@@ -502,8 +502,8 @@ static void _file_open_mode(CCP4File * cfile, const int flag)
  * _file_close:
  * @param cfile  (CCP4File *)
  *
- * close cfile if it is "owned" (cfile->own) using fclose or close.
- * Reset cfile to some safe value.  Note: flush anyway.
+ * close @cfile if it is "owned" (@cfile->own) using fclose or close.
+ * Reset @cfile to some safe value.  Note: flush anyway.
  * @return 0 on success, -1 on failure.
  */
 static int _file_close (CCP4File *cfile)
@@ -536,7 +536,7 @@ static int _file_close (CCP4File *cfile)
  * ccp4_file_is_write:
  * @param cfile  (CCP4File *)
  *
- * is the cfile writeable
+ * is the @cfile writeable
  * @return 1 if true 
  */
 int ccp4_file_is_write(const CCP4File *cfile)
@@ -548,7 +548,7 @@ int ccp4_file_is_write(const CCP4File *cfile)
  * ccp4_file_is_read:
  * @param cfile  (CCP4File *)
  *
- * is the cfile readable
+ * is the @cfile readable
  * @return 1 if true.
  */
 int ccp4_file_is_read(const CCP4File *cfile)
@@ -560,7 +560,7 @@ int ccp4_file_is_read(const CCP4File *cfile)
  * ccp4_file_is_append:
  * @param cfile  (CCP4File *)
  *
- * is the cfile in append mode
+ * is the @cfile in append mode
  * @return 1 if true.
  */
 int ccp4_file_is_append(const CCP4File *cfile)
@@ -619,7 +619,7 @@ int ccp4_file_raw_setstamp(CCP4File *cfile, const size_t offset)
  * @param offset (size_t) offset in items
  *
  * set the machine stamp offset in CCP4 items determined
- * by the mode of cfile.  See ccp4_file_setmode().
+ * by the mode of @cfile.  See ccp4_file_setmode().
  * @return 0 on success, %EOF on failure
  */
 int ccp4_file_setstamp(CCP4File *cfile, const size_t offset)
@@ -638,9 +638,9 @@ int ccp4_file_setstamp(CCP4File *cfile, const size_t offset)
  * @param mode (int) io_mode
  *
  * set the data mode of cfile to mode
- * (BYTE (8 bit) = 0, 
- *  INT16  (16 bit) = 1, 
- *  INT32  (32 bit) = 6, 
+ * (CCP4_BYTE (8 bit) = 0, 
+ *  CCP4_INT16 (16 bit) = 1, 
+ *  CCP4_INT32 (32 bit) = 6, 
  *  FLOAT32 (32 bit) = 2, 
  *  COMP32 (2*16 bit) = 3, 
  *  COMP64 (2*32 bit) = 4).  
@@ -670,8 +670,8 @@ int ccp4_file_setmode (CCP4File *cfile, const int mode)
  * ccp4_file_mode:
  * @param cfile  (CCP4File *)
  *
- * get data mode of cfile (BYTE =0, INT16 =1, INT32=6, FLOAT32 =2, 
- * COMP32 =3, COMP64 =4)
+ * get data mode of @cfile (CCP4_BYTE =0, CCP4_INT16 =1, CCP4_INT32=6,
+ * FLOAT32 =2, COMP32 =3, COMP64 =4)
  * @return %mode
  */
 int ccp4_file_mode (const CCP4File *cfile)
@@ -688,7 +688,7 @@ int ccp4_file_mode (const CCP4File *cfile)
  * ccp4_file_itemsize:
  * @param cfile  (CCP4File *)
  *
- * @return %itemsize of cfile.
+ * @return %itemsize of @cfile.
  */
 int ccp4_file_itemsize(const CCP4File *cfile)
 {
@@ -704,10 +704,10 @@ int ccp4_file_itemsize(const CCP4File *cfile)
  * ccp4_file_name:
  * @param cfile (CCP4File *)
  *
- * strdup cfile->name
- * @return name of file as const char *
+ * strdup @cfile->name
+ * @return name of file as char *
  */
-const char *ccp4_file_name( CCP4File *cfile)
+char *ccp4_file_name( CCP4File *cfile)
 {
 #if defined _MSC_VER
   return ( cfile == NULL ? NULL : _strdup(cfile->name));
@@ -771,8 +771,7 @@ int ccp4_file_byte(CCP4File *cfile)
  * @param flag (const int) io mode (O_RDONLY =0, O_WRONLY =1, O_RDWR =2,
  *        O_TMP =, O_APPEND =)
  *
- * open cfile with existing handle FILE struct file and mode @c 
-flag.
+ * open @cfile with existing handle FILE struct file and mode @flag.
  * The struct stat is check to determine if file is a regular file,
  * if it is, and is not stdin, it is assumed to be direct access. 
  * @return (CCP4File *) on success, NULL on failure
@@ -826,7 +825,7 @@ CCP4File *ccp4_file_open_file (const FILE *file, const int flag)
  * @param flag (const int) io mode (O_RDONLY =0, O_WRONLY =1, O_RDWR =2,
  *        O_TMP =, O_APPEND =)
  *
- * initialise CCP4File struct with file descriptor @c fd and mode @c flag 
+ * initialise CCP4File struct with file descriptor @fd and mode @flag 
  * The struct stat is check to determine if file is a regular file,
  * if it is, and is not stdin, it is assumed to be direct access. 
  * @return (CCP4File *) on success, NULL on failure
@@ -879,7 +878,7 @@ CCP4File *ccp4_file_open_fd (const int fd, const int flag)
  * @param flag (const int) i/o mode, possible values are O_RDONLY, O_WRONLY, 
  *      O_RDWR, O_APPEND, O_TMP, O_CREAT, O_TRUNC - see ccp4_sysdep.h
  *
- * initialise CCP4File struct for file filename with mode @c flag.
+ * initialise CCP4File struct for file filename with mode @flag.
  * If !buffered use open(), otherwise fopen()
   * The struct stat is check to determine if file is a regular file,
  * if it is, and is not stdin, it is assumed to be direct access. 
@@ -947,6 +946,7 @@ CCP4File *ccp4_file_open (const char *filename, const int flag)
     *mptr++ = 'b';
 #endif
     *mptr++ = '\0';
+
 #ifdef VMS
     if (cfile->scratch)
       cfile->stream = fopen (filename, fmode,
@@ -956,16 +956,16 @@ CCP4File *ccp4_file_open (const char *filename, const int flag)
       cfile->stream = fopen (filename, fmode,
                              "mbc=16",        /* bigger blocksize */
                              "ctx=stm", "mrs=0", "rat=cr", "rfm=stmlf");
-#else
-# ifdef _MSC_VER
-	if (cfile->scratch) { 
+#elif defined(_WIN32)
+    if (cfile->scratch) {
       cfile->stream = tmpfile();
-// if tmpfile fails, try opening temporary file the unix way
-	  if (!cfile->stream) {
-	     cfile->stream = fopen (filename, fmode);
-	  }
-	}
-    else 
+      if (!cfile->stream) {
+        ccp4_signal(CCP4_ERRLEVEL(2) | CCP4_ERRNO(CIO_CantOpenFile),
+                    "tmpfile() failed, opening normal file instead.", NULL);
+        cfile->stream = fopen (filename, fmode);
+      }
+    }
+    else
       cfile->stream = fopen (filename, fmode);
 # else
     cfile->stream = fopen (filename, fmode);
@@ -974,12 +974,12 @@ CCP4File *ccp4_file_open (const char *filename, const int flag)
         ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_UnlinkFail),
                     "ccp4_file_open(unlink)", NULL);
         cfile->iostat = CIO_UnlinkFail; return NULL; }
-# endif
 #endif
     if (!cfile->stream) {
       ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_CantOpenFile),
                   "ccp4_file_open2", NULL);
       cfile->iostat = CIO_CantOpenFile;
+      free(cfile);
       return NULL; } 
 #if defined (__alpha) && defined (vms)
 (void) fflush (cfile->stream);
@@ -1017,7 +1017,7 @@ CCP4File *ccp4_file_open (const char *filename, const int flag)
  * ccp4_file_close:
  * @param cfile (CCP4File *) 
  *
- * close cfile if owned, close (non-buffered) or 
+ * close @cfile if owned, close (non-buffered) or 
  * fclose (buffered),  or fflush if stream not owned.
  * Free resources.
  * @return 0 on success, EOF on failure
@@ -1043,8 +1043,8 @@ int ccp4_file_close (CCP4File *cfile)
  * ccp4_file_rarch:
  * @param cfile (CCP4File *) 
  *
- * read machine stamp from file cfile->stream.
- * The machine stamp is at cfile->stamp_loc items, set
+ * read machine stamp from file @cfile->stream.
+ * The machine stamp is at @cfile->stamp_loc items, set
  * by ccp4_file_setstamp() (default 0).
  * NB. these values may be overrriden with the environmental
  * variable CONVERT_FROM.
@@ -1093,8 +1093,8 @@ int ccp4_file_rarch (CCP4File *cfile)
  * ccp4_file_warch:
  * @param cfile (CCP4File *) 
  *
- * write machine stamp to file cfile->stream.
- * The machine stamp is placed at cfile->stamp_loc items,
+ * write machine stamp to file @cfile->stream.
+ * The machine stamp is placed at @cfile->stamp_loc items,
  * set by ccp4_file_setstamp() (defaults to 0).
  *
  * @return 0 on success, EOF on failure
@@ -1129,8 +1129,8 @@ int ccp4_file_warch (CCP4File *cfile)
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * mode dependent read function.  Reads nitems items from stream
- * cfile->stream to buffer as determined by cfile->mode.
+ * mode dependent read function.  Reads @nitems items from stream
+ * @cfile->stream to @buffer as determined by cfile->mode.
  *
  * @return number of items read on success, EOF on failure
  */
@@ -1152,8 +1152,8 @@ int ccp4_file_read (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * float complex {float,float} read function.  Reads nitems complex from stream
- * cfile->stream to buffer.  Allows short count when eof is detected (
+ * float complex {float,float} read function.  Reads @nitems complex from stream
+ * @cfile->stream to @buffer.  Allows short count when eof is detected (
  * buffered input only).
  *
  * @return number of complex read on success, EOF on failure
@@ -1249,8 +1249,8 @@ int ccp4_file_readcomp (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * short complex {short,short} read function.  Reads nitems complex from stream
- * cfile->stream to buffer. Allows short count when eof is detected (
+ * short complex {short,short} read function.  Reads @nitems complex from stream
+ * @cfile->stream to @buffer. Allows short count when eof is detected (
  * buffered input only).
  *
  * @return number of complex read on success, EOF on failure
@@ -1308,8 +1308,8 @@ int ccp4_file_readshortcomp (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * float read function.  Reads nitems floats from stream
- * cfile->stream to buffer.
+ * float read function.  Reads @nitems floats from stream
+ * @cfile->stream to @buffer.
  *
  * @return number of floats read on success, EOF on failure
  */
@@ -1404,8 +1404,8 @@ int ccp4_file_readfloat (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * integer read function.  Reads nitems int from stream
- * cfile->stream to buffer.
+ * integer read function.  Reads @nitems int from stream
+ * @cfile->stream to @buffer.
  *
  * @return number of int read on success, EOF on failure
  */
@@ -1428,13 +1428,13 @@ int ccp4_file_readint (CCP4File *cfile, uint8 *buffer, size_t nitems)
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readint", NULL);
       return EOF; }   
 
-  n = _item_sizes[INT32] * nitems;
+  n = _item_sizes[CCP4_INT32] * nitems;
   if ( (result = ccp4_file_raw_read (cfile, (char *) buffer, n)) != n) {
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readint", NULL);
     if (cfile->stream && !feof(cfile->stream)) 
       return EOF; } 
 
-  result /= _item_sizes[INT32];
+  result /= _item_sizes[CCP4_INT32];
 
   n = result;
 
@@ -1464,8 +1464,8 @@ int ccp4_file_readint (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * short read function.  Reads nitems shorts from stream
- * cfile->stream to buffer.
+ * short read function.  Reads @nitems shorts from stream
+ * @cfile->stream to @buffer.
  *
  * @return number of shorts read on success, EOF on failure
  */
@@ -1488,13 +1488,13 @@ int ccp4_file_readshort (CCP4File *cfile, uint8 *buffer, size_t nitems)
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readshort", NULL);
       return EOF; }   
 
-  n = _item_sizes[INT16] * nitems;
+  n = _item_sizes[CCP4_INT16] * nitems;
   if ( (result = ccp4_file_raw_read (cfile, (char *) buffer, n)) != n) {
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_readshort", NULL);
     if (cfile->stream && !feof(cfile->stream)) 
       return EOF; } 
 
-  result /= _item_sizes[INT16];
+  result /= _item_sizes[CCP4_INT16];
 
   n = result;
   if (cfile->iconvert != nativeIT) {
@@ -1520,8 +1520,8 @@ int ccp4_file_readshort (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * character read function.  Reads nitems characters from stream
- * cfile->stream to buffer.
+ * character read function.  Reads @nitems characters from stream
+ * @cfile->stream to @buffer.
  *
  * @return number of characters read on success, EOF on failure
  */
@@ -1558,8 +1558,8 @@ int ccp4_file_readchar (CCP4File *cfile, uint8 *buffer, size_t nitems)
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * mode dependent write function.  Write nitems items from buffer
- * to cfile->stream as determined by cfile->mode.
+ * mode dependent write function.  Write @nitems items from @buffer
+ * to @cfile->stream as determined by cfile->mode.
  *
  * @return number of items written on success, EOF on failure
  */
@@ -1581,8 +1581,8 @@ int ccp4_file_write (CCP4File *cfile, const uint8 *buffer, size_t nitems)
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * complex {float,float} write function.  Write nitems items from buffer
- * to cfile->stream.
+ * complex {float,float} write function.  Write @nitems items from @buffer
+ * to @cfile->stream.
  *
  * @return number of complex items written on success, EOF on failure
  */
@@ -1690,8 +1690,8 @@ int ccp4_file_writecomp (CCP4File *cfile, const uint8 *buffer, size_t nitems)
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * short complex {short,short} write function.  Write nitems items from buffer
- * to cfile->stream.
+ * short complex {short,short} write function.  Write @nitems items from @buffer
+ * to @cfile->stream.
  *
  * @return number of complex items written on success, EOF on failure
  */
@@ -1749,8 +1749,8 @@ int ccp4_file_writeshortcomp (CCP4File *cfile, const uint8 *buffer, size_t nitem
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * float write function.  Write nitems items from buffer
- * to cfile->stream.
+ * float write function.  Write @nitems items from @buffer
+ * to @cfile->stream.
  *
  * Returns number of floats written on success, EOF on failure
  */
@@ -1848,8 +1848,8 @@ int ccp4_file_writefloat (CCP4File *cfile, const uint8 *buffer, size_t nitems)
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * int write function.  Write nitems items from buffer
- * to cfile->stream.
+ * int write function.  Write @nitems items from @buffer
+ * to @cfile->stream.
  *
  * @return number of int written on success, EOF on failure
  */
@@ -1872,7 +1872,7 @@ int ccp4_file_writeint (CCP4File *cfile, const uint8 *buffer, size_t nitems)
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writeint", NULL);
       return EOF; }   
       
-  n = nitems * _item_sizes[INT32];
+  n = nitems * _item_sizes[CCP4_INT32];
 
   if (cfile->iconvert != nativeIT) {
     char out_buffer[4];
@@ -1889,7 +1889,7 @@ int ccp4_file_writeint (CCP4File *cfile, const uint8 *buffer, size_t nitems)
         ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
 		"ccp4_file_writeint", NULL);
         return EOF; }
-    result += ccp4_file_raw_write (cfile, out_buffer, _item_sizes[INT32]);
+    result += ccp4_file_raw_write (cfile, out_buffer, _item_sizes[CCP4_INT32]);
     }
    } else {
     result = ccp4_file_raw_write (cfile, (char *) buffer, n);
@@ -1898,7 +1898,7 @@ int ccp4_file_writeint (CCP4File *cfile, const uint8 *buffer, size_t nitems)
   if ( result != n) 
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writeint", NULL);
 
-  return (result / _item_sizes[INT32]);
+  return (result / _item_sizes[CCP4_INT32]);
 }
 
 /**
@@ -1907,8 +1907,8 @@ int ccp4_file_writeint (CCP4File *cfile, const uint8 *buffer, size_t nitems)
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * short write function.  Write nitems items from buffer
- * to cfile->stream.
+ * short write function.  Write @nitems items from @buffer
+ * to @cfile->stream.
  *
  * @return number of short written on success, EOF on failure
  */
@@ -1931,7 +1931,7 @@ int ccp4_file_writeshort (CCP4File *cfile, const uint8 *buffer, size_t nitems)
       ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writeshort", NULL);
       return EOF; }   
       
-  n = nitems * _item_sizes[INT16];
+  n = nitems * _item_sizes[CCP4_INT16];
   
   if (cfile->iconvert != nativeIT) {
     char out_buffer[2];
@@ -1946,7 +1946,7 @@ int ccp4_file_writeshort (CCP4File *cfile, const uint8 *buffer, size_t nitems)
         ccp4_signal(CCP4_ERRLEVEL(3) | CCP4_ERRNO(CIO_BadMode), 
 		"ccp4_file_readint", NULL);
         return EOF; }
-    result += ccp4_file_raw_write (cfile, out_buffer, _item_sizes[INT16]);
+    result += ccp4_file_raw_write (cfile, out_buffer, _item_sizes[CCP4_INT16]);
     }
    } else {
     result = ccp4_file_raw_write (cfile, (char *) buffer, n);
@@ -1955,7 +1955,7 @@ int ccp4_file_writeshort (CCP4File *cfile, const uint8 *buffer, size_t nitems)
   if ( result != n) 
     ccp4_signal(CCP4_ERRLEVEL(3), "ccp4_file_writeshort", NULL);
 
-  return (result / _item_sizes[INT16]);
+  return (result / _item_sizes[CCP4_INT16]);
 }
 
 /**
@@ -1964,8 +1964,8 @@ int ccp4_file_writeshort (CCP4File *cfile, const uint8 *buffer, size_t nitems)
  * @param buffer (uint8 *) buffer
  * @param nitems (size_t) number of items 
  *
- * char write function.  Write nitems items from buffer
- * to cfile->stream.
+ * char write function.  Write @nitems items from @buffer
+ * to @cfile->stream.
  *
  * @return number of bytes written on success, EOF on failure
  */
@@ -2050,7 +2050,7 @@ void ccp4_file_rewind (CCP4File *cfile)
  * @param cfile (CCP4File *)
  * 
  * Length of file on disk.
- * @return length of cfile on success, EOF on failure
+ * @return length of @cfile on success, EOF on failure
  */
 long ccp4_file_length (CCP4File *cfile)
 {
@@ -2084,7 +2084,7 @@ long ccp4_file_length (CCP4File *cfile)
  * @param cfile (CCP4File *)
  *
  * Current location in file, uses either ftell or lseek.
- * @return current offset of cfile in bytes.
+ * @return current offset of @cfile in bytes.
  */
 long ccp4_file_tell (CCP4File *cfile)
 {
@@ -2099,7 +2099,7 @@ long ccp4_file_tell (CCP4File *cfile)
 
   if (cfile->buffered && cfile->stream) {
 #if !defined (_MSC_VER)
-    fflush (cfile->stream);
+    if ( cfile->last_op == WRITE_OP ) fflush (cfile->stream);
 #endif	
     result = (long) ftell(cfile->stream);
   } else
@@ -2118,7 +2118,7 @@ long ccp4_file_tell (CCP4File *cfile)
  * ccp4_file_feof:
  * @param cfile (CCP4File *)
  *
- * @return true if cfile is at EoF.
+ * @return true if @cfile is at EoF.
  *
  */
 int ccp4_file_feof(CCP4File *cfile)
@@ -2135,7 +2135,7 @@ int ccp4_file_feof(CCP4File *cfile)
  * ccp4_file_clearerr:
  * @param cfile (CCP4File *)
  *
- * Clears error status of cfile.
+ * Clears error status of @cfile.
  *
  */
 void ccp4_file_clearerr(CCP4File *cfile)
@@ -2149,8 +2149,8 @@ void ccp4_file_clearerr(CCP4File *cfile)
 /**
  * ccp4_file_fatal:
  * @param cfile (CCP4File *)
- * @param message message to output.
- * Die with error message based on cfile error status.
+ *
+ * Die with error message based on @cfile error status.
  */
 void ccp4_file_fatal (CCP4File *cfile, char *message)
 {
@@ -2190,7 +2190,7 @@ int ccp4_file_error(CCP4File *cfile)
  * ccp4_file_flush:
  * @param cfile (CCP4File *)
  *
- * flush buffer contents of cfile
+ * flush buffer contents of @cfile
  */
 void ccp4_file_flush(CCP4File *cfile)
 {
@@ -2204,7 +2204,7 @@ void ccp4_file_flush(CCP4File *cfile)
    @param msg_start pointer to start position in string
    @param msg_end   pointer to end position in string
  *
- * @return cfile information in char array for printing.
+ * @return @cfile information in char array for printing.
  */
 char *ccp4_file_print(CCP4File *cfile, char *msg_start, char *msg_end)
 {

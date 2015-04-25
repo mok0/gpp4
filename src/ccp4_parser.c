@@ -55,7 +55,7 @@
 #define  CPARSERR_MatToSymop          9
 #define  CPARSERR_SymopToMat         10
 
-static int symop_to_mat4_err(const char *);
+/*------------------------------------------------------------------*/
 
 /*! Initialise a CCP4PARSERARRAY 
 
@@ -210,7 +210,6 @@ int ccp4_parse_init_token(const CCP4PARSERARRAY *parsePtr, const int itok)
    parser array, rather than reinitialising the structure members
    explicitly
 */
-
 int ccp4_parse_reset(CCP4PARSERARRAY *parsePtr)
 {
   int itok;
@@ -411,14 +410,14 @@ int ccp4_parse_maxmin(CCP4PARSERARRAY *parsePtr, const double max_exponent,
 int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
 {
   int quotedstring,starttoken,endtoken;
-  char this_char,next_char,matchquote=0;
+  char this_char,next_char,matchquote;
 
   int llen,ich,lword,diag=0;
   int token,nulltoken,isquote,iscommt=0,isdelim;
   double value;
   char *delim,*nulldelim,*comm;
   char quot[]="\"\'";
-  int  ibeg=0,iend,start;
+  int  ibeg,iend,start;
 
   double intvalue,frcvalue,expvalue;
   int    intdigits,frcdigits,expdigits;
@@ -674,6 +673,7 @@ int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
       }
 
       /* Don't do any more processing after a comment */
+      
       if (iscommt) {
 	parser->ntokens = ntok;
 	if (diag) printf("CCP4_PARSE: returning after a comment\n");
@@ -685,6 +685,7 @@ int ccp4_parse(const char *line, CCP4PARSERARRAY *parser)
     parser->ntokens = ntok;
     if (diag) printf("CCP4_PARSE: ntokens = %d, and ntok = %d\n",parser->ntokens,ntok);
   }
+  if (diag) printf("CCP4_PARSE: returning at function end\n");
   return ntok;
 }
 
@@ -1244,16 +1245,16 @@ int doublefromstr(const char *str, const double max_exp, const double min_exp,
       } else if (toupper(this_char) == 'E') {
         char next_char = (ichar+1 < lstr ) ? str[ichar+1] : '\0';
         if ( next_char == '+' || next_char == '-')
-	   next_char = (ichar+2 < lstr ) ? str[ichar+2] : '\0';
+           next_char = (ichar+2 < lstr ) ? str[ichar+2] : '\0';
         /* require the next active character after E to be a digit */
         if ( !isdigit(next_char) )  return 0;
 	/* Exponent? i.e. e or E
 	   There can only be one exponent */
-	if (exponent > -1) return 0;
-	exponent = ichar;
-	is_int = 0;
-	is_frc = 0;
-	is_exp = 1;
+        if (exponent > -1) return 0;
+        exponent = ichar;
+        is_int = 0;
+        is_frc = 0;
+        is_exp = 1;
       } else {
 	/* Not a permissible character
 	   This is not a number so get out now */
@@ -1544,7 +1545,7 @@ const char *symop_to_mat4(const char *symchs_begin, const char *symchs_end, floa
 }
 
 /* Internal function: report error from symop_to_mat4_err */
-static int symop_to_mat4_err(const char *symop)
+int symop_to_mat4_err(const char *symop)
 {
   printf("\n **SYMMETRY OPERATOR ERROR**\n\n Error in interpreting symop \"%s\"\n\n",
 	 symop);
