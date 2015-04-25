@@ -5,6 +5,7 @@
 *.o
 *~
 .bzr/
+.bzrignore
 .deps/
 .libs/
 Doxyfile
