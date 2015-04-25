@@ -58,28 +58,24 @@ If you have a structure in memory already, use @c MtzPut followed
 by @c MtzFree to release the memory. 
 
 If you need to create a structure from scratch (i.e. without reading
-from an input file) then use @c MtzMalloc, @c MtzOpenForWrite, 
-@c ccp4_lwsymm, @c MtzAddXtal, @c MtzAddDataset, 
-@c MtzAddColumn and @c ccp4_lwrefl.
+from an input file) then use @c MtzMalloc, @c MtzOpenForWrite, @c
+ccp4_lwsymm, @c MtzAddXtal, @c MtzAddDataset, @c MtzAddColumn and @c
+ccp4_lwrefl.
 
 @section cmtz_symmetry Symmetry Information
 
 All reflection data in an MTZ file is assumed to belong to the same
-spacegroup. The spacegroup is identified in the MTZ file by SYMINF
-and SYMM records in the file header. This information is copied 
-into the in-memory data structure. The list of symmetry operators
-(copied from the SYMM header records) is taken to be the definitive
-indicator of the spacegroup.
-<p>
-The functions <tt>ccp4_lrsymi</tt>, <tt>ccp4_lrsymm</tt> and 
-<tt>ccp4_lwsymm</tt> read from and write to the symmetry sections
-of the data structure. No symmetry manipulations are done within
-the CMTZ library itself. Within CCP4, the CSYM library provides 
-appropriate functions, but other symmetry libraries could be used.
+spacegroup. The spacegroup is identified in the MTZ file by SYMINF and
+SYMM records in the file header. This information is copied into the
+in-memory data structure. The list of symmetry operators (copied from
+the SYMM header records) is taken to be the definitive indicator of
+the spacegroup.
 
- *  @section cmtz_examples Examples
-
-See examples on <a href="ftp://ftp.ccp4.ac.uk/mdw/cmtz">ftp area</a>
+The functions @c ccp4_lrsymi, @c ccp4_lrsymm and @c ccp4_lwsymm read
+from and write to the symmetry sections of the data structure. No
+symmetry manipulations are done within the CMTZ library itself. Within
+CCP4, the CSYM library provides appropriate functions, but other
+symmetry libraries could be used.
 
  */
 
@@ -89,11 +85,10 @@ See examples on <a href="ftp://ftp.ccp4.ac.uk/mdw/cmtz">ftp area</a>
  *
  *  Functions defining the C-level API for accessing MTZ files.
  *  MtzGet and MtzPut read and write MTZ files to/from a data
- *  structure defined in mtzdata.h  Other functions allow one
- *  to access data structure members, and to manipulate the structure
- *  and the values of structure members. Functions with names
- *  beginning <tt>ccp4_lr</tt> or <tt>ccp4_lw</tt> are primarily 
- *  to support the Fortran API.
+ *  structure defined in mtzdata.h Other functions allow one to access
+ *  data structure members, and to manipulate the structure and the
+ *  values of structure members. Functions with names beginning @c
+ *  ccp4_lr or @c ccp4_lw are primarily to support the Fortran API.
  *
  *  @author Martyn Winn 
  */

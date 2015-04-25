@@ -64,6 +64,8 @@ Example: to handle an array of type mytype:
 
   ccp4array_free(array);
 \endcode
+
+The resizable array implementation was written by Kevin Cowtan.
 */
 
 #ifndef __CCP4_ARRAY_INC
