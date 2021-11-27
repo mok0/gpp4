@@ -1,0 +1,107 @@
+#!/usr/bin/make -f
+# -*- mode: makefile; mode: font-lock -*-
+
+include /usr/share/quilt/quilt.make
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# Export DH_OPTIONS to save options for binary-common
+export DH_OPTIONS
+
+CFLAGS = -Wall -g
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0 -D_REENTRANT
+else
+	CFLAGS += -O2 -D_REENTRANT
+endif
+
+config.status: patch configure
+	dh_testdir
+	dh_autotools-dev_updateconfig
+	./configure --prefix=/usr
+
+build: build-arch
+
+build-arch: build-arch-stamp
+build-arch-stamp: config.status
+	dh_testdir
+
+	# Build the libary
+	$(MAKE) CFLAGS="$(CFLAGS)"
+	touch $@
+
+# The build-indep target is called from install-indep only
+# This is to avoid generating the doxygen docs in a -B build
+build-indep: build-indep-stamp
+build-indep-stamp:
+	dh_testdir
+
+	# create the doxygen documentation
+	doxygen	
+	touch $@
+
+clean: unpatch
+	dh_testdir
+	dh_testroot
+	rm -f build-arch-stamp build-indep-stamp
+
+	# Clean up after the build process.
+	[ ! -f Makefile ] || $(MAKE) distclean
+
+	# remove the doxygen-generated tree
+	rm -rf doc/
+
+	dh_autotools-dev_restoreconfig
+
+	dh_clean
+
+install: install-indep install-arch
+
+install-indep: build-indep
+
+install-arch:
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+
+	# Install the compiled library in debian/tmp tree
+	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
+	dh_install -a --sourcedir=debian/tmp
+
+# Build architecture-independent packages
+binary-indep: build-indep install-indep
+	dh_testdir
+	dh_testroot
+	# Now call make recursively to execute the common bits 
+	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+
+# Build architecture-dependent package
+binary-arch: build-arch install-arch
+	dh_testdir
+	dh_testroot
+	dh_strip
+	dh_makeshlibs
+	dh_shlibdeps
+	# Now call make recursively to execute the common bits 
+	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
+
+# These are the debhelpers common to both indep and arch-dependent
+binary-common:
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs ChangeLog
+	dh_installdocs
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+
+.PHONY: build clean binary-indep binary-arch binary install install-indep install-arch build-indep build-indep-stamp build-arch build-arch-stamp
+
+####

@@ -1,0 +1,9 @@
+Document: gpp4
+Title: gpp4 Programmers Manual
+Author: Various
+Abstract: This manual is generated from the source code of libgpp4.
+Section: Devel
+
+Format: HTML
+Index: /usr/share/doc/libgpp4-doc/html/index.html
+Files: /usr/share/doc/libgpp4-doc/html/*.html
