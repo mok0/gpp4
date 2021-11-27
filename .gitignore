@@ -51,3 +51,4 @@ test/maphdr
 test/mtz2csv
 test/mtzcols
 test/mtzhdr
+test/hdr
