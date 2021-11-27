@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(gpp4, 1.4.1, mortenkjeldgaard@gmail.com)
+AC_INIT(gpp4, 1.4.2, mortenkjeldgaard@gmail.com)
 AC_CONFIG_SRCDIR([src/ccp4_vars.h])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([config])
